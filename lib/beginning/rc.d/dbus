@@ -1,6 +1,7 @@
 #!/bin/bash
 
 dbus_start() {
+    dbus_status || rm -f /run/dbus.pid
     dbus-uuidgen --ensure
     dbus-daemon --system --fork
 }
