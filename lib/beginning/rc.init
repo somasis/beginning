@@ -1,0 +1,131 @@
+#!/bin/bash
+#
+# Beginning - a minimal init system that doesn't try to be too clever
+#
+# Copyright (c) 2015 Kylie McClain <somasis@exherbo.org>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+## start
+if [[ "$PPID" -ne 1 ]];then
+    printf "This script should only be ran from init.\n" >&2
+    exit 1
+fi
+
+if [[ -r /lib/beginning/rc.functions ]];then
+    . /lib/beginning/rc.functions
+else
+    printf 'Could not find /lib/beginning/rc.functions, going into emergency shell...\n'
+    while true;do
+        sulogin && exec "$0"
+    done
+fi
+
+# We've read the configuration... time to start working.
+dmesg -n 3; clear
+printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
+printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}" "${BEGINNING_COPYRIGHT}" "$(uname -srvm)"
+
+# Mount partitions required to do anything useful
+mkdir -p /dev /dev/pts /dev/shm /proc /run /run/beginning /sys >/dev/null 2>&1
+
+mount -n -t proc        -o nodev,noexec,nosuid      proc    /proc >/dev/null 2>&1
+mount -n -t sysfs       -o nodev,noexec,nosuid      sys     /sys >/dev/null 2>&1
+mount -n -t devtmpfs    -o nosuid,mode=0755         dev     /dev >/dev/null 2>&1
+mount -n -t devpts      -o gid=5,mode=0620          devpts  /dev/pts >/dev/null 2>&1
+mount -n -t tmpfs       -o nodev,nosuid,noexec      shm     /dev/shm >/dev/null 2>&1
+
+# Enable ctrl-alt-del rebooting
+echo 0 > /proc/sys/kernel/ctrl-alt-del
+
+# If we specify that the kernel should be verbose, we should tell dmesg
+if grep -q " verbose" /proc/cmdline;then
+    dmesg -n 8
+else
+    dmesg -n "${LOG_LEVEL:-3}"
+fi
+mount -o remount,ro /
+
+# Set correct locations for /dev/std{in,out,err}
+ln -sf /proc/self/fd/0  /dev/stdin
+ln -sf /proc/self/fd/1  /dev/stdout
+ln -sf /proc/self/fd/2  /dev/stderr
+ln -sf /proc/self/fd    /dev/fd
+
+printf "Checking filesystems...\n"
+fsck -ATy | tabprefix
+
+printf "Remounting root as read-write...\n"
+mount -o remount,rw /
+rm -f /run/beginning/{started,failed}.*
+
+printf "Mounting filesystems in fstab...\n"
+mount -av | egrep -v '(already|ignored)' | tabprefix
+
+printf "Setting hostname to \"$HOSTNAME\"...\n"
+echo "$HOSTNAME" > /proc/sys/kernel/hostname
+
+type -t pre_network >/dev/null 2>&1 && printf 'Running pre-network commands...\n' && pre_network
+
+printf "Bringing up network interfaces...\n"
+for interface in ${INTERFACES[@]:-lo};do
+    printf "\t\`$interface\`...\n"
+    ifconfig ${interface} up
+done
+
+printf "Setting hwclock...\n"
+export TZ
+CLOCK=${CLOCK,,}
+if [[ "${CLOCK}" == localtime ]];then
+    hwclock -s -l
+elif [[ "${CLOCK}" == utc ]];then
+    hwclock -s -u
+else
+    printf '\tInvalid $CLOCK setting: %s; defaulting to UTC\n' "$CLOCK"
+    hwclock -s -u
+fi
+unset TZ
+
+printf "Setting random seed...\n"
+if [[ -f /var/tmp/random-seed ]];then
+    cat /var/tmp/random-seed >/dev/urandom
+else
+    poolsize=$(</proc/sys/kernel/random/poolsize)
+    dd if=/dev/urandom of=/var/tmp/random-seed count=1 bs=${poolsize:-512} 2>/dev/null
+fi
+
+printf "Storing dmesg output to /var/log/dmesg.log...\n"
+dmesg > /var/log/dmesg.log
+
+# If the kernel wants us to restrict dmesg to just the root, do so with the log
+if [[ -e /proc/sys/kernel/dmesg_restrict && $(</proc/sys/kernel/dmesg_restrict) == "1" ]];then
+    chmod 0600 /var/log/dmesg.log
+else
+    chmod 0644 /var/log/dmesg.log
+fi
+
+printf "Enabling coredumps...\n"
+ulimit -c unlimited
+
+type -t post_boot >/dev/null && printf "Running post-boot commands...\n" && post_boot
+
+: > /var/run/utmp
+
+[[ "${DAEMONS[@]}" ]] && printf "Starting daemons...\n" && beginning_daemon_start ${DAEMONS[@]}
+
+for terminal in $(seq 1 ${VTERMS});do
+    sh -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
+done
+
+wait

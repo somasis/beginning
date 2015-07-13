@@ -1,0 +1,19 @@
+#!/bin/bash
+
+connman_depends() {
+    echo dbus
+}
+
+connman_start() {
+    connmand -n >/dev/null 2>&1 &
+    echo $! > /run/connman.pid
+}
+
+connman_stop() {
+    kill $(</run/connman.pid)
+    kill -0 $(</run/connman.pid) || rm -f /run/connman.pid
+}
+
+connman_status() {
+    kill -0 $(</run/connman.pid)
+}

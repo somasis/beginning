@@ -1,0 +1,15 @@
+#!/bin/bash
+
+dbus_start() {
+    dbus-uuidgen --ensure
+    dbus-daemon --system --fork
+}
+
+dbus_stop() {
+    kill $(</run/dbus.pid)
+    rm -f /run/dbus.pid
+}
+
+dbus_status() {
+    kill -0 $(</run/dbus.pid)
+}

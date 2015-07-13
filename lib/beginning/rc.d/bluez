@@ -1,0 +1,19 @@
+#!/bin/bash
+
+bluez_depends() {
+    echo dbus
+}
+
+bluez_start() {
+    /usr/lib/libexec/bluetooth/bluetoothd -n >/dev/null 2>&1 &
+    echo $! > /run/bluetooth.pid
+}
+
+bluez_stop() {
+    kill $(</run/bluetooth.pid)
+    kill -0 $(</run/bluetooth.pid) || rm -f /run/bluetooth.pid
+}
+
+bluez_status() {
+    kill -0 $(</run/bluetooth.pid)
+}

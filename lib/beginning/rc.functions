@@ -1,0 +1,130 @@
+#!/bin/bash
+#
+# beginning - a minimal init system that doesn't try to be too clever
+#
+# Copyright (c) 2015 Kylie McClain <somasis@exherbo.org>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+export PATH="/bin:/sbin"
+
+# os-release contains things such as distro name, distro's 'color'...
+[[ -r /lib/os-release ]] && . /lib/os-release
+[[ -r /lib/beginning/rc.conf ]] && . /lib/beginning/rc.conf
+[[ -r /lib/beginning/rc.distro.conf ]] && . /lib/beginning/rc.distro.conf
+[[ -r /etc/os-release ]] && . /etc/os-release
+[[ -r /etc/rc.conf ]] && . /etc/rc.conf
+
+if [[ ! -r /lib/beginning/rc.conf && ! -f /etc/rc.conf ]];then
+    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' /lib /etc
+    emergency_shell
+fi
+
+# If os-release gives us a color, use it; if not, use the reset color code
+ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
+[[ -z "$PRETTY_NAME" ]] && PRETTY_NAME=${NAME:-Linux}
+
+
+tabprefix() {
+    while read line;do
+        printf '\t%s\n' "$line"
+    done
+}
+
+emergency_shell() {
+    while true;do
+        sulogin && exec "$@"
+    done
+}
+
+reverse() {
+    if [[ $# -ne 0 ]];then
+        local rev="$1"
+        shift
+        reverse "$@"
+        printf '%s\n' "$rev"
+    fi
+}
+
+unset_phases() {
+    for func in ${daemon:-$1}_{start,reload,restart,stop,depends};do
+        type -t "${func}" >/dev/null 2>&1 && unset -f "${func}"
+    done
+}
+
+beginning_daemon_start() {
+    export BEGINNING_PHASE=start
+    local daemon
+    for daemon in ${@};do
+        if [[ -f "/etc/rc.d/${daemon}" ]];then
+            daemon_file="/etc/rc.d/${daemon}"
+        elif [[ -f "/lib/rc.d/${daemon}" ]];then
+            daemon_file="/lib/rc.d/${daemon}"
+        elif [[ -f /run/beginning/started.${daemon} ]];then
+            continue
+        else
+            printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
+        fi
+        if [[ "${daemon_file}" ]];then
+            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
+            if type -t ${daemon}_start >/dev/null 2>&1;then
+                printf "\tStarting \`%s\`..." "${daemon}"
+                set -x
+                ${daemon}_start
+                if [[ $? -eq 0 ]];then
+                    date +%s > /run/beginning/started.${daemon}
+                    printf " done.\n"
+                else
+                    date +%s > /run/beginning/failed.${daemon}
+                    printf " failed.\n"
+                fi
+                set +x
+            fi
+        fi
+    done
+}
+
+beginning_daemon_stop() {
+    export BEGINNING_PHASE=stop
+    local daemon
+    for daemon in ${@};do
+        if [[ -f "/etc/rc.d/${daemon}" ]];then
+            daemon_file="/etc/rc.d/${daemon}"
+        elif [[ -f "/lib/rc.d/${daemon}" ]];then
+            daemon_file="/lib/rc.d/${daemon}"
+        elif [[ -f /run/beginning/started.${daemon} ]];then
+            continue
+        else
+            printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
+        fi
+        if [[ "${daemon_file}" ]];then
+            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(${daemon}_depends | reverse)
+            if type -t ${daemon}_start >/dev/null 2>&1;then
+                printf "\tStarting \`%s\`..." "${daemon}"
+                set -x
+                ${daemon}_start
+                if [[ $? -eq 0 ]];then
+                    date +%s > /run/beginning/started.${daemon}
+                    printf " done.\n"
+                else
+                    date +%s > /run/beginning/failed.${daemon}
+                    printf " failed.\n"
+                fi
+                set +x
+            fi
+        fi
+    done
+}
