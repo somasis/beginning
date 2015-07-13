@@ -1,0 +1,17 @@
+#!/bin/bash
+
+consolekit_start() {
+    consolekit_status || rm -f /run/consolekit.pid
+    console-kit-daemon --no-daemon &
+    echo $! > /run/consolekit.pid
+}
+
+consolekit_stop() {
+    kill $(</run/consolekit.pid)
+    consolekit_status || rm -f /run/consolekit.pid
+}
+
+consolekit_status() {
+    kill -0 $(</run/consolekit.pid) >/dev/null 2>&1; return $?
+}
+
