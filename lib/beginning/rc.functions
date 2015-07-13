@@ -71,8 +71,8 @@ beginning_daemon_start() {
     for daemon in ${@};do
         if [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
-        elif [[ -f "/lib/rc.d/${daemon}" ]];then
-            daemon_file="/lib/rc.d/${daemon}"
+        elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
+            daemon_file="/lib/beginning/rc.d/${daemon}"
         elif [[ -f /run/beginning/started.${daemon} ]];then
             continue
         else
@@ -104,8 +104,8 @@ beginning_daemon_stop() {
     for daemon in ${@};do
         if [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
-        elif [[ -f "/lib/rc.d/${daemon}" ]];then
-            daemon_file="/lib/rc.d/${daemon}"
+        elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
+            daemon_file="/lib/beginning/rc.d/${daemon}"
         elif [[ -f /run/beginning/started.${daemon} ]];then
             continue
         else
