@@ -84,9 +84,11 @@ beginning_daemon_start() {
                 printf "\tStarting \`%s\`..." "${daemon}"
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
+                    rm -f /run/beginning/failed.${daemon}
                     date +%s > /run/beginning/started.${daemon}
                     printf " done.\n"
                 else
+                    rm -f /run/beginning/started.${daemon}
                     date +%s > /run/beginning/failed.${daemon}
                     printf " failed.\n"
                 fi
@@ -115,9 +117,10 @@ beginning_daemon_stop() {
                 printf "\tStopping \`%s\`..." "${daemon}"
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
-                    rm -f /run/beginning/started.${daemon}
+                    rm -f /run/beginning/{failed,started}.${daemon}
                     printf " done.\n"
                 else
+                    rm -f /run/beginning/started.${daemon}
                     date +%s > /run/beginning/failed.${daemon}
                     printf " failed.\n"
                 fi
