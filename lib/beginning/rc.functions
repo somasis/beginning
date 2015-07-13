@@ -24,12 +24,11 @@ export PATH="/bin:/sbin"
 # os-release contains things such as distro name, distro's 'color'...
 [[ -r /lib/os-release ]] && . /lib/os-release
 [[ -r /lib/beginning/rc.conf ]] && . /lib/beginning/rc.conf
-[[ -r /lib/beginning/rc.distro.conf ]] && . /lib/beginning/rc.distro.conf
 [[ -r /etc/os-release ]] && . /etc/os-release
 [[ -r /etc/rc.conf ]] && . /etc/rc.conf
 
 if [[ ! -r /lib/beginning/rc.conf && ! -f /etc/rc.conf ]];then
-    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' /lib /etc
+    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' /lib/beginning /etc
     emergency_shell
 fi
 
