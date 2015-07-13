@@ -129,6 +129,6 @@ beginning_daemon_stop() {
 
 killall5() {
     for pid in $(pgrep . | egrep -v "^(1|$$|$PPID)$");do
-        kill "${1:--15}" "$pid"
+        kill "${1:--15}" "$pid" >/dev/null 2>&1
     done
 }
