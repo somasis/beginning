@@ -68,12 +68,12 @@ beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
     for daemon in ${@};do
-        if [[ -f "/etc/rc.d/${daemon}" ]];then
+        if [[ -f /run/beginning/started.${daemon} ]];then
+            continue
+        elif [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
-        elif [[ -f /run/beginning/started.${daemon} ]];then
-            continue
         else
             printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
@@ -101,12 +101,12 @@ beginning_daemon_stop() {
     export BEGINNING_PHASE=stop
     local daemon
     for daemon in ${@};do
-        if [[ -f "/etc/rc.d/${daemon}" ]];then
+        if [[ ! -f /run/beginning/started.${daemon} ]];then
+            continue
+        elif [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
-        elif [[ ! -f /run/beginning/started.${daemon} ]];then
-            continue
         else
             printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
