@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# Beginning - a rc program that doesn't try to be too clever
+#
+# Copyright (c) 2015 Kylie McClain <somasis@exherbo.org>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+## start
+if [[ "$PPID" -ne 1 ]];then
+    printf "This script should only be ran from init.\n" >&2
+    exit 1
+fi
+
+# Since we check for the readability/existence of rc.functions in rc.init,
+# we don't really need to check again. If you remove it then uh...
+# don't do that, stupid
+. /lib/beginning/rc.functions
+
+case "$1" in
+    reboot|poweroff)
+        true
+        ;;
+    *)
+        printf "Invalid action '$1' for rc.shutdown\n" 1>&2
+        exit 1
+        ;;
+esac
+
+clear;tput reset
+
+printf '\e[0mShutting down ${ANSI_COLOR}%s\e[0m...\n' "${PRETTY_NAME}"
+
+# Allow for ctrl-alt-del hard reboots, for if this script breaks
+echo 1 > /proc/sys/kernel/ctrl-alt-del
+
+[[ "${DAEMONS[@]}" ]] && printf "Stopping daemons...\n" && beginning_daemon_stop $(reverse "${DAEMONS[@]}")
+
+printf 'Storing random seed...\n'
+dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
+
+printf 'Sending TERM to all processes...\n'
+killall5 -15 && sleep 1
+
+printf 'Sending KILL to all processes...\n'
+killall5 -9
+
+printf 'Remounting root as read-only...\n'
+mount -o remount,ro /
+
+printf 'Unmounting filesystems...\n'
+umount -a
+
+printf 'Syncing filesystems...\n'
+sync
+
+case "$1" in
+    reboot)
+        busybox reboot -nf
+    ;;
+    poweroff)
+        busybox poweroff -nf
+    ;;
+esac
+
