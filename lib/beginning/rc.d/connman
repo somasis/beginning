@@ -11,9 +11,9 @@ connman_start() {
 
 connman_stop() {
     kill $(</run/connman.pid)
-    kill -0 $(</run/connman.pid) || rm -f /run/connman.pid
+    connman_status || rm -f /run/connman.pid
 }
 
 connman_status() {
-    kill -0 $(</run/connman.pid)
+    kill -0 $(</run/connman.pid) >/dev/null 2>&1; return $?
 }

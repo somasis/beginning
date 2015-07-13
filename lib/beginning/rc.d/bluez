@@ -11,9 +11,9 @@ bluez_start() {
 
 bluez_stop() {
     kill $(</run/bluetooth.pid)
-    kill -0 $(</run/bluetooth.pid) || rm -f /run/bluetooth.pid
+    bluez_status || rm -f /run/bluetooth.pid
 }
 
 bluez_status() {
-    kill -0 $(</run/bluetooth.pid)
+    kill -0 $(</run/bluetooth.pid) >/dev/null 2>&1; return $?
 }
