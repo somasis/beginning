@@ -83,7 +83,6 @@ beginning_daemon_start() {
             type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
             if type -t ${daemon}_start >/dev/null 2>&1;then
                 printf "\tStarting \`%s\`..." "${daemon}"
-                set -x
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
                     date +%s > /run/beginning/started.${daemon}
@@ -92,7 +91,6 @@ beginning_daemon_start() {
                     date +%s > /run/beginning/failed.${daemon}
                     printf " failed.\n"
                 fi
-                set +x
             fi
         fi
     done
@@ -116,7 +114,6 @@ beginning_daemon_stop() {
             type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(reverse "$(${daemon}_depends)")
             if type -t ${daemon}_start >/dev/null 2>&1;then
                 printf "\tStarting \`%s\`..." "${daemon}"
-                set -x
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
                     date +%s > /run/beginning/started.${daemon}
@@ -125,7 +122,6 @@ beginning_daemon_stop() {
                     date +%s > /run/beginning/failed.${daemon}
                     printf " failed.\n"
                 fi
-                set +x
             fi
         fi
     done
