@@ -1,5 +1,9 @@
 #!/bin/bash
 
+consolekit_depends() {
+    echo dbus
+}
+
 consolekit_start() {
     consolekit_status || rm -f /run/consolekit.pid
     console-kit-daemon --no-daemon &
