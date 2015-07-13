@@ -1,16 +1,16 @@
 #!/bin/bash
 
 skel_start() {
-    daemon --start &
+    skel_status || rm -f /run/skel.pid
+    daemon &
     echo $! > /run/skel.pid
 }
 
 skel_stop() {
     kill $(</run/skel.pid)
-    kill -0 $(</run/skel.pid) || rm -f /run/skel.pid
+    skel_status || rm -f /run/skel.pid
 }
 
 skel_status() {
-    kill -0 $(</run/skel.pid)
+    kill -0 $(</run/skel.pid) >/dev/null 2>&1; return $?
 }
-
