@@ -17,6 +17,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+umask 022
+
 export PATH="/bin:/sbin"
 
 # os-release contains things such as distro name, distro's 'color'...
