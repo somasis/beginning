@@ -7,7 +7,7 @@ dbus_start() {
 
 dbus_stop() {
     kill $(</run/dbus.pid)
-    rm -f /run/dbus.pid
+    dbus_status || rm -f /run/dbus.pid
 }
 
 dbus_status() {
