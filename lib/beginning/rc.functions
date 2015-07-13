@@ -103,19 +103,19 @@ beginning_daemon_stop() {
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
-        elif [[ -f /run/beginning/started.${daemon} ]];then
+        elif [[ ! -f /run/beginning/started.${daemon} ]];then
             continue
         else
             printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(reverse "$(${daemon}_depends)")
-            if type -t ${daemon}_start >/dev/null 2>&1;then
-                printf "\tStarting \`%s\`..." "${daemon}"
+            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(reverse $(${daemon}_depends))
+            if type -t ${daemon}_stop >/dev/null 2>&1;then
+                printf "\tStopping \`%s\`..." "${daemon}"
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
-                    date +%s > /run/beginning/started.${daemon}
+                    rm -f /run/beginning/started.${daemon}
                     printf " done.\n"
                 else
                     date +%s > /run/beginning/failed.${daemon}
