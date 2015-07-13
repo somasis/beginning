@@ -113,7 +113,7 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(${daemon}_depends | reverse)
+            type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop $(reverse "$(${daemon}_depends)")
             if type -t ${daemon}_start >/dev/null 2>&1;then
                 printf "\tStarting \`%s\`..." "${daemon}"
                 set -x
