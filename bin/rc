@@ -1,0 +1,93 @@
+#!/bin/bash
+#
+# Beginning - an rc program that doesn't try to be too clever
+#
+# Copyright (c) 2015 Kylie McClain <somasis@exherbo.org>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+if [[ -r /lib/beginning/rc.functions ]];then
+    . /lib/beginning/rc.functions
+else
+    printf 'Could not find /lib/beginning/rc.functions...\n'
+    exit 2
+fi
+
+status() {
+    case "${1}" in
+        STARTED) printf "[ \e[1;32mSTARTED\e[0m ]"   ;;
+        STOPPED) printf "[ \e[1;31mSTOPPED\e[0m ]"   ;;
+    esac
+}
+
+case "$1" in
+    start|stop|restart|reload)
+        act="$1"
+        if [[ $UID -ne 0 ]];then
+            printf '%s: Must be root to %s daemons.\n' "${0##*/}" "${act}" >&2
+            exit 2
+        fi
+        shift
+        for dae in ${@};do
+            if [[ -f "/etc/rc.d/${dae}" ]];then
+                daemon_file="/etc/rc.d/${dae}"
+            elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
+                daemon_file="/lib/beginning/rc.d/${dae}"
+            else
+                printf "Could not find ${dae}." >&2
+                exit 1
+            fi
+            BEGINNING_NO_RESOLVE_DEPENDS=1
+            beginning_daemon_${act} "${dae}"
+        done
+    ;;
+    -h|--help|help)
+        man rc
+    ;;
+    ''|list|status)
+        if [[ "$1" == "status" || "$1" == "list" ]] && [[ "$#" -gt 1 ]];then
+            shift
+            for dae in ${@};do
+                ALL_DAEMON=( /lib/beginning/rc.d/${dae} /etc/rc.d/${dae} )
+            done
+        else
+            ALL_DAEMON=( /lib/beginning/rc.d/* /etc/rc.d/* )
+        fi
+        ALL_DAEMONS=( )
+        for dae in ${ALL_DAEMON[@]};do
+            [[ -r "${dae}" ]] && ALL_DAEMONS+=( "${dae##*/}" )
+        done
+        for dae in ${ALL_DAEMONS[@]};do
+            if [[ -f /run/beginning/started.${dae} ]];then
+                status=$(status STARTED)
+            elif [[ -f "/etc/rc.d/${dae}" ]];then
+                daemon_file="/etc/rc.d/${dae}"
+            elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
+                daemon_file="/lib/beginning/rc.d/${dae}"
+            fi
+            if [[ -z "${status}" ]];then
+                . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+                if type -t ${dae}_status >/dev/null 2>&1;then
+                    if ${dae}_status;then
+                        status=$(status STARTED)
+                    else
+                        status=$(status STOPPED)
+                    fi
+                fi
+            fi
+            printf '%s %s\n' "${status}" "${dae}"
+        done
+    ;;
+esac
+
