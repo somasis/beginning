@@ -159,3 +159,18 @@ killall5() {
         kill "${1:--15}" "$pid" >/dev/null 2>&1
     done
 }
+
+keeprunning() {
+    local err
+    local daemon="$1"
+    shift
+    while [[ "${err:-1}" -ne 0 ]];do
+        local i=$(( ${i:-1} + 1 ))
+        "$@"; local err=$?
+        sleep 1
+        if [[ "$i" -eq 10 ]];then
+            break
+        fi
+    done
+}
+
