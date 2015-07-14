@@ -69,6 +69,7 @@ case "$1" in
             [[ -r "${dae}" ]] && ALL_DAEMONS+=( "${dae##*/}" )
         done
         for dae in ${ALL_DAEMONS[@]};do
+            status=
             if [[ -f /run/beginning/started.${dae} ]];then
                 status=$(status STARTED)
             elif [[ -f "/etc/rc.d/${dae}" ]];then
