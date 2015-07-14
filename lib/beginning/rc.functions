@@ -38,12 +38,14 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 
 
 tabprefix() {
-    if [[ "$PPID" -eq 1 ]];then
+    if [[ "${IN_INIT}" ]];then
         while read line;do
             printf '\t%s\n' "$line"
         done
     else
-        cat /dev/stdin
+        while read line;do
+            printf '%s\n' "$line"
+        done
     fi
 }
 

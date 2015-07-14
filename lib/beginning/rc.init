@@ -122,7 +122,9 @@ type -t post_boot >/dev/null && printf "Running post-boot commands...\n" && post
 
 : > /var/run/utmp
 
+IN_INIT=true
 [[ "${DAEMONS[@]}" ]] && printf "Starting daemons...\n" && beginning_daemon_start ${DAEMONS[@]}
+IN_INIT=
 
 for terminal in $(seq 1 ${VTERMS});do
     sh -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
