@@ -45,11 +45,16 @@ case "$1" in
             elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
                 daemon_file="/lib/beginning/rc.d/${dae}"
             else
-                printf "Could not find ${dae}." >&2
+                printf "%s: Could not find %s." "${0##*/}" "${dae}" >&2
                 exit 1
             fi
             BEGINNING_NO_RESOLVE_DEPENDS=1
-            beginning_daemon_${act} "${dae}"
+            if type -t beginning_daemon_${act};then
+                beginning_daemon_${act} "${dae}"
+            else
+                printf "%s: ${dae} does not have a ${act} action." >&2
+                exit 4
+            fi
         done
     ;;
     -h|--help|help)
