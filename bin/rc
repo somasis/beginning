@@ -80,7 +80,7 @@ case "$1" in
             if [[ -z "${status}" ]];then
                 . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
                 if type -t ${dae}_status >/dev/null 2>&1;then
-                    if ${dae}_status;then
+                    if ${dae}_status >/dev/null 2>&1;then
                         status=$(status STARTED)
                     else
                         status=$(status STOPPED)
