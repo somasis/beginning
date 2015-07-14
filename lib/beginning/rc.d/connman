@@ -15,5 +15,5 @@ connman_stop() {
 }
 
 connman_status() {
-    kill -0 $(</run/connman.pid) >/dev/null 2>&1; return $?
+    pidexists $(</run/connman.pid)
 }

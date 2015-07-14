@@ -16,6 +16,6 @@ consolekit_stop() {
 }
 
 consolekit_status() {
-    kill -0 $(</run/consolekit.pid) >/dev/null 2>&1; return $?
+    pidexists $(</run/consolekit.pid)
 }
 

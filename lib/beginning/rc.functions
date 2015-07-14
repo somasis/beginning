@@ -129,6 +129,18 @@ beginning_daemon_stop() {
     done
 }
 
+# check if $1 is a pid which is exists
+# if we are root, we use the bash builtin kill, and if not we use ps
+# since kill will return 'operation not permitted' with a 1 errcode, which
+# would be interpreted as the pid not existing
+pidexists() {
+    if [[ $UID -eq 0 ]];then
+        kill -0 "$1" >/dev/null 2>&1; return $?
+    else
+        ps "$1" >/dev/null 2>&1; return $?
+    fi
+}
+
 killall5() {
     for pid in $(pgrep . | egrep -v "^(1|$$|$PPID)$");do
         kill "${1:--15}" "$pid" >/dev/null 2>&1

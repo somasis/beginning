@@ -12,5 +12,5 @@ dbus_stop() {
 }
 
 dbus_status() {
-    kill -0 $(</run/dbus.pid) >/dev/null 2>&1; return $?
+    pidexists $(</run/dbus.pid)
 }

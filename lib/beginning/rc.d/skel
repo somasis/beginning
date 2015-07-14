@@ -12,5 +12,5 @@ skel_stop() {
 }
 
 skel_status() {
-    kill -0 $(</run/skel.pid) >/dev/null 2>&1; return $?
+    pidexists $(</run/skel.pid)
 }
