@@ -64,14 +64,14 @@ ln -sf /proc/self/fd/2  /dev/stderr
 ln -sf /proc/self/fd    /dev/fd
 
 printf "Checking filesystems...\n"
-fsck -ATy | tabprefix
+fsck -ATy
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
 rm -f /run/beginning/{started,failed}.*
 
 printf "Mounting filesystems in fstab...\n"
-mount -av | egrep -v '(already|ignored)' | tabprefix
+mount -av | egrep -v '(already|ignored)'
 
 printf "Setting hostname to \"$HOSTNAME\"...\n"
 echo "$HOSTNAME" > /proc/sys/kernel/hostname

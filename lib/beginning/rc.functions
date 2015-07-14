@@ -37,18 +37,6 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 [[ -z "$PRETTY_NAME" ]] && PRETTY_NAME=${NAME:-Linux}
 
 
-tabprefix() {
-    if [[ "${IN_INIT}" ]];then
-        while read line;do
-            printf '\t%s\n' "$line"
-        done
-    else
-        while read line;do
-            printf '%s\n' "$line"
-        done
-    fi
-}
-
 emergency_shell() {
     while true;do
         sulogin && exec "$@"
@@ -89,7 +77,7 @@ beginning_daemon_start() {
                 type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
             fi
             if type -t ${daemon}_start >/dev/null 2>&1;then
-                printf "Starting \`%s\`..." "${daemon}" | tabprefix
+                printf "Starting \`%s\`..." "${daemon}"
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
                     rm -f /run/beginning/failed.${daemon}
@@ -129,7 +117,7 @@ beginning_daemon_stop() {
                 type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop "${depends}"
             fi
             if type -t ${daemon}_stop >/dev/null 2>&1;then
-                printf "Stopping \`%s\`..." "${daemon}" | tabprefix
+                printf "Stopping \`%s\`..." "${daemon}"
                 ${daemon}_start
                 if [[ $? -eq 0 ]];then
                     rm -f /run/beginning/{failed,started}.${daemon}
