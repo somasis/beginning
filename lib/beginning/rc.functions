@@ -38,9 +38,13 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 
 
 tabprefix() {
-    while read line;do
-        printf '\t%s\n' "$line"
-    done
+    if [[ "$PPID" -eq 1 ]];then
+        while read line;do
+            printf '\t%s\n' "$line"
+        done
+    else
+        cat /dev/stdin
+    fi
 }
 
 emergency_shell() {
