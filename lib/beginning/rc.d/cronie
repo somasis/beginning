@@ -1,0 +1,19 @@
+#!/bin/bash
+
+[[ -r /etc/conf.d/cronie.conf ]] && . /etc/conf.d/cronie.conf
+
+cronie_start() {
+    cronie_status || rm -f /var/run/crond.pid
+    crond -n "${CRONDARGS}" &
+    echo $! > /var/run/crond.pid
+}
+
+cronie_stop() {
+    kill $(</var/run/crond.pid)
+    cronie_status || rm -f /var/run/crond.pid
+}
+
+cronie_status() {
+    pidexists /var/run/crond.pid
+}
+
