@@ -12,5 +12,5 @@ rsyslog_stop() {
 }
 
 rsyslog_status() {
-    pidexists $(</run/rsyslog.pid)
+    pidexists /run/rsyslog.pid
 }

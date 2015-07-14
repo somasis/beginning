@@ -12,5 +12,5 @@ dbus_stop() {
 }
 
 dbus_status() {
-    pidexists $(</run/dbus.pid)
+    pidexists /run/dbus.pid
 }

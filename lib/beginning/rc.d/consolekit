@@ -15,6 +15,6 @@ consolekit_stop() {
 }
 
 consolekit_status() {
-    pidexists $(</run/console-kit-daemon.pid)
+    pidexists /run/console-kit-daemon.pid
 }
 

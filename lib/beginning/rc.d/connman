@@ -15,5 +15,5 @@ connman_stop() {
 }
 
 connman_status() {
-    pidexists $(</run/connman.pid)
+    pidexists /run/connman.pid
 }

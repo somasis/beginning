@@ -12,5 +12,5 @@ skel_stop() {
 }
 
 skel_status() {
-    pidexists $(</run/skel.pid)
+    pidexists /run/skel.pid
 }

@@ -15,5 +15,5 @@ bluez_stop() {
 }
 
 bluez_status() {
-    pidexists $(</run/bluetooth.pid)
+    pidexists /run/bluetooth.pid
 }
