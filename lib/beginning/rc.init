@@ -36,6 +36,7 @@ fi
 dmesg -n 3; clear
 printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
 printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}" "${BEGINNING_COPYRIGHT}" "$(uname -srvm)"
+printf "\n"
 
 # Mount partitions required to do anything useful
 mkdir -p /dev /dev/pts /dev/shm /proc /run /run/beginning /sys >/dev/null 2>&1
@@ -80,7 +81,7 @@ type -t pre_network >/dev/null 2>&1 && printf 'Running pre-network commands...\n
 
 printf "Bringing up network interfaces...\n"
 for interface in ${INTERFACES[@]:-lo};do
-    printf "\t\`$interface\`...\n"
+    printf "\`$interface\`...\n"
     ifconfig ${interface} up
 done
 
@@ -92,7 +93,7 @@ if [[ "${CLOCK}" == localtime ]];then
 elif [[ "${CLOCK}" == utc ]];then
     hwclock -s -u
 else
-    printf '\tInvalid $CLOCK setting: %s; defaulting to UTC\n' "$CLOCK"
+    printf 'Invalid $CLOCK setting: %s; defaulting to UTC\n' "$CLOCK"
     hwclock -s -u
 fi
 unset TZ
@@ -101,7 +102,12 @@ printf "Setting random seed...\n"
 if [[ -f /var/tmp/random-seed ]];then
     cat /var/tmp/random-seed >/dev/urandom
 else
-    poolsize=$(</proc/sys/kernel/random/poolsize)
+    poolsize=/proc/sys/kernel/random/poolsize
+    if [[ -r "$poolsize" ]];then
+        poolsize=$(<"$poolsize")
+    else
+        poolsize=
+    fi
     dd if=/dev/urandom of=/var/tmp/random-seed count=1 bs=${poolsize:-512} 2>/dev/null
 fi
 
@@ -109,7 +115,7 @@ printf "Storing dmesg output to /var/log/dmesg.log...\n"
 dmesg > /var/log/dmesg.log
 
 # If the kernel wants us to restrict dmesg to just the root, do so with the log
-if [[ -e /proc/sys/kernel/dmesg_restrict && $(</proc/sys/kernel/dmesg_restrict) == "1" ]];then
+if [[ -r /proc/sys/kernel/dmesg_restrict && $(</proc/sys/kernel/dmesg_restrict) == "1" ]];then
     chmod 0600 /var/log/dmesg.log
 else
     chmod 0644 /var/log/dmesg.log
