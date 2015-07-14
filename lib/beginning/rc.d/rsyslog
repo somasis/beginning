@@ -2,7 +2,7 @@
 
 rsyslog_start() {
     rsyslog_status || rm -f /run/rsyslog.pid
-    rsyslog -n >/dev/null 2>&1 &
+    rsyslogd -n >/dev/null 2>&1 &
     echo $! > /run/rsyslog.pid
 }
 
