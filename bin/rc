@@ -32,7 +32,7 @@ status() {
 }
 
 case "$1" in
-    start|stop|restart|reload)
+    start|stop|reload|restart)
         act="$1"
         if [[ $UID -ne 0 ]];then
             printf '%s: Must be root to %s daemons.\n' "${0##*/}" "${act}" >&2
@@ -48,11 +48,19 @@ case "$1" in
                 printf "%s: Could not find %s." "${0##*/}" "${dae}" >&2
                 exit 1
             fi
+            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
             BEGINNING_NO_RESOLVE_DEPENDS=1
-            if type -t beginning_daemon_${act};then
-                beginning_daemon_${act} "${dae}"
+            if type -t beginning_daemon_${act} >/dev/null 2>&1;then
+                beginning_daemon_${act} "${dae}"; return $?
             else
-                printf "%s: ${dae} does not have a ${act} action." >&2
+                if [[ "${act}" == restart ]];then
+                    if type -t ${dae}_status >/dev/null 2>&1 && ${dae}_status;then
+                        beginning_daemon_stop "${dae}"
+                    fi
+                    beginning_daemon_start "${dae}"
+                    exit 0
+                fi
+                printf "%s: %s does not have a %s action." "${0##*/}" "${dae}" "${act}" >&2
                 exit 4
             fi
         done
