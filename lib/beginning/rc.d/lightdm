@@ -1,0 +1,16 @@
+#!/bin/bash
+
+lightdm_start() {
+    lightdm_status || rm -f /run/lightdm.pid
+    lightdm --pid-file=/run/lightdm.pid &
+    echo $! > /run/lightdm.pid
+}
+
+lightdm_stop() {
+    kill $(</run/lightdm.pid)
+    lightdm_status || rm -f /run/lightdm.pid
+}
+
+lightdm_status() {
+    pidexists /run/lightdm.pid
+}
