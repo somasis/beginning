@@ -99,8 +99,8 @@ fi
 unset TZ
 
 printf "Setting random seed...\n"
-if [[ -f /var/tmp/random-seed ]];then
-    cat /var/tmp/random-seed >/dev/urandom
+if [[ -r "${RANDOM_SEED}" ]];then
+    cat "${RANDOM_SEED}" >/dev/urandom
 else
     poolsize=/proc/sys/kernel/random/poolsize
     if [[ -r "$poolsize" ]];then
@@ -108,7 +108,7 @@ else
     else
         poolsize=
     fi
-    dd if=/dev/urandom of=/var/tmp/random-seed count=1 bs=${poolsize:-512} 2>/dev/null
+    dd if=/dev/urandom of="${RANDOM_SEED}" count=1 bs=${poolsize:-512} 2>/dev/null
 fi
 
 printf "Storing dmesg output to /var/log/dmesg.log...\n"
