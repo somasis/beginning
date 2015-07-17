@@ -32,6 +32,8 @@ else
     done
 fi
 
+rchook pre_beginning
+
 # We've read the configuration... time to start working.
 dmesg -n 3; clear
 printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
@@ -64,26 +66,35 @@ ln -sf /proc/self/fd/1  /dev/stdout
 ln -sf /proc/self/fd/2  /dev/stderr
 ln -sf /proc/self/fd    /dev/fd
 
+rchook pre_fsck
+
 printf "Checking filesystems...\n"
 fsck -ATy
+
+rchook post_fsck
+rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
 rm -f /run/beginning/{started,failed}.*
 
+rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
 mount -av | egrep -v '(already|ignored)'
 
 printf "Setting hostname to \"$HOSTNAME\"...\n"
 echo "$HOSTNAME" > /proc/sys/kernel/hostname
 
-type -t pre_network >/dev/null 2>&1 && printf 'Running pre-network commands...\n' && pre_network
+rchook pre_network
 
 printf "Bringing up network interfaces...\n"
 for interface in ${INTERFACES[@]:-lo};do
     printf "\`$interface\`...\n"
     ifconfig ${interface} up
 done
+
+rchook post_network
+rchook pre_hwclock
 
 printf "Setting hwclock...\n"
 export TZ
@@ -97,6 +108,8 @@ else
     hwclock -s -u
 fi
 unset TZ
+
+rchook post_hwclock
 
 printf "Setting random seed...\n"
 if [[ -r "${RANDOM_SEED}" ]];then
@@ -124,13 +137,15 @@ fi
 printf "Enabling coredumps...\n"
 ulimit -c unlimited
 
-type -t post_boot >/dev/null && printf "Running post-boot commands...\n" && post_boot
-
 : > /var/run/utmp
 
-IN_INIT=true
-[[ "${DAEMONS[@]}" ]] && printf "Starting daemons...\n" && beginning_daemon_start ${DAEMONS[@]}
-IN_INIT=
+rchook post_boot
+
+if [[ "${DAEMONS[@]}" ]];then
+    printf "Starting daemons...\n"
+    beginning_daemon_start ${DAEMONS[@]}
+    rchook post_daemons
+fi
 
 for terminal in $(seq 1 ${VTERMS});do
     sh -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
