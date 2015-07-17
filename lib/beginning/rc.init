@@ -32,12 +32,14 @@ else
     done
 fi
 
+TABS=true
+
 rchook pre_beginning
 
 # We've read the configuration... time to start working.
 dmesg -n 3; clear
 printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
-printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}" "${BEGINNING_COPYRIGHT}" "$(uname -srvm)"
+printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}" "${BEGINNING_COPYRIGHT}" "Running $(uname -srvm)"
 printf "\n"
 
 # Mount partitions required to do anything useful
@@ -69,7 +71,7 @@ ln -sf /proc/self/fd    /dev/fd
 rchook pre_fsck
 
 printf "Checking filesystems...\n"
-fsck -ATy
+fsck -ATy | tab
 
 rchook post_fsck
 rchook pre_root_rw
@@ -80,7 +82,7 @@ rm -f /run/beginning/{started,failed}.*
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
-mount -av | egrep -v '(already|ignored)'
+mount -av | egrep -v '(already|ignored)' | tab
 
 printf "Setting hostname to \"$HOSTNAME\"...\n"
 echo "$HOSTNAME" > /proc/sys/kernel/hostname
@@ -89,8 +91,12 @@ rchook pre_network
 
 printf "Bringing up network interfaces...\n"
 for interface in ${INTERFACES[@]:-lo};do
-    printf "\`$interface\`...\n"
-    ifconfig ${interface} up
+    tab "$interface..."
+    if ifconfig ${interface} up;then
+        printf " failed.\n"
+    else
+        printf " up.\n"
+    fi
 done
 
 rchook post_network
@@ -104,7 +110,7 @@ if [[ "${CLOCK}" == localtime ]];then
 elif [[ "${CLOCK}" == utc ]];then
     hwclock -s -u
 else
-    printf 'Invalid $CLOCK setting: %s; defaulting to UTC\n' "$CLOCK"
+    printf 'Invalid $CLOCK setting, defaulting to UTC\n' "$CLOCK" | tab
     hwclock -s -u
 fi
 unset TZ
@@ -146,6 +152,8 @@ if [[ "${DAEMONS[@]}" ]];then
     beginning_daemon_start ${DAEMONS[@]}
     rchook post_daemons
 fi
+
+TABS=
 
 for terminal in $(seq 1 ${VTERMS});do
     sh -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
