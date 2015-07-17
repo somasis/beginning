@@ -1,0 +1,34 @@
+#!/bin/bash
+
+setfont_args=
+
+consolefont_start() {
+    consolefont_status
+    [[ "${CONSOLEFONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONTMAP}"
+    [[ "${CONSOLEFONTUNIMAP}" ]]    && setfont_args="$setfont_args -u ${CONSOLEFONTUNIMAP}"
+    for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
+        if setfont -C "$tty" $setfont_args "${CONSOLEFONT}";then
+            err=0
+        else
+            err=1
+            break
+        fi
+    done
+    return $err
+}
+
+consolefont_stop() {
+    for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
+        if setfont -C "$tty";then
+            err=0
+        else
+            err=1
+            break
+        fi
+    done
+    return $err
+}
+
+consolefont_status() {
+    [[ -r /run/beginning/started.consolefont ]]
+}
