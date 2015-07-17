@@ -192,6 +192,6 @@ tab() {
 }
 
 rchook() {
-    type -t "$1" >/dev/null 2>&1 && printf 'Running %s...\n' && "$1"
+    type -t "$1" >/dev/null 2>&1 && printf 'Running %s...\n' "$1" && "$1"
 }
 
