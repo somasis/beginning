@@ -171,3 +171,23 @@ keeprunning() {
     done
 }
 
+tab() {
+    if [[ "$@" ]];then
+        if [[ "${TABS}" ]];then
+            printf '\t%s' "${@}"
+        else
+            printf '%s' "${@}"
+        fi
+    else
+        if [[ "${TABS}" ]];then
+            while read line;do
+                printf "\t%s\n" "${line}"
+            done
+        else
+            while read line;do
+                printf "%s\n" "${line}"
+            done
+        fi
+    fi
+}
+
