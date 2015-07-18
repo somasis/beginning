@@ -45,7 +45,7 @@ case "$1" in
             elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
                 daemon_file="/lib/beginning/rc.d/${dae}"
             else
-                printf "%s: Could not find %s." "${0##*/}" "${dae}" >&2
+                printf "%s: Could not find %s.\n" "${0##*/}" "${dae}" >&2
                 exit 1
             fi
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
@@ -60,7 +60,7 @@ case "$1" in
                     beginning_daemon_start "${dae}"
                     exit 0
                 fi
-                printf "%s: %s does not have a %s action." "${0##*/}" "${dae}" "${act}" >&2
+                printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
                 exit 4
             fi
         done
