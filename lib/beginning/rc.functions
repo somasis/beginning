@@ -62,9 +62,7 @@ beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
     for daemon in ${@};do
-        if [[ -f /run/beginning/started.${daemon} ]];then
-            continue
-        elif [[ -f "/etc/rc.d/${daemon}" ]];then
+        if [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
@@ -73,20 +71,20 @@ beginning_daemon_start() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
-                type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
-            fi
-            if type -t ${daemon}_start >/dev/null 2>&1;then
-                printf "Starting \`%s\`..." "${daemon}"
-                ${daemon}_start
-                if [[ $? -eq 0 ]];then
-                    rm -f /run/beginning/failed.${daemon}
-                    date +%s > /run/beginning/started.${daemon}
-                    printf " done.\n"
-                else
-                    rm -f /run/beginning/started.${daemon}
-                    date +%s > /run/beginning/failed.${daemon}
-                    printf " failed.\n"
+            if type -t ${daemon}_status >/dev/null 2>&1;then
+                if ! ${daemon}_status;then
+                    if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
+                        type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
+                    fi
+                    if type -t ${daemon}_start >/dev/null 2>&1;then
+                        printf "Starting \`%s\`..." "${daemon}"
+                        ${daemon}_start
+                        if [[ $? -eq 0 ]];then
+                            printf " done.\n"
+                        else
+                            printf " failed.\n"
+                        fi
+                    fi
                 fi
             fi
         fi
@@ -97,9 +95,7 @@ beginning_daemon_stop() {
     export BEGINNING_PHASE=stop
     local daemon
     for daemon in ${@};do
-        if [[ ! -f /run/beginning/started.${daemon} ]];then
-            continue
-        elif [[ -f "/etc/rc.d/${daemon}" ]];then
+        if [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
@@ -108,24 +104,25 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
-                if [[ -z "${BEGINNING_NO_REVERSE_DEPENDS}" ]];then
-                    depends=$(reverse $(${daemon}_depends))
-                else
-                    depends=$(${daemon}_depends)
+            if type -t ${daemon}_status >/dev/null 2>&1 && ${daemon}_status;then
+                if type -t ${daemon}_depends >/dev/null 2>&1;then
+                    if [[ -z "$BEGINNING_NO_STOP_DEPENDS" ]];then
+                        if [[ -z "${BEGINNING_NO_REVERSE_DEPENDS}" ]];then
+                            depends=$(reverse $(${daemon}_depends))
+                        else
+                            depends=$(${daemon}_depends)
+                        fi
+                        beginning_daemon_stop "${depends}"
+                    fi
                 fi
-                type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_stop "${depends}"
-            fi
-            if type -t ${daemon}_stop >/dev/null 2>&1;then
-                printf "Stopping \`%s\`..." "${daemon}"
-                ${daemon}_start
-                if [[ $? -eq 0 ]];then
-                    rm -f /run/beginning/{failed,started}.${daemon}
-                    printf " done.\n"
-                else
-                    rm -f /run/beginning/started.${daemon}
-                    date +%s > /run/beginning/failed.${daemon}
-                    printf " failed.\n"
+                if type -t ${daemon}_stop >/dev/null 2>&1;then
+                    printf "Stopping \`%s\`..." "${daemon}"
+                    ${daemon}_stop
+                    if [[ $? -eq 0 ]];then
+                        printf " done.\n"
+                    else
+                        printf " failed.\n"
+                    fi
                 fi
             fi
         fi

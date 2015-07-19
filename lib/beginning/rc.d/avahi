@@ -1,0 +1,20 @@
+#!/bin/bash
+
+avahi_depends() {
+    echo dbus
+}
+
+avahi_start() {
+    avahi_status || rm -f /run/avahi-daemon/pid
+    avahi-daemon -Ds
+}
+
+avahi_stop() {
+    cat /run/avahi-daemon/pid
+    kill $(</run/avahi-daemon/pid)
+    avahi_status || rm -f /run/avahi-daemon/pid
+}
+
+avahi_status() {
+    avahi-daemon -c >/dev/null 2>&1
+}

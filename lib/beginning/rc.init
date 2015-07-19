@@ -78,14 +78,14 @@ rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
-rm -f /run/beginning/{started,failed}.*
+rm -rf /run/beginning/*
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
 mount -av | egrep -v '(already|ignored)' | tab
 
 printf "Setting hostname to \"$HOSTNAME\"...\n"
-echo "$HOSTNAME" > /proc/sys/kernel/hostname
+hostname "$HOSTNAME"
 
 rchook pre_network
 
@@ -93,9 +93,9 @@ printf "Bringing up network interfaces...\n"
 for interface in ${INTERFACES[@]:-lo};do
     tab "$interface..."
     if ifconfig ${interface} up;then
-        printf " failed.\n"
-    else
         printf " up.\n"
+    else
+        printf " failed.\n"
     fi
 done
 

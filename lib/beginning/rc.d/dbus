@@ -3,7 +3,7 @@
 dbus_start() {
     dbus_status || rm -f /run/dbus.pid
     dbus-uuidgen --ensure
-    dbus-daemon --system --fork
+    dbus-daemon --system --fork --nopidfile --print-pid > /run/dbus.pid
 }
 
 dbus_stop() {

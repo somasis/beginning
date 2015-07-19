@@ -7,27 +7,27 @@ consolefont_start() {
     [[ "${CONSOLEFONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONTMAP}"
     [[ "${CONSOLEFONTUNIMAP}" ]]    && setfont_args="$setfont_args -u ${CONSOLEFONTUNIMAP}"
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        { if setfont -C "$tty" $setfont_args "${CONSOLEFONT}";then
+        if setfont -C "$tty" $setfont_args "${CONSOLEFONT}";then
             err=0
         else
             err=1
             break
-        fi; } &
+        fi
     done
-    wait
+    date +%s > /run/beginning/started.consolefont
     return $err
 }
 
 consolefont_stop() {
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        { if setfont -C "$tty";then
+        if setfont -C "$tty";then
             err=0
         else
             err=1
             break
-        fi; } &
+        fi
     done
-    wait
+    rm -f /run/beginning/started.consolefont
     return $err
 }
 
