@@ -1,0 +1,15 @@
+#!/bin/bash
+
+openntpd_start() {
+    openntpd_status || rm -f /run/openntpd.pid
+    openntpd -p /run/openntpd.pid
+}
+
+openntpd_stop() {
+    kill $(</run/openntpd.pid)
+    openntpd_status || rm -f /run/openntpd.pid
+}
+
+openntpd_status() {
+    pidexists /run/openntpd.pid
+}
