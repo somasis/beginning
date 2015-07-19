@@ -95,6 +95,9 @@ beginning_daemon_stop() {
     export BEGINNING_PHASE=stop
     local daemon
     for daemon in ${@};do
+        if [[ " ${BEGINNING_SKIP_DEPS} " == *" ${daemon} "* ]];then
+            continue
+        fi
         if [[ -f "/etc/rc.d/${daemon}" ]];then
             daemon_file="/etc/rc.d/${daemon}"
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
@@ -104,37 +107,41 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            if type -t ${daemon}_status >/dev/null 2>&1 && ${daemon}_status;then
-                if type -t ${daemon}_depends >/dev/null 2>&1;then
-                    if [[ -z "$BEGINNING_NO_STOP_DEPENDS" ]];then
-                        dae_list=(
-                            $(for dae in /lib/beginning/rc.d/* /etc/rc.d/*;do
-                                [[ -r "$dae" ]] && . "$dae" && type -t ${dae}_depends >/dev/null 2>&1 && ${dae}_depends | while read line;do
-                                    echo "${dae}:${line}"
-                            done)
-                        )
-                        depends=( )
-                        for dep in ${dae_list[@]};do
-                            [[ "${dep}" == ${daemon}:* ]] && depends+=( "${dep#*:}" )
+                d_list=(
+                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
+                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
+                            d="/etc/rc.d/${d##*/}"
+                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
+                            d="/lib/beginning/rc.d/${d##*/}"
+                        fi
+                        . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
+                        while read line;do
+                            echo ${d##*/}:" ${line} "
                         done
-                        #if [[ -z "${BEGINNING_NO_REVERSE_DEPENDS}" ]];then
-                        #    depends=$(reverse $(${daemon}_depends))
-                        #else
-                        #    depends=$(${daemon}_depends)
-                        #fi
-                        beginning_daemon_stop "${depends[@]}"
+                    done 2>/dev/null)
+                )
+                depends=( )
+                for dep in ${d_list[@]};do
+                    [[ "${dep}" != *: ]] && continue
+                    dname=${dep/:*}
+                    [[ " ${BEGINNING_SKIP_DEPS} " == *" ${dname} "* ]] && continue
+                    depends+=( "${dname}" )
+                done
+                BEGINNING_SKIP_DEPS="${BEGINNING_SKIP_DEPS} ${daemon} " beginning_daemon_stop ${depends[@]}
+                if type -t ${daemon}_status >/dev/null 2>&1;then
+                    if ${daemon}_status;then
+                        if type -t ${daemon}_stop >/dev/null 2>&1;then
+                            printf "Stopping \`%s\`..." "${daemon}"
+                            ${daemon}_stop
+                            if [[ $? -eq 0 ]];then
+                                printf " done."
+                            else
+                                printf " failed."
+                            fi
+                            printf '\n'
+                        fi
                     fi
                 fi
-                if type -t ${daemon}_stop >/dev/null 2>&1;then
-                    printf "Stopping \`%s\`..." "${daemon}"
-                    ${daemon}_stop
-                    if [[ $? -eq 0 ]];then
-                        printf " done.\n"
-                    else
-                        printf " failed.\n"
-                    fi
-                fi
-            fi
         fi
     done
 }

@@ -45,7 +45,7 @@ printf '\e[0mShutting down ${ANSI_COLOR}%s\e[0m...\n\n' "${PRETTY_NAME}"
 # Allow for ctrl-alt-del hard reboots, for if this script breaks
 echo 1 > /proc/sys/kernel/ctrl-alt-del
 
-[[ "${DAEMONS[@]}" ]] && printf "Stopping daemons...\n" && beginning_daemon_stop $(reverse ${DAEMONS[@]})
+[[ "${DAEMONS[@]}" ]] && printf "Stopping daemons...\n" && beginning_daemon_stop "${DAEMONS[@]}"
 
 printf 'Storing random seed...\n'
 dd if=/dev/urandom of=/var/tmp/random-seed count=1 bs=512 2>/dev/null
