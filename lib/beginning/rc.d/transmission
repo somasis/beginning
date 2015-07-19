@@ -1,0 +1,15 @@
+#!/bin/bash
+
+transmission_start() {
+    transmission_status || rm -f /run/transmission.pid
+    transmission-daemon -x /run/transmission.pid &
+}
+
+transmission_stop() {
+    kill $(</run/transmission.pid)
+    transmission_status || rm -f /run/transmission.pid
+}
+
+transmission_status() {
+    pidexists /run/transmission.pid
+}
