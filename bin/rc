@@ -26,8 +26,9 @@ fi
 
 status() {
     case "${1}" in
-        STARTED) printf "[ \e[1;32mSTARTED\e[0m ]"   ;;
-        STOPPED) printf "[ \e[1;31mSTOPPED\e[0m ]"   ;;
+        STARTED) printf "[ \e[1;32mSTARTED\e[0m ]"  ;;
+        UNKNOWN) printf "\e[1;40m[ UNKNOWN ]\e[0m"  ;;
+        STOPPED) printf "[ \e[1;31mSTOPPED\e[0m ]"  ;;
     esac
 }
 
@@ -49,16 +50,14 @@ case "$1" in
                 exit 1
             fi
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            [[ "${act}" == stop ]] && BEGINNING_NO_STOP_DEPENDS=1
             if type -t beginning_daemon_${act} >/dev/null 2>&1;then
-                beginning_daemon_${act} "${dae}"; exit $?
+                beginning_daemon_${act} "${dae}"
             else
                 if [[ "${act}" == restart ]];then
                     if type -t ${dae}_status >/dev/null 2>&1 && ${dae}_status;then
                         beginning_daemon_stop "${dae}"
                     fi
                     beginning_daemon_start "${dae}"
-                    exit 0
                 fi
                 printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
                 exit 4
@@ -83,9 +82,7 @@ case "$1" in
         done
         for dae in ${ALL_DAEMONS[@]};do
             status=
-            if [[ -f /run/beginning/started.${dae} ]];then
-                status=$(status STARTED)
-            elif [[ -f "/etc/rc.d/${dae}" ]];then
+            if [[ -f "/etc/rc.d/${dae}" ]];then
                 daemon_file="/etc/rc.d/${dae}"
             elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
                 daemon_file="/lib/beginning/rc.d/${dae}"
@@ -98,6 +95,8 @@ case "$1" in
                     else
                         status=$(status STOPPED)
                     fi
+                else
+                    status=$(status UNKNOWN)
                 fi
             fi
             printf '%s %s\n' "${status}" "${dae}"
