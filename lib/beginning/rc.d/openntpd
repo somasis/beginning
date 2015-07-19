@@ -1,5 +1,9 @@
 #!/bin/bash
 
+openntpd_exists() {
+    type -fPp openntpd
+}
+
 openntpd_start() {
     openntpd_status || rm -f /run/openntpd.pid
     openntpd -p /run/openntpd.pid

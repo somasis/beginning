@@ -1,13 +1,17 @@
 #!/bin/bash
 
+connman_exists() {
+    type -fPp connmand
+}
+
 connman_depends() {
     echo dbus
 }
 
 connman_start() {
+    connman_status || rm -f /run/connmand.pid
     connmand -n >/dev/null 2>&1 &
     echo $! > /run/connman.pid
-    pidexists /run/connman.pid || rm -f /run/connmand.pid && return 1
 }
 
 connman_stop() {

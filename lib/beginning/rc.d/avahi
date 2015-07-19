@@ -1,5 +1,9 @@
 #!/bin/bash
 
+avahi_exists() {
+    type -fPp avahi-daemon
+}
+
 avahi_depends() {
     echo dbus
 }

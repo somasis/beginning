@@ -1,5 +1,9 @@
 #!/bin/bash
 
+transmission_exists() {
+    type -fPp transmission-daemon
+}
+
 transmission_start() {
     transmission_status || rm -f /run/transmission.pid
     transmission-daemon -x /run/transmission.pid &

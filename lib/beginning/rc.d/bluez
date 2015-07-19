@@ -1,5 +1,13 @@
 #!/bin/bash
 
+bluez_exists() {
+    if type -fPp bluetoothd || [[ -x /usr/libexec/bluetooth/bluetoothd ]];then
+        return 0
+    else
+        return 1
+    fi
+}
+
 bluez_depends() {
     echo dbus
 }

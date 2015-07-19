@@ -2,6 +2,10 @@
 
 [[ -r /etc/conf.d/cronie.conf ]] && . /etc/conf.d/cronie.conf
 
+cronie_exists() {
+    type -fPp crond
+}
+
 cronie_start() {
     cronie_status || rm -f /var/run/crond.pid
     crond -n "${CRONDARGS}" &

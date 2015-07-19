@@ -2,6 +2,10 @@
 
 setfont_args=
 
+consolefont_exists() {
+    type -fPp setfont
+}
+
 consolefont_start() {
     consolefont_status
     [[ "${CONSOLEFONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONTMAP}"

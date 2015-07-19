@@ -53,7 +53,7 @@ reverse() {
 }
 
 unset_phases() {
-    for func in ${daemon:-$1}_{start,reload,restart,stop,depends};do
+    for func in ${daemon:-$1}_{start,reload,restart,stop,depends,exists,status};do
         type -t "${func}" >/dev/null 2>&1 && unset -f "${func}"
     done
 }
@@ -71,6 +71,12 @@ beginning_daemon_start() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon_exists};then
+                true
+            else
+                printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}"
+                continue
+            fi
             if type -t ${daemon}_status >/dev/null 2>&1;then
                 if ! ${daemon}_status;then
                     if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
@@ -107,6 +113,12 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon_exists} >/dev/null 2>&1;then
+                true
+            else
+                printf "\tStopping \`%s\`... doesn't exist.\n" "${daemon}"
+                continue
+            fi
                 d_list=(
                     $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
                         if [[ -r "/etc/rc.d/${d##*/}" ]];then

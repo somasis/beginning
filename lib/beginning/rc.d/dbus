@@ -1,5 +1,9 @@
 #!/bin/bash
 
+dbus_exists() {
+    type -fPp dbus-daemon
+}
+
 dbus_start() {
     dbus_status || rm -f /run/dbus.pid
     dbus-uuidgen --ensure

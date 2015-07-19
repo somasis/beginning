@@ -1,5 +1,9 @@
 #!/bin/bash
 
+skel_exists() {
+    type -fPp skel
+}
+
 skel_start() {
     skel_status || rm -f /run/skel.pid
     daemon &

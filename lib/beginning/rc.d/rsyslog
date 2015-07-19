@@ -1,5 +1,9 @@
 #!/bin/bash
 
+rsyslog_exists() {
+    type -fPp rsyslogd
+}
+
 rsyslog_start() {
     rsyslog_status || rm -f /run/rsyslogd.pid
     rsyslogd -n >/dev/null 2>&1 &

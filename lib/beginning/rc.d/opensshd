@@ -1,5 +1,9 @@
 #!/bin/bash
 
+opensshd_exists() {
+    type -fPp sshd
+}
+
 opensshd_start() {
     opensshd_status || rm -f /run/sshd.pid
     [[ -x $(type -fPp sshd-keygen.sh) ]] && $(type -fPp sshd-keygen.sh)
