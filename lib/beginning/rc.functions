@@ -107,12 +107,22 @@ beginning_daemon_stop() {
             if type -t ${daemon}_status >/dev/null 2>&1 && ${daemon}_status;then
                 if type -t ${daemon}_depends >/dev/null 2>&1;then
                     if [[ -z "$BEGINNING_NO_STOP_DEPENDS" ]];then
-                        if [[ -z "${BEGINNING_NO_REVERSE_DEPENDS}" ]];then
-                            depends=$(reverse $(${daemon}_depends))
-                        else
-                            depends=$(${daemon}_depends)
-                        fi
-                        beginning_daemon_stop "${depends}"
+                        dae_list=(
+                            $(for dae in /lib/beginning/rc.d/* /etc/rc.d/*;do
+                                [[ -r "$dae" ]] && . "$dae" && type -t ${dae}_depends >/dev/null 2>&1 && ${dae}_depends | while read line;do
+                                    echo "${dae}:${line}"
+                            done)
+                        )
+                        depends=( )
+                        for dep in ${dae_list[@]};do
+                            [[ "${dep}" == ${daemon}:* ]] && depends+=( "${dep#*:}" )
+                        done
+                        #if [[ -z "${BEGINNING_NO_REVERSE_DEPENDS}" ]];then
+                        #    depends=$(reverse $(${daemon}_depends))
+                        #else
+                        #    depends=$(${daemon}_depends)
+                        #fi
+                        beginning_daemon_stop "${depends[@]}"
                     fi
                 fi
                 if type -t ${daemon}_stop >/dev/null 2>&1;then
