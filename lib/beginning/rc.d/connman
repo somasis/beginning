@@ -7,6 +7,7 @@ connman_depends() {
 connman_start() {
     connmand -n >/dev/null 2>&1 &
     echo $! > /run/connman.pid
+    pidexists /run/connman.pid || rm -f /run/connmand.pid && return 1
 }
 
 connman_stop() {
