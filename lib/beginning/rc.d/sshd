@@ -1,0 +1,20 @@
+#!/bin/bash
+
+sshd_start() {
+    sshd_status || rm -f /run/sshd.pid
+    [[ -x $(type -fPp sshd-keygen.sh) ]] && $(type -fPp sshd-keygen.sh)
+    $(type -fPp sshd)
+}
+
+sshd_reload() {
+    kill -HUP $(</run/sshd.pid)
+}
+
+sshd_stop() {
+    kill $(</run/sshd.pid)
+    sshd_status || rm -f /run/sshd.pid
+}
+
+skel_status() {
+    pidexists /run/skel.pid
+}
