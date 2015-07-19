@@ -15,6 +15,6 @@ sshd_stop() {
     sshd_status || rm -f /run/sshd.pid
 }
 
-skel_status() {
-    pidexists /run/skel.pid
+sshd_status() {
+    pidexists /run/sshd.pid
 }
