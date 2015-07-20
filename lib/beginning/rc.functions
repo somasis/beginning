@@ -71,7 +71,29 @@ beginning_daemon_start() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\tStarting \`%s\`.. invalid script, possible syntax errors.\n" "${daemon}" >&2
-            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon_exists};then
+            if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
+                d_list=(
+                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
+                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
+                            d="/etc/rc.d/${d##*/}"
+                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
+                            d="/lib/beginning/rc.d/${d##*/}"
+                        fi
+                        . "$d"
+                        if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+                            echo "${d##*/}"
+                        fi
+                    done 2>/dev/null | head)
+                )
+                if [[ -n "${d_list}" ]];then
+                    beginning_daemon_start "${d_list}"; return $?
+                else
+                    printf "Starting \`%s\`... \`%s\` has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
+                    return 1
+                fi
+
+            fi
+            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
             else
                 printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}" >&2
@@ -113,7 +135,28 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon_exists} >/dev/null 2>&1;then
+            if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
+                d_list=(
+                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
+                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
+                            d="/etc/rc.d/${d##*/}"
+                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
+                            d="/lib/beginning/rc.d/${d##*/}"
+                        fi
+                        . "$d"
+                        if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+                            echo "${d##*/}"
+                        fi
+                    done 2>/dev/null | head)
+                )
+                if [[ -n "${d_list}" ]];then
+                    beginning_daemon_stop "${d_list}"; return $?
+                else
+                    printf "Stopping \`%s\`... \`%s\` has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
+                    return 1
+                fi
+            fi
+            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
             else
                 printf "\tStopping \`%s\`... doesn't exist.\n" "${daemon}"

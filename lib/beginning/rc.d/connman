@@ -4,6 +4,10 @@ connman_exists() {
     type -fPp connmand
 }
 
+connman_provides() {
+    echo network
+}
+
 connman_depends() {
     echo dbus
 }
