@@ -7,7 +7,7 @@ opensshd_exists() {
 opensshd_start() {
     opensshd_status || rm -f /run/sshd.pid
     [[ -x $(type -fPp sshd-keygen.sh) ]] && $(type -fPp sshd-keygen.sh)
-    setsid -w $(type -fPp sshd)
+    setsid -w $(type -fPp sshd) >/dev/null 2>&1
 }
 
 opensshd_reload() {
