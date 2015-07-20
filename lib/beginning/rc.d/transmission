@@ -6,7 +6,11 @@ transmission_exists() {
 
 transmission_start() {
     transmission_status || rm -f /run/transmission.pid
-    transmission-daemon -x /run/transmission.pid &
+    if [[ "${TRANSMISSION_USER}" ]];then
+        su -c 'transmission-daemon -x /run/transmission.pid' ${TRANSMISSION_USER} &
+    else
+        transmission-daemon -x /run/transmission.pid &
+    fi
 }
 
 transmission_stop() {
