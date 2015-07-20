@@ -15,7 +15,7 @@ avahi_start() {
 
 avahi_reload() {
     avahi-daemon -r
-)
+}
 
 avahi_stop() {
     cat /run/avahi-daemon/pid
