@@ -10,7 +10,7 @@ openntpd_depends() {
 
 openntpd_start() {
     openntpd_status || rm -f /run/openntpd.pid
-    openntpd -p /run/openntpd.pid "${OPENNTPD_ARGS}"
+    openntpd -p /run/openntpd.pid ${OPENNTPD_ARGS:+"${OPENNTPD_ARGS}"}
 }
 
 openntpd_stop() {
