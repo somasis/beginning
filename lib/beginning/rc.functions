@@ -86,7 +86,7 @@ beginning_daemon_start() {
                     done 2>/dev/null)
                 )
                 provider=
-                provider=${daemon}_PROVIDER
+                provider=${daemon^^}_PROVIDER
                 provider=${!provider}
                 if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
                     d_list=( "${provider}" )
@@ -157,7 +157,7 @@ beginning_daemon_stop() {
                     done 2>/dev/null)
                 )
                 provider=
-                provider=${daemon}_PROVIDER
+                provider=${daemon^^}_PROVIDER
                 provider=${!provider}
                 if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
                     d_list=( "${provider}" )
