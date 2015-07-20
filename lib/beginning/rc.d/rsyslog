@@ -1,5 +1,9 @@
 #!/bin/bash
 
+rsyslog_provides() {
+    echo syslogd
+}
+
 rsyslog_exists() {
     type -fPp rsyslogd
 }
