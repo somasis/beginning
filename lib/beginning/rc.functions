@@ -83,7 +83,7 @@ beginning_daemon_start() {
                         if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                             echo "${d##*/}"
                         fi
-                    done 2>/dev/null | head)
+                    done 2>/dev/null)
                 )
                 if [[ -n "${d_list}" ]];then
                     beginning_daemon_start "${d_list}"; return $?
