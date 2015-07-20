@@ -13,7 +13,8 @@ bluez_depends() {
 }
 
 bluez_start() {
-    /usr/libexec/bluetooth/bluetoothd -n >/dev/null 2>&1 &
+    PATH="/usr/libexec/bluetooth/:${PATH}"
+    bluetoothd -n >/dev/null 2>&1 &
     echo $! > /run/bluetooth.pid
 }
 
