@@ -1,14 +1,12 @@
 #!/bin/bash
 
-[[ -r /etc/conf.d/openntpd.conf ]] && . /etc/conf.d/openntpd.conf
-
 openntpd_exists() {
     type -fPp openntpd
 }
 
 openntpd_start() {
     openntpd_status || rm -f /run/openntpd.pid
-    openntpd -p /run/openntpd.pid ${NTPD_OPTS}
+    openntpd -p /run/openntpd.pid "${OPENNTPD_ARGS}"
 }
 
 openntpd_stop() {

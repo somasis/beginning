@@ -8,10 +8,10 @@ consolefont_exists() {
 
 consolefont_start() {
     consolefont_status
-    [[ "${CONSOLEFONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONTMAP}"
-    [[ "${CONSOLEFONTUNIMAP}" ]]    && setfont_args="$setfont_args -u ${CONSOLEFONTUNIMAP}"
+    [[ "${CONSOLEFONT_FONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONT_FONTMAP}"
+    [[ "${CONSOLEFONT_FONTUNIMAP}" ]]    && setfont_args="$setfont_args -u ${CONSOLEFONT_FONTUNIMAP}"
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        if setfont -C "$tty" $setfont_args "${CONSOLEFONT}";then
+        if setfont -C "$tty" $setfont_args "${CONSOLEFONT_FONT}";then
             err=0
         else
             err=1

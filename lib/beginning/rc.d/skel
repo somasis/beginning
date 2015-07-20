@@ -6,7 +6,7 @@ skel_exists() {
 
 skel_start() {
     skel_status || rm -f /run/skel.pid
-    daemon &
+    skel &
     echo $! > /run/skel.pid
 }
 
