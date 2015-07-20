@@ -96,7 +96,6 @@ beginning_daemon_start() {
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
             else
-                printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}" >&2
                 continue
             fi
             if type -t ${daemon}_status >/dev/null 2>&1;then
