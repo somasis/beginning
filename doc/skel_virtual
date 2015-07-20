@@ -1,0 +1,3 @@
+#!/bin/bash
+
+skel_virtual() { true; }

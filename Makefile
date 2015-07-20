@@ -1,6 +1,7 @@
-DESTDIR?=build/
+DESTDIR?=build
 BINDIR?=$(PREFIX)/bin
 LIBDIR?=$(PREFIX)/lib
+DOCDIR?=$(PREFIX)/share/doc
 SYSCONFDIR?=$(PREFIX)/etc
 
 clean:
@@ -13,3 +14,5 @@ install:
 	cp -dr lib/* $(DESTDIR)/$(LIBDIR)
 	mkdir -p $(DESTDIR)/$(SYSCONFDIR)
 	cp -dr etc/* $(DESTDIR)/$(SYSCONFDIR)
+	mkdir -p $(DESTDIR)/$(DOCDIR)
+	cp -dr doc/* $(DESTDIR)/$(DOCDIR)
