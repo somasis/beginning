@@ -4,6 +4,10 @@ cronie_exists() {
     type -fPp crond
 }
 
+cronie_provides() {
+    echo crond
+}
+
 cronie_start() {
     cronie_status || rm -f /var/run/crond.pid
     crond -n "${CRONIE_ARGS}" &
