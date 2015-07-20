@@ -67,14 +67,14 @@ beginning_daemon_start() {
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
         else
-            printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
+            printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}" >&2
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            . "${daemon_file}" || printf "\tStarting \`%s\`.. invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon_exists};then
                 true
             else
-                printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}"
+                printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}" >&2
                 continue
             fi
             if type -t ${daemon}_status >/dev/null 2>&1;then
@@ -83,12 +83,12 @@ beginning_daemon_start() {
                         type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
                     fi
                     if type -t ${daemon}_start >/dev/null 2>&1;then
-                        printf "Starting \`%s\`..." "${daemon}"
+                        printf "Starting \`%s\`... " "${daemon}"
                         ${daemon}_start
                         if [[ $? -eq 0 ]];then
-                            printf " done.\n"
+                            printf "done.\n"
                         else
-                            printf " failed.\n"
+                            printf "failed.\n"
                         fi
                     fi
                 fi
@@ -128,13 +128,12 @@ beginning_daemon_stop() {
                         fi
                         . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
                         while read line;do
-                            echo ${d##*/}:" ${line} "
+                            [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
                         done
                     done 2>/dev/null)
                 )
                 depends=( )
                 for dep in ${d_list[@]};do
-                    [[ "${dep}" != *: ]] && continue
                     dname=${dep/:*}
                     [[ " ${BEGINNING_SKIP_DEPS} " == *" ${dname} "* ]] && continue
                     depends+=( "${dname}" )
