@@ -67,10 +67,10 @@ beginning_daemon_start() {
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
         else
-            printf "\tStarting \`%s\`... doesn't exist.\n" "${daemon}" >&2
+            continue
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "\tStarting \`%s\`.. invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" || printf "Starting \`%s\`.. invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
                 d_list=(
                     $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
@@ -85,6 +85,14 @@ beginning_daemon_start() {
                         fi
                     done 2>/dev/null)
                 )
+                provider=
+                provider=${daemon}_PROVIDER
+                provider=${!provider}
+                if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
+                    d_list=( "${provider}" )
+                elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
+                    printf "\`%s\` provider is not valid. Starting all possible providers.\n" "${daemon}" >&2
+                fi
                 if [[ -n "${d_list}" ]];then
                     beginning_daemon_start "${d_list}"; return $?
                 else
@@ -130,10 +138,10 @@ beginning_daemon_stop() {
         elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
             daemon_file="/lib/beginning/rc.d/${daemon}"
         else
-            printf "\tCannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
+            printf "Cannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            . "${daemon_file}" || printf "%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
                 d_list=(
                     $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
@@ -146,8 +154,16 @@ beginning_daemon_stop() {
                         if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                             echo "${d##*/}"
                         fi
-                    done 2>/dev/null | head)
+                    done 2>/dev/null)
                 )
+                provider=
+                provider=${daemon}_PROVIDER
+                provider=${!provider}
+                if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
+                    d_list=( "${provider}" )
+                elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
+                    printf "\`%s\` provider is not valid. Stopping all possible providers.\n" "${daemon}" >&2
+                fi
                 if [[ -n "${d_list}" ]];then
                     beginning_daemon_stop "${d_list}"; return $?
                 else
@@ -158,7 +174,6 @@ beginning_daemon_stop() {
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
             else
-                printf "\tStopping \`%s\`... doesn't exist.\n" "${daemon}"
                 continue
             fi
                 d_list=(
