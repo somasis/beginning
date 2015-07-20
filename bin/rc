@@ -24,14 +24,6 @@ else
     exit 2
 fi
 
-status() {
-    case "${1}" in
-        STARTED) printf "\e[1;42m[x]\e[0m"  ;;
-        UNKNOWN) printf "\e[1;40m[?]\e[0m"  ;;
-        STOPPED) printf "\e[1;41m[ ]\e[0m"  ;;
-    esac
-}
-
 case "$1" in
     start|stop|reload|restart)
         act="$1"
