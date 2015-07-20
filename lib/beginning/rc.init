@@ -140,9 +140,6 @@ else
     chmod 0644 /var/log/dmesg.log
 fi
 
-printf "Enabling coredumps...\n"
-ulimit -c unlimited
-
 : > /var/run/utmp
 
 rchook post_boot
