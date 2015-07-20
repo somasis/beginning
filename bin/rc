@@ -58,9 +58,10 @@ case "$1" in
                         beginning_daemon_stop "${dae}"
                     fi
                     beginning_daemon_start "${dae}"
+                else
+                    printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
+                    exit 4
                 fi
-                printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
-                exit 4
             fi
         done
     ;;
