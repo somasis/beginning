@@ -13,6 +13,10 @@ avahi_start() {
     avahi-daemon -Ds
 }
 
+avahi_reload() {
+    avahi-daemon -r
+)
+
 avahi_stop() {
     cat /run/avahi-daemon/pid
     kill $(</run/avahi-daemon/pid)
