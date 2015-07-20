@@ -7,15 +7,15 @@ opensshd_exists() {
 opensshd_start() {
     opensshd_status || rm -f /run/sshd.pid
     [[ -x $(type -fPp sshd-keygen.sh) ]] && $(type -fPp sshd-keygen.sh)
-    setsid bash -c "$(type -fPp sshd)"
+    setsid -w $(type -fPp sshd)
 }
 
 opensshd_reload() {
-    setsid bash -c 'kill -HUP $(</run/sshd.pid)'
+    kill -HUP $(</run/sshd.pid)
 }
 
 opensshd_stop() {
-    setsid bash -c 'kill $(</run/sshd.pid)'
+    setsid -w kill $(</run/sshd.pid)
     opensshd_status || rm -f /run/sshd.pid
 }
 
