@@ -4,6 +4,10 @@ openntpd_exists() {
     type -fPp openntpd
 }
 
+openntpd_depends() {
+    echo network
+}
+
 openntpd_start() {
     openntpd_status || rm -f /run/openntpd.pid
     openntpd -p /run/openntpd.pid "${OPENNTPD_ARGS}"
