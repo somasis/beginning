@@ -88,16 +88,16 @@ case "$1" in
                     continue
                 fi
                 if type -t ${dae}_status >/dev/null 2>&1;then
+                    printf "[ ] ${dae}"
                     if ${dae}_status >/dev/null 2>&1;then
-                        status=$(status STARTED)
+                        status STARTED
                     else
-                        status=$(status STOPPED)
+                        status STOPPED
                     fi
                 else
-                    status=$(status UNKNOWN)
+                    status UNKNOWN
                 fi
             fi
-            printf '%s %s\n' "${status}" "${dae}"
         done
     ;;
 esac

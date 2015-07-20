@@ -39,10 +39,10 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 
 status() {
     case "${1^^}" in
-        STARTED) printf "\r\e[1;42m[x]\e[0m "   ;;
-        UNKNOWN) printf "\r\e[1;40m[?]\e[0m "   ;;
-        FAILED)  printf "\r\e[1;41m[x]\e[0m "   ;;
-        STOPPED) printf "\r\e[1;41m[ ]\e[0m "   ;;
+        STARTED) printf "\r\e[1;42m[x]\e[0m\n"   ;;
+        UNKNOWN) printf "\r\e[1;40m[?]\e[0m\n"   ;;
+        FAILED)  printf "\r\e[1;41m[x]\e[0m\n"   ;;
+        STOPPED) printf "\r\e[1;41m[ ]\e[0m\n"   ;;
     esac
 }
 
@@ -128,7 +128,6 @@ beginning_daemon_start() {
                         else
                             status FAILED
                         fi
-                        printf '\n'
                     fi
                 fi
             fi
@@ -211,15 +210,14 @@ beginning_daemon_stop() {
                 fi
                 if type -t ${daemon}_status >/dev/null 2>&1;then
                     if ${daemon}_status;then
+                        printf "[ ] %s" "${daemon}"
                         if type -t ${daemon}_stop >/dev/null 2>&1;then
-                            printf "[ ] %s" "${daemon}"
                             ${daemon}_stop
                             if [[ $? -eq 0 ]];then
                                 status STOPPED
                             else
                                 status FAILED
                             fi
-                            printf '\n'
                         fi
                     fi
                 fi
