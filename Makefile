@@ -8,8 +8,8 @@ clean:
 
 install:
 	mkdir -p $(DESTDIR)/$(BINDIR)
-	cp -dr --no-preserve=ownership bin/* $(DESTDIR)/$(BINDIR)
+	cp -dr bin/* $(DESTDIR)/$(BINDIR)
 	mkdir -p $(DESTDIR)/$(LIBDIR)
-	cp -dr --no-preserve=ownership lib/* $(DESTDIR)/$(LIBDIR)
+	cp -dr lib/* $(DESTDIR)/$(LIBDIR)
 	mkdir -p $(DESTDIR)/$(SYSCONFDIR)
-	cp -dr --no-preserve=ownership etc/* $(DESTDIR)/$(SYSCONFDIR)
+	cp -dr etc/* $(DESTDIR)/$(SYSCONFDIR)
