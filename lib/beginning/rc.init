@@ -107,7 +107,7 @@ fi
 TABS=
 
 for terminal in $(seq 1 ${VTERMS});do
-    sh -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
+    bash -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
 done
 
 wait
