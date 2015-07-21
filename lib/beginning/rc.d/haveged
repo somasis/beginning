@@ -1,0 +1,20 @@
+#!/bin/bash
+
+haveged_exists() {
+    type -fPp haveged
+}
+
+haveged_start() {
+    haveged_status || rm -f /run/haveged.pid
+    haveged -p "/run/haveged.pid"
+}
+
+haveged_stop() {
+    kill $(</run/haveged.pid)
+    haveged_status || rm -f /run/haveged.pid
+}
+
+haveged_status() {
+    pidexists /run/haveged.pid
+}
+
