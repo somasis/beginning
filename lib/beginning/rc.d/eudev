@@ -1,0 +1,36 @@
+#!/bin/bash
+
+eudev_provides() {
+	echo udev
+}
+
+eudev_exists() {
+    if type -fPp udevd && ! type -fPp systemctl;then
+        true
+    else
+        false
+    fi
+}
+
+eudev_start() {
+    eudev_status || rm -f /run/eudev.pid
+    udevd &
+    local pid=$!
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    echo $pid > /run/eudev.pid
+}
+
+eudev_reload() {
+    eudev_status || return 1
+    udevadm control --reload
+}
+
+eudev_stop() {
+    udevadm --exit
+    eudev_status || rm -f /run/eudev.pid
+}
+
+eudev_status() {
+    pidexists /run/eudev.pid
+}
