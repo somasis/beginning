@@ -6,11 +6,11 @@ consolefont_exists() {
 
 consolefont_start() {
     consolefont_status
-    [[ "${CONSOLEFONT_MAP}" ]] && CONSOLEFONT_ARGS="${CONSOLEFONT_ARGS} -m ${CONSOLEFONT_MAP}"
-    [[ "${CONSOLEFONT_UNIMAP}" ]] && CONSOLEFONT_ARGS="${CONSOLEFONT_ARGS} -u ${CONSOLEFONT_UNIMAP}"
+    [[ "${CONSOLEFONT_MAP}" ]] && CONSOLEFONT_SETFONT_ARGS="${CONSOLEFONT_SETFONT_ARGS} -m ${CONSOLEFONT_MAP}"
+    [[ "${CONSOLEFONT_UNIMAP}" ]] && CONSOLEFONT_SETFONT_ARGS="${CONSOLEFONT_SETFONT_ARGS} -u ${CONSOLEFONT_UNIMAP}"
     local err tty
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        if setfont -C "$tty" ${CONSOLEFONT_ARGS:+"${CONSOLEFONT_ARGS}"} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"};then
+        if setfont -C "$tty" ${CONSOLEFONT_SETFONT_ARGS} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"};then
             err=$?
         else
             err=1

@@ -10,7 +10,7 @@ rsyslog_exists() {
 
 rsyslog_start() {
     rsyslog_status || rm -f /run/rsyslogd.pid
-    rsyslogd -n -i "/run/rsyslogd.pid" >/dev/null 2>&1 &
+    rsyslogd -n -i "/run/rsyslogd.pid" ${RSYSLOG_ARGS} >/dev/null 2>&1 &
 }
 
 rsyslog_stop() {

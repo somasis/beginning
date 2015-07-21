@@ -10,7 +10,7 @@ consolekit_depends() {
 
 consolekit_start() {
     consolekit_status || rm -f /run/console-kit-daemon.pid
-    console-kit-daemon --no-daemon >/dev/null 2>&1 &
+    console-kit-daemon --no-daemon ${CONSOLEKIT_ARGS} >/dev/null 2>&1 &
 }
 
 consolekit_stop() {

@@ -14,7 +14,7 @@ connman_depends() {
 
 connman_start() {
     connman_status || rm -f /run/connmand.pid
-    connmand -n >/dev/null 2>&1 &
+    connmand -n ${CONNMAN_ARGS} >/dev/null 2>&1 &
     echo $! > /run/connman.pid
 }
 

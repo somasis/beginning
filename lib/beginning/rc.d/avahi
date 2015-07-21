@@ -10,7 +10,7 @@ avahi_depends() {
 
 avahi_start() {
     avahi_status || rm -f /run/avahi-daemon/pid
-    avahi-daemon -Ds
+    avahi-daemon -Ds ${AVAHI_ARGS}
 }
 
 avahi_reload() {

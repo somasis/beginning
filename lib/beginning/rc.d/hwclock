@@ -14,10 +14,10 @@ hwclock_start() {
     export TZ=${HWCLOCK_TZ}
     case ${HWCLOCK_TYPE,,} in
         localtime)
-            hwclock --hctosys --localtime;err=$?
+            hwclock --hctosys --localtime ${HWCLOCK_ARGS};err=$?
         ;;
         utc)
-            hwclock --hctosys --utc;err=$?
+            hwclock --hctosys --utc ${HWCLOCK_ARGS};err=$?
         ;;
         *)
             err=1
