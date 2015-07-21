@@ -1,0 +1,23 @@
+#!/bin/bash
+
+dhcpd_exists() {
+    type -fPp dhcpd
+}
+
+dhcpd_provides() {
+    echo network
+}
+
+dhcpd_start() {
+    dhcpd_status || rm -f /run/dhcpd.pid
+    dhcpd -q -f -cf ${DHCPD_CONF:-/etc/dhcpd.conf} ${DHCPD_OPTS} ${DHCPD_IFACE} &
+}
+
+dhcpd_stop() {
+    kill $(</run/dhcpd.pid)
+    dhcpd_status || rm -f /run/dhcpd.pid
+}
+
+dhcpd_status() {
+    pidexists /run/dhcpd.pid
+}
