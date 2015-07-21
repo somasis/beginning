@@ -25,7 +25,12 @@ else
 fi
 
 case "$1" in
-    start|stop|reload|restart)
+    restart)
+        shift
+        rc stop "$@"
+        rc start "$@"
+    ;;
+    start|stop|reload)
         act="$1"
         if [[ $UID -ne 0 ]];then
             printf '%s: Must be root to %s daemons.\n' "${0##*/}" "${act}" >&2
@@ -45,15 +50,8 @@ case "$1" in
             if type -t beginning_daemon_${act} >/dev/null 2>&1;then
                 beginning_daemon_${act} "${dae}"
             else
-                if [[ "${act}" == restart ]];then
-                    if type -t ${dae}_status >/dev/null 2>&1 && ${dae}_status;then
-                        beginning_daemon_stop "${dae}"
-                    fi
-                    beginning_daemon_start "${dae}"
-                else
-                    printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
-                    exit 4
-                fi
+                printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
+                exit 4
             fi
         done
     ;;
