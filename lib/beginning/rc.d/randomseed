@@ -1,0 +1,33 @@
+#!/bin/bash
+
+randomseed_exists() {
+    [[ -e /dev/urandom ]]
+}
+
+randomseed_start() {
+    randomseed_status
+    local err poolsize
+    if [[ -r "${RANDOMSEED_FILE}" ]];then
+        cat "${RANDOMSEED_FILE}" > /dev/urandom || err=$?
+    else
+        poolsize=/proc/sys/kernel/random/poolsize
+        if [[ -r "${poolsize}" ]];then
+            poolsize=$(<"${poolsize}")
+        else
+            poolsize=512
+        fi
+        dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${poolsize} >/dev/null 2>&1 || err=$?
+    fi
+    date +%s > /run/beginning/started.randomseed
+    return $err
+}
+
+randomseed_stop() {
+    randomseed_status
+    rm -f /run/beginning/started.randomseed
+    return 0
+}
+
+randomseed_status() {
+    [[ -r /run/beginning/started.randomseed ]]
+}

@@ -17,7 +17,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-## start
+## Start
 if [[ "$PPID" -ne 1 ]];then
     printf "This script should only be ran from init.\n" >&2
     exit 1
@@ -83,22 +83,6 @@ rm -rf /run/beginning/*
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
 mount -av | egrep -v '(already|ignored)' | tab
-
-printf "Setting hostname to \"$HOSTNAME\"...\n"
-hostname "$HOSTNAME"
-
-printf "Setting random seed...\n"
-if [[ -r "${RANDOM_SEED}" ]];then
-    cat "${RANDOM_SEED}" >/dev/urandom
-else
-    poolsize=/proc/sys/kernel/random/poolsize
-    if [[ -r "$poolsize" ]];then
-        poolsize=$(<"$poolsize")
-    else
-        poolsize=
-    fi
-    dd if=/dev/urandom of="${RANDOM_SEED}" count=1 bs=${poolsize:-512} 2>/dev/null
-fi
 
 printf "Storing dmesg output to /var/log/dmesg.log...\n"
 dmesg > /var/log/dmesg.log

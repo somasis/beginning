@@ -1,0 +1,23 @@
+#!/bin/bash
+
+hostname_exists() {
+    type -fPp hostname
+}
+
+hostname_start() {
+    hostname_status
+    local err
+    hostname "${HOSTNAME}"; err=$?
+    [[ $err -eq 0 ]] && date +%s > /run/beginning/started.hostname
+    return $err
+}
+
+hostname_stop() {
+    hostname_status
+    rm -f /run/beginning/started.hostname
+    return 0
+}
+
+hostname_status() {
+    [[ -r /run/beginning/started.hostname ]]
+}
