@@ -39,10 +39,10 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 
 status() {
     case "${1^^}" in
-        STARTED) printf "\r\e[1;42m[x]\e[0m\n"   ;;
-        UNKNOWN) printf "\r\e[1;40m[?]\e[0m\n"   ;;
-        FAILED)  printf "\r\e[1;41m[x]\e[0m\n"   ;;
-        STOPPED) printf "\r\e[1;41m[ ]\e[0m\n"   ;;
+        STARTED) printf "\r\e[1;42m[x]\e[0m\n"      ;; # green bg [x]
+        FAILED) printf "\r\e[1;41m[x]\e[0m\n"       ;; # red bg [x]
+        STOPPED) printf "\r\e[1;41m[ ]\e[0m\n"      ;; # red bg [ ]
+        UNKNOWN|*) printf "\r\e[1;40m[?]\e[0m\n"    ;; # black bg [?]
     esac
 }
 

@@ -87,36 +87,6 @@ mount -av | egrep -v '(already|ignored)' | tab
 printf "Setting hostname to \"$HOSTNAME\"...\n"
 hostname "$HOSTNAME"
 
-rchook pre_network
-
-printf "Bringing up network interfaces...\n"
-for interface in ${INTERFACES[@]:-lo};do
-    tab "$interface..."
-    if ifconfig ${interface} up;then
-        printf " up.\n"
-    else
-        printf " failed.\n"
-    fi
-done
-
-rchook post_network
-rchook pre_hwclock
-
-printf "Setting hwclock...\n"
-export TZ
-CLOCK=${CLOCK,,}
-if [[ "${CLOCK}" == localtime ]];then
-    hwclock -s -l
-elif [[ "${CLOCK}" == utc ]];then
-    hwclock -s -u
-else
-    printf 'Invalid $CLOCK setting, defaulting to UTC\n' "$CLOCK" | tab
-    hwclock -s -u
-fi
-unset TZ
-
-rchook post_hwclock
-
 printf "Setting random seed...\n"
 if [[ -r "${RANDOM_SEED}" ]];then
     cat "${RANDOM_SEED}" >/dev/urandom

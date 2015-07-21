@@ -1,0 +1,53 @@
+#!/bin/bash
+
+hwclock_exists() {
+    if type -fPp hwclock && [[ -x /dev/rtc ]];then
+        return 0
+    else
+        return 1
+    fi
+}
+
+hwclock_start() {
+    hwclock_status
+    local err
+    export TZ=${HWCLOCK_TZ}
+    case ${HWCLOCK_TYPE,,} in
+        localtime)
+            hwclock --hctosys --localtime;err=$?
+        ;;
+        utc)
+            hwclock --hctosys --utc;err=$?
+        ;;
+        *)
+            err=1
+        ;;
+    esac
+    unset TZ
+    date +%s > /run/beginning/started.hwclock
+    return $err
+}
+
+hwclock_stop() {
+    hwclock_status
+    local err
+    export TZ=${HWCLOCK_TZ}
+    case ${HWCLOCK_TYPE,,} in
+        localtime)
+            hwclock --systohc --localtime;err=$?
+        ;;
+        utc)
+            hwclock --systohc --utc;err=$?
+        ;;
+        *)
+            err=1
+        ;;
+    esac
+    unset TZ
+    rm -f /run/beginning/started.hwclock
+    return $err
+}
+
+hwclock_status() {
+    [[ -r /run/beginning/started.hwclock ]]
+}
