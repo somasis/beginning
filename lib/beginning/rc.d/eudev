@@ -27,7 +27,7 @@ eudev_reload() {
 }
 
 eudev_stop() {
-    udevadm --exit
+    udevadm control --exit
     eudev_status || rm -f /run/eudev.pid
 }
 
