@@ -1,0 +1,3 @@
+#!/bin/bash
+
+udev_virtual() { true; }
