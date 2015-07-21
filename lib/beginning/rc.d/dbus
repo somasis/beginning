@@ -16,5 +16,5 @@ dbus_stop() {
 }
 
 dbus_status() {
-    pidexists /run/dbus.pid
+    pidfileexists /run/dbus.pid
 }

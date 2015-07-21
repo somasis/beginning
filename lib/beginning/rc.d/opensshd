@@ -20,5 +20,5 @@ opensshd_stop() {
 }
 
 opensshd_status() {
-    pidexists /run/sshd.pid
+    pidfileexists /run/sshd.pid
 }

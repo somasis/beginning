@@ -19,5 +19,5 @@ openntpd_stop() {
 }
 
 openntpd_status() {
-    pidexists /run/openntpd.pid
+    pidfileexists /run/openntpd.pid
 }

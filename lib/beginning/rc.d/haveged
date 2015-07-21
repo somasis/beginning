@@ -15,6 +15,6 @@ haveged_stop() {
 }
 
 haveged_status() {
-    pidexists /run/haveged.pid
+    pidfileexists /run/haveged.pid
 }
 

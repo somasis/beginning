@@ -20,5 +20,5 @@ transmission_stop() {
 }
 
 transmission_status() {
-    pidexists /run/transmission.pid
+    pidfileexists /run/transmission.pid
 }

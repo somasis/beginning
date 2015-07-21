@@ -20,6 +20,6 @@ cronie_stop() {
 }
 
 cronie_status() {
-    pidexists /run/cronie.pid
+    pidfileexists /run/cronie.pid
 }
 
