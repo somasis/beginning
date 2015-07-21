@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hwclock_exists() {
-    if type -fPp hwclock && [[ -x /dev/rtc ]];then
+    if type -fPp hwclock && [[ -e /dev/rtc ]];then
         return 0
     else
         return 1
