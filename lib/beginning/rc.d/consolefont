@@ -1,18 +1,17 @@
 #!/bin/bash
 
-setfont_args=
-
 consolefont_exists() {
     type -fPp setfont
 }
 
 consolefont_start() {
     consolefont_status
-    [[ "${CONSOLEFONT_FONTMAP}" ]]       && setfont_args="$setfont_args -m ${CONSOLEFONT_FONTMAP}"
-    [[ "${CONSOLEFONT_FONTUNIMAP}" ]]    && setfont_args="$setfont_args -u ${CONSOLEFONT_FONTUNIMAP}"
+    [[ "${CONSOLEFONT_MAP}" ]] && CONSOLEFONT_ARGS="${CONSOLEFONT_ARGS} -m ${CONSOLEFONT_MAP}"
+    [[ "${CONSOLEFONT_UNIMAP}" ]] && CONSOLEFONT_ARGS="${CONSOLEFONT_ARGS} -u ${CONSOLEFONT_UNIMAP}"
+    local err tty
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        if setfont -C "$tty" $setfont_args "${CONSOLEFONT_FONT}";then
-            err=0
+        if setfont -C "$tty" ${CONSOLEFONT_ARGS:+"${CONSOLEFONT_ARGS}"} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"};then
+            err=$?
         else
             err=1
             break
@@ -23,6 +22,7 @@ consolefont_start() {
 }
 
 consolefont_stop() {
+    local err tty
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
         if setfont -C "$tty";then
             err=0
