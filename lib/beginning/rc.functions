@@ -131,7 +131,9 @@ beginning_daemon_start() {
             if type -t ${daemon}_status >/dev/null 2>&1;then
                 if ! ${daemon}_status;then
                     if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
+                        BEGINNING_RESOLVING_DEPS=true
                         type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
+                        BEGINNING_RESOLVING_DEPS=
                     fi
                     if type -t ${daemon}_start >/dev/null 2>&1;then
                         printf "[ ] %s" "${daemon}"
@@ -143,7 +145,7 @@ beginning_daemon_start() {
                         fi
                     fi
                 else
-                    status FAILED "${daemon}: already started"
+                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && status STARTED "${daemon}: already started"
                 fi
             fi
         fi
@@ -174,43 +176,45 @@ beginning_daemon_stop() {
             else
                 continue
             fi
-                d_list=(
-                    $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
-                        if [[ -r "${USER_RC}/${d##*/}" ]];then
-                            d="${USER_RC}/${d##*/}"
-                        elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
-                            d="${BEGINNING_LIB}/rc.d/${d##*/}"
-                        fi
-                        . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
-                        while read line;do
-                            [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
-                        done
-                    done 2>/dev/null)
-                )
-                depends=( )
-                for dep in ${d_list[@]};do
-                    dname=${dep/:*}
-                    [[ " ${BEGINNING_SKIP_DEPS} " == *" ${dname} "* ]] && continue
-                    depends+=( "${dname}" )
-                done
-                if [[ " ${depends[@]} " != *" ${daemon} "* ]];then
-                    BEGINNING_SKIP_DEPS="${BEGINNING_SKIP_DEPS} ${daemon} " beginning_daemon_stop ${depends[@]}
-                fi
-                if type -t ${daemon}_status >/dev/null 2>&1;then
-                    if ${daemon}_status;then
-                        printf "[ ] %s" "${daemon}"
-                        if type -t ${daemon}_stop >/dev/null 2>&1;then
-                            ${daemon}_stop
-                            if [[ $? -eq 0 ]];then
-                                status STOPPED
-                            else
-                                status FAILED
-                            fi
-                        fi
-                    else
-                        status FAILED "${daemon}: already stopped"
+            BEGINNING_RESOLVING_DEPS=true
+            d_list=(
+                $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
+                    if [[ -r "${USER_RC}/${d##*/}" ]];then
+                        d="${USER_RC}/${d##*/}"
+                    elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
+                        d="${BEGINNING_LIB}/rc.d/${d##*/}"
                     fi
+                    . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
+                    while read line;do
+                        [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
+                    done
+                done 2>/dev/null)
+            )
+            depends=( )
+            for dep in ${d_list[@]};do
+                dname=${dep/:*}
+                [[ " ${BEGINNING_SKIP_DEPS} " == *" ${dname} "* ]] && continue
+                depends+=( "${dname}" )
+            done
+            if [[ " ${depends[@]} " != *" ${daemon} "* ]];then
+                BEGINNING_SKIP_DEPS="${BEGINNING_SKIP_DEPS} ${daemon} " beginning_daemon_stop ${depends[@]}
+            fi
+            BEGINNING_RESOLVING_DEPS=
+            if type -t ${daemon}_status >/dev/null 2>&1;then
+                if ${daemon}_status;then
+                    printf "[ ] %s" "${daemon}"
+                    if type -t ${daemon}_stop >/dev/null 2>&1;then
+                        ${daemon}_stop
+                        if [[ $? -eq 0 ]];then
+                            status STOPPED
+                        else
+                            status FAILED
+                        fi
+                    fi
+                else
+                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && status FAILED "${daemon}: already stopped"
                 fi
+            fi
         fi
     done
 }
