@@ -79,7 +79,7 @@ beginning_daemon_start() {
             continue
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "Starting \`%s\`.. invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
                 d_list=(
                     $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
@@ -100,13 +100,19 @@ beginning_daemon_start() {
                 if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
                     d_list=( "${provider}" )
                 elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-                    printf "\`%s\` provider is not valid. Starting all possible providers.\n" "${daemon}" >&2
+                    d_list=( "${d_list[1]}" )
+                    printf "%s's provider is not valid. Starting first possible provider: %s\n" "${daemon}" "${d_list[1]}"  >&2
+                elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
+                    printf "%s's provider is not set. Failing. Possible providers: %s\n" "${daemon}" "${d_list[*]}" >&2
+                    status FAILED
+                    return 5
                 fi
                 if [[ -n "${d_list}" ]];then
                     beginning_daemon_start "${d_list}"; return $?
                 else
-                    printf "Starting \`%s\`... \`%s\` has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
-                    return 1
+                    printf "%s has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
+                    status FAILED
+                    return 5
                 fi
 
             fi
@@ -150,7 +156,7 @@ beginning_daemon_stop() {
             printf "Cannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
                 d_list=(
                     $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
@@ -171,14 +177,19 @@ beginning_daemon_stop() {
                 if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
                     d_list=( "${provider}" )
                 elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-                    printf "\`%s\` provider is not valid. Stopping all possible providers.\n" "${daemon}" >&2
+                    d_list=( "${d_list[1]}" )
+                    printf "%s's provider is not valid. Stopping first possible provider: %s\n" "${daemon}" "${d_list[1]}"  >&2
+                elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
+                    printf "%s's provider is not set. Failing. Possible providers: %s\n" "${daemon}" "${d_list[*]}" >&2
+                    status FAILED
+                    return 6
                 fi
                 if [[ -n "${d_list}" ]];then
                     beginning_daemon_stop "${d_list}"; return $?
                 else
-                    printf "\`%s\` has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
+                    printf "%s has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
                     status FAILED
-                    return 1
+                    return 5
                 fi
             fi
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
