@@ -22,13 +22,13 @@ umask 022
 export PATH="/bin:/sbin"
 
 # os-release contains things such as distro name, distro's 'color'...
-[[ -r /lib/os-release ]] && . /lib/os-release
-[[ -r /lib/beginning/rc.conf ]] && . /lib/beginning/rc.conf
-[[ -r /etc/os-release ]] && . /etc/os-release
-[[ -r /etc/rc.conf ]] && . /etc/rc.conf
+[[ -r ${LIBDIR:-/lib}/os-release ]] && . ${LIBDIR:-/lib}/os-release
+[[ -r ${BEGINNING_LIB:-/lib/beginning}/rc.conf ]] && . ${BEGINNING_LIB:-/lib/beginning}/rc.conf
+[[ -r ${SYSCONFDIR:-/etc}/os-release ]] && . ${SYSCONFDIR:-/etc}/os-release
+[[ -r ${SYSCONFDIR:-/etc}/rc.conf ]] && . ${SYSCONFDIR:-/etc}/rc.conf
 
-if [[ ! -r /lib/beginning/rc.conf && ! -f /etc/rc.conf ]];then
-    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' /lib/beginning /etc
+if [[ ! -r ${BEGINNING_LIB:-/lib/beginning}/rc.conf && ! -f ${SYSCONFDIR:-/etc}/rc.conf ]];then
+    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' "${BEGINNING_LIB:-/lib/beginning}" "${SYSCONFDIR:-/etc}"
     emergency_shell
 fi
 
@@ -74,11 +74,11 @@ beginning_daemon_provider() {
 
     d_list=
     d_list=(
-        $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
-            if [[ -r "/etc/rc.d/${d##*/}" ]];then
-                d="/etc/rc.d/${d##*/}"
-            elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
-                d="/lib/beginning/rc.d/${d##*/}"
+        $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
+            if [[ -r "${USER_RC}/${d##*/}" ]];then
+                d="${USER_RC}/${d##*/}"
+            elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
+                d="${BEGINNING_LIB}/rc.d/${d##*/}"
             fi
             . "$d"
             if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
@@ -110,10 +110,10 @@ beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
     for daemon in ${@};do
-        if [[ -f "/etc/rc.d/${daemon}" ]];then
-            daemon_file="/etc/rc.d/${daemon}"
-        elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
-            daemon_file="/lib/beginning/rc.d/${daemon}"
+        if [[ -f "${USER_RC}/${daemon}" ]];then
+            daemon_file="${USER_RC}/${daemon}"
+        elif [[ -f "${BEGINNING_LIB}/rc.d/${daemon}" ]];then
+            daemon_file="${BEGINNING_LIB}/rc.d/${daemon}"
         else
             continue
         fi
@@ -154,10 +154,10 @@ beginning_daemon_stop() {
         if [[ " ${BEGINNING_SKIP_DEPS} " == *" ${daemon} "* ]];then
             continue
         fi
-        if [[ -f "/etc/rc.d/${daemon}" ]];then
-            daemon_file="/etc/rc.d/${daemon}"
-        elif [[ -f "/lib/beginning/rc.d/${daemon}" ]];then
-            daemon_file="/lib/beginning/rc.d/${daemon}"
+        if [[ -f "${USER_RC}/${daemon}" ]];then
+            daemon_file="${USER_RC}/${daemon}"
+        elif [[ -f "${BEGINNING_LIB}/rc.d/${daemon}" ]];then
+            daemon_file="${BEGINNING_LIB}/rc.d/${daemon}"
         else
             printf "Cannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
@@ -172,11 +172,11 @@ beginning_daemon_stop() {
                 continue
             fi
                 d_list=(
-                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
-                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
-                            d="/etc/rc.d/${d##*/}"
-                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
-                            d="/lib/beginning/rc.d/${d##*/}"
+                    $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
+                        if [[ -r "${USER_RC}/${d##*/}" ]];then
+                            d="${USER_RC}/${d##*/}"
+                        elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
+                            d="${BEGINNING_LIB}/rc.d/${d##*/}"
                         fi
                         . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
                         while read line;do
