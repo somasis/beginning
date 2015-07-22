@@ -269,6 +269,13 @@ tab() {
 }
 
 rchook() {
-    type -t "$1" >/dev/null 2>&1 && printf 'Running %s...\n' "$1" && "$1"
+    if type -t "$@" >/dev/null 2>&1;then
+        status NOTHING "rchook: ${@}"
+        if "$@";then
+            status STARTED "rchook: ${@}"
+        else
+            status FAILED "rchook: ${@}"
+        fi
+    fi
 }
 
