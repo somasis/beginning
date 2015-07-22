@@ -23,6 +23,8 @@ if [[ "$PPID" -ne 1 ]];then
     exit 1
 fi
 
+BEGINNING_RUNNER=init
+
 if [[ -r /lib/beginning/rc.functions ]];then
     . /lib/beginning/rc.functions
 else

@@ -13,9 +13,11 @@ hostname_start() {
 }
 
 hostname_stop() {
-    hostname_status
-    rm -f /run/beginning/started.hostname
-    return 0
+    if [[ "${BEGINNING_RUNNER}" == shutdown ]];then
+        return 0
+    else
+        return 1
+    fi
 }
 
 hostname_status() {

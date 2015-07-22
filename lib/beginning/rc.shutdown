@@ -23,6 +23,8 @@ if [[ "$PPID" -ne 1 ]];then
     exit 1
 fi
 
+BEGINNING_RUNNER=shutdown
+
 # Since we check for the readability/existence of rc.functions in rc.init,
 # we don't really need to check again. If you remove it then uh...
 # don't do that, stupid
