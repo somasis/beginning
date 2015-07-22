@@ -68,6 +68,44 @@ unset_phases() {
     done
 }
 
+beginning_daemon_provider() {
+    local action="${1}"
+    local daemon="${2}"
+
+    d_list=
+    d_list=(
+        $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
+            if [[ -r "/etc/rc.d/${d##*/}" ]];then
+                d="/etc/rc.d/${d##*/}"
+            elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
+                d="/lib/beginning/rc.d/${d##*/}"
+            fi
+            . "$d"
+            if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+                echo "${d##*/}"
+            fi
+        done 2>/dev/null)
+    )
+    local provider=
+    local provider=${daemon^^}_PROVIDER
+    local provider=${!provider}
+    if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
+        d_list=( "${provider}" )
+    elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
+        d_list=( "${d_list[1]}" )
+        [[ "${action}" == start ]] && status UNKNOWN "${daemon}: provider is not valid. Starting first possible provider: ${d_list[1]}"
+        [[ "${action}" == stop ]] && status UNKNOWN "${daemon}: provider is not valid. Stopping first possible provider: ${d_list[1]}"
+    elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
+        status FAILED "${daemon}: provider is not set. Possible providers: ${d_list[*]}"
+        return 2
+    fi
+    if [[ -n "${d_list}" ]];then
+        beginning_daemon_${action} "${d_list}"; return $?
+    else
+        status FAILED "${daemon}: has no providers. You need to set one."
+        return 3
+    fi
+}
 beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
@@ -82,40 +120,7 @@ beginning_daemon_start() {
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
-                d_list=(
-                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
-                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
-                            d="/etc/rc.d/${d##*/}"
-                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
-                            d="/lib/beginning/rc.d/${d##*/}"
-                        fi
-                        . "$d"
-                        if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
-                            echo "${d##*/}"
-                        fi
-                    done 2>/dev/null)
-                )
-                provider=
-                provider=${daemon^^}_PROVIDER
-                provider=${!provider}
-                if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
-                    d_list=( "${provider}" )
-                elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-                    d_list=( "${d_list[1]}" )
-                    printf "%s's provider is not valid. Starting first possible provider: %s\n" "${daemon}" "${d_list[1]}"  >&2
-                elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
-                    printf "%s's provider is not set. Failing. Possible providers: %s\n" "${daemon}" "${d_list[*]}" >&2
-                    status FAILED
-                    return 5
-                fi
-                if [[ -n "${d_list}" ]];then
-                    beginning_daemon_start "${d_list}"; return $?
-                else
-                    printf "%s has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
-                    status FAILED
-                    return 5
-                fi
-
+                beginning_daemon_provider start "${daemon}"; return $?
             fi
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
@@ -159,39 +164,7 @@ beginning_daemon_stop() {
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
-                d_list=(
-                    $(for d in $(echo /lib/beginning/rc.d/* /etc/rc.d/*);do
-                        if [[ -r "/etc/rc.d/${d##*/}" ]];then
-                            d="/etc/rc.d/${d##*/}"
-                        elif [[ -r "/lib/beginning/rc.d/${d##*/}" ]];then
-                            d="/lib/beginning/rc.d/${d##*/}"
-                        fi
-                        . "$d"
-                        if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
-                            echo "${d##*/}"
-                        fi
-                    done 2>/dev/null)
-                )
-                provider=
-                provider=${daemon^^}_PROVIDER
-                provider=${!provider}
-                if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
-                    d_list=( "${provider}" )
-                elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-                    d_list=( "${d_list[1]}" )
-                    printf "%s's provider is not valid. Stopping first possible provider: %s\n" "${daemon}" "${d_list[1]}"  >&2
-                elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
-                    printf "%s's provider is not set. Failing. Possible providers: %s\n" "${daemon}" "${d_list[*]}" >&2
-                    status FAILED
-                    return 6
-                fi
-                if [[ -n "${d_list}" ]];then
-                    beginning_daemon_stop "${d_list}"; return $?
-                else
-                    printf "%s has no providers. Failed.\n" "${daemon}" "${daemon}" >&2
-                    status FAILED
-                    return 5
-                fi
+                beginning_daemon_provider stop "${daemon}"; return $?
             fi
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
