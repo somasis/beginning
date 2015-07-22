@@ -10,7 +10,7 @@ dhcpd_provides() {
 
 dhcpd_start() {
     dhcpd_status || rm -f /run/dhcpd.pid
-    dhcpd -q -f ${DHCPD_CONF:+-cf ${DHCPD_CONF}} ${DHCPD_ARGS} ${DHCPD_IFACE} &
+    dhcpd -pf /run/dhcpd.pid -q ${DHCPD_CONF:+-cf ${DHCPD_CONF}} ${DHCPD_ARGS} ${DHCPD_IFACE} || return $?
 }
 
 dhcpd_stop() {
