@@ -5,7 +5,7 @@ cronie_exists() {
 }
 
 cronie_provides() {
-    echo crond
+    echo cron
 }
 
 cronie_start() {
