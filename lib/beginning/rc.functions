@@ -142,6 +142,8 @@ beginning_daemon_start() {
                             status FAILED
                         fi
                     fi
+                else
+                    status FAILED "${daemon}: already started"
                 fi
             fi
         fi
@@ -205,6 +207,8 @@ beginning_daemon_stop() {
                                 status FAILED
                             fi
                         fi
+                    else
+                        status FAILED "${daemon}: already stopped"
                     fi
                 fi
         fi
