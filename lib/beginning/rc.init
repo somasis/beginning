@@ -78,7 +78,8 @@ rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
-rm -rf /run/beginning/*
+rm -rf /run/beginning/
+mkdir /run/beginning/
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
