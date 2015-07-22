@@ -121,7 +121,7 @@ beginning_daemon_start() {
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
-                beginning_daemon_provider start "${daemon}"; return $?
+                beginning_daemon_provider start "${daemon}"; continue
             fi
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
@@ -169,7 +169,7 @@ beginning_daemon_stop() {
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
-                beginning_daemon_provider stop "${daemon}"; return $?
+                beginning_daemon_provider stop "${daemon}"; continue
             fi
             if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
                 true
