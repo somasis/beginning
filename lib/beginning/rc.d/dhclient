@@ -1,0 +1,23 @@
+#!/bin/bash
+
+dhclient_exists() {
+    type -fPp dhclient
+}
+
+dhclient_provides() {
+    echo network
+}
+
+dhclient_start() {
+    dhclient_status || rm -f /run/dhclient.pid
+    dhclient -pf /run/dhclient.pid -q ${DHCLIENT_CONF:+-cf ${DHCLIENT_CONF}} ${DHCLIENT_ARGS} ${DHCLIENT_IFACE} || return $?
+}
+
+dhclient_stop() {
+    kill $(</run/dhclient.pid)
+    dhclient_status || rm -f /run/dhclient.pid
+}
+
+dhclient_status() {
+    pidfileexists /run/dhclient.pid
+}
