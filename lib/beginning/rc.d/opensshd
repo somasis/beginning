@@ -11,7 +11,7 @@ opensshd_start() {
 }
 
 opensshd_reload() {
-    kill -HUP $(</run/sshd.pid)
+    pidfilekill -HUP /run/sshd.pid
 }
 
 opensshd_stop() {

@@ -15,7 +15,7 @@ cronie_start() {
 }
 
 cronie_stop() {
-    kill $(</run/cronie.pid)
+    pidfilekill /run/cronie.pid
     cronie_status || rm -f /run/cronie.pid
 }
 

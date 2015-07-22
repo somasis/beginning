@@ -10,7 +10,7 @@ haveged_start() {
 }
 
 haveged_stop() {
-    kill $(</run/haveged.pid)
+    pidfilekill /run/haveged.pid
     haveged_status || rm -f /run/haveged.pid
 }
 

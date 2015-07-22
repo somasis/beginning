@@ -232,6 +232,17 @@ pidfileexists() {
     fi
 }
 
+pidfilekill() {
+    [[ $# -gt 1 ]] && local sig="${1}" && shift
+    if [[ -r "${@}" ]];then
+        local pid=$(<"${1}")
+    else
+        return 1
+    fi
+    kill ${sig} "$pid" >/dev/null 2>&1
+    return $?
+}
+
 killall5() {
     for pid in $(pgrep . | egrep -v "^(1|$$|$PPID)$");do
         kill "${1:--15}" "$pid" >/dev/null 2>&1

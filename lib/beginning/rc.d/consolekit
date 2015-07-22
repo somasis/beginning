@@ -14,7 +14,7 @@ consolekit_start() {
 }
 
 consolekit_stop() {
-    kill $(</run/console-kit-daemon.pid)
+    pidfilekill /run/console-kit-daemon.pid
     consolekit_status || rm -f /run/console-kit-daemon.pid
 }
 

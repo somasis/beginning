@@ -18,7 +18,7 @@ avahi_reload() {
 }
 
 avahi_stop() {
-    kill $(</run/avahi-daemon/pid)
+    pidfilekill /run/avahi-daemon/pid
     avahi_status || rm -f /run/avahi-daemon/pid
 }
 

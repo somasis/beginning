@@ -19,7 +19,7 @@ bluez_start() {
 }
 
 bluez_stop() {
-    kill $(</run/bluetooth.pid)
+    pidfilekill /run/bluetooth.pid
     bluez_status || rm -f /run/bluetooth.pid
 }
 

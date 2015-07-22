@@ -14,7 +14,7 @@ openntpd_start() {
 }
 
 openntpd_stop() {
-    kill $(</run/openntpd.pid)
+    pidfilekill /run/openntpd.pid
     openntpd_status || rm -f /run/openntpd.pid
 }
 

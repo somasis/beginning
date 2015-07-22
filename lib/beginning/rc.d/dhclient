@@ -14,7 +14,7 @@ dhclient_start() {
 }
 
 dhclient_stop() {
-    kill $(</run/dhclient.pid)
+    pidfilekill /run/dhclient.pid
     dhclient_status || rm -f /run/dhclient.pid
 }
 

@@ -19,7 +19,7 @@ connman_start() {
 }
 
 connman_stop() {
-    kill $(</run/connman.pid)
+    pidfilekill /run/connman.pid
     connman_status || rm -f /run/connman.pid
 }
 

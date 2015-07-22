@@ -14,7 +14,7 @@ rsyslog_start() {
 }
 
 rsyslog_stop() {
-    kill $(</run/rsyslogd.pid)
+    pidfilekill /run/rsyslogd.pid
     rsyslog_status || rm -f /run/rsyslogd.pid
 }
 

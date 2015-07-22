@@ -15,7 +15,7 @@ transmission_start() {
 }
 
 transmission_stop() {
-    kill $(</run/transmission.pid)
+    pidfilekill /run/transmission.pid
     transmission_status || rm -f /run/transmission.pid
 }
 
