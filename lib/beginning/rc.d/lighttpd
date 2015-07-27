@@ -1,0 +1,20 @@
+#!/bin/bash
+
+lighttpd_exists() {
+    type -fPp lighttpd
+}
+
+lighttpd_start() {
+    lighttpd_status || rm -f /run/lighttpd.pid
+    lighttpd -t -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 && \
+    lighttpd -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1
+}
+
+lighttpd_stop() {
+    pidfilekill /run/lighttpd.pid
+    lighttpd_status || rm -f /run/lighttpd.pid
+}
+
+lighttpd_status() {
+    pidfileexists /run/lighttpd.pid
+}
