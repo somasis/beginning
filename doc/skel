@@ -11,7 +11,7 @@ skel_start() {
 }
 
 skel_stop() {
-    kill $(</run/skel.pid)
+    pidfilekill /run/skel.pid
     skel_status || rm -f /run/skel.pid
 }
 
