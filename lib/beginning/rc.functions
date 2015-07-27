@@ -82,8 +82,10 @@ beginning_daemon_provider() {
                 d="${BEGINNING_LIB}/rc.d/${d##*/}"
             fi
             . "$d"
-            if [[ " $(type -t ${d##*/}_exists >/dev/null 2>&1 && ${d##*/}_exists && type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
-                echo "${d##*/}"
+            if type -t ${d##*/}_exists >/dev/null 2>&1 && ${d##*/}_exists >/dev/null 2>&1;then
+                if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+                    echo "${d##*/}"
+                fi
             fi
         done 2>/dev/null)
     )
@@ -93,7 +95,7 @@ beginning_daemon_provider() {
     if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
         d_list=( "${provider}" )
     elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-        status FAILED "${daemon} invalid provider. Possible providers: ${d_list[*]}"
+        status FAILED "${daemon}: invalid provider. Possible providers: ${d_list[*]}"
         return 1
     elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
         status FAILED "${daemon}: provider is not set. Possible providers: ${d_list[*]}"
