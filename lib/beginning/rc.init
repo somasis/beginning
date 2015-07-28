@@ -60,7 +60,7 @@ mount -n -t tmpfs       -o rw,nosuid,nodev,mode=755 tmpfs   /run     >/dev/null 
 echo 0 > /proc/sys/kernel/ctrl-alt-del
 
 # If we specify that the kernel should be verbose, we should tell dmesg
-if [[ " <$(/proc/cmdline) " == *" verbose "* ]];then
+if [[ " $(</proc/cmdline) " == *" verbose "* ]];then
     dmesg -n 8
 else
     dmesg -n "${LOG_LEVEL:-3}"
