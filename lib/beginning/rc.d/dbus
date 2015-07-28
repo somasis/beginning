@@ -5,6 +5,7 @@ dbus_exists() {
 }
 
 dbus_start() {
+    mkdir /run/dbus || return $?
     dbus_status || rm -f /run/dbus.pid
     dbus-uuidgen --ensure
     dbus-daemon --system --fork --nopidfile --print-pid ${DBUS_ARGS} > /run/dbus.pid
