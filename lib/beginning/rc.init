@@ -104,6 +104,11 @@ fi
 
 rchook post_boot
 
+if [[ " $(</proc/cmdline) " == *" single "* ]];then
+    printf "Going into single user mode..."
+    emergency_shell
+fi
+
 if [[ "${DAEMONS[@]}" ]];then
     printf "Starting daemons...\n"
     beginning_daemon_start ${DAEMONS[@]}
