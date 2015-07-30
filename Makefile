@@ -16,3 +16,4 @@ install:
 	cp -dr etc/* $(DESTDIR)/$(SYSCONFDIR)
 	mkdir -p $(DESTDIR)/$(DOCDIR)
 	cp -dr doc/* $(DESTDIR)/$(DOCDIR)
+
