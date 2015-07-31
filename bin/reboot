@@ -30,8 +30,8 @@ else
 fi
 
 if [[ "$#" -eq 0 ]];then
-    [[ "${0##*/}" == reboot ]]      && kill -10 1
-    [[ "${0##*/}" == poweroff ]]    && kill -2  1
-elif [[ "$1" ]];then
-    busybox "${0##*/}" $1 # TODO: remove dependency on busybox
+    [[ "${0##*/}" == reboot ]]      && kill -2  1
+    [[ "${0##*/}" == poweroff ]]    && kill -10 1
+elif [[ "$1" || "${PPID}" -eq 1 ]];then
+    busybox "${0##*/}" "$@" # TODO: remove dependency on busybox
 fi 
