@@ -69,10 +69,10 @@ sync
 
 case "$1" in
     reboot)
-        busybox reboot -nf
+        reboot -nf
     ;;
     poweroff)
-        busybox poweroff -nf
+        poweroff -nf
     ;;
 esac
 
