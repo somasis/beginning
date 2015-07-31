@@ -7,7 +7,8 @@ lighttpd_exists() {
 lighttpd_start() {
     lighttpd_status || rm -f /run/lighttpd.pid
     lighttpd -t -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 && \
-    lighttpd -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1
+    lighttpd -D -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/lighttpd.pid
 }
 
 lighttpd_stop() {
