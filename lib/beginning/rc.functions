@@ -146,7 +146,7 @@ beginning_daemon_start() {
                         fi
                     fi
                 else
-                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && status STARTED "${daemon}: already started"
+                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && [[ "${BEGINNING_RUNNER}" != init ]] && status STARTED "${daemon}: already started"
                 fi
             fi
         fi
