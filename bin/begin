@@ -33,7 +33,6 @@ fi
 
 trap "${INIT_SHUTDOWN_CMD}" SIGUSR1
 trap "${INIT_REBOOT_CMD}"   SIGINT
-trap
 
 ${INIT_RC_CMD} &
 
