@@ -30,8 +30,16 @@ else
 fi
 
 if [[ "$#" -eq 0 ]];then
-    [[ "${0##*/}" == reboot ]]      && kill -2  1
-    [[ "${0##*/}" == poweroff ]]    && kill -10 1
+    bin="${0##*/}"
+    bin="${bin##beginning.}"
+    case "${bin}" in
+        reboot)
+            kill -2 1
+        ;;
+        poweroff|shutdown|halt)
+            kill -10 1
+        ;;
+    esac
 elif [[ "$1" || "${PPID}" -eq 1 ]];then
     busybox "${0##*/}" "$@" # TODO: remove dependency on busybox
 fi 
