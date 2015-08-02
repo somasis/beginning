@@ -1,0 +1,25 @@
+#!/bin/bash
+
+znc_exists() {
+    type -fPp znc
+}
+
+znc_start() {
+    znc_status || rm -f /run/znc.pid
+    if [[ "${ZNC_USER}" ]];then
+        touch /run/znc.pid && chown "${ZNC_USER}" /run/znc.pid
+        su -s $(type -fPp sh) -c "znc -f ${ZNC_ARGS}" "${ZNC_USER}" >/dev/null 2>&1 &
+    else
+        znc -f ${ZNC_ARGS} >/dev/null 2>&1 &
+    fi
+    echo $! > /run/znc.pid
+}
+
+znc_stop() {
+    pidfilekill /run/znc.pid
+    znc_status || rm -f /run/znc.pid
+}
+
+znc_status() {
+    pidfileexists /run/znc.pid
+}
