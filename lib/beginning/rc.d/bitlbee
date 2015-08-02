@@ -1,0 +1,20 @@
+#!/bin/bash
+
+bitlbee_exists() {
+    type -fPp bitlbee
+}
+
+bitlbee_start() {
+    bitlbee_status || rm -f /run/bitlbee.pid
+    bitlbee -Fn ${BITLBEE_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/bitlbee.pid
+}
+
+bitlbee_stop() {
+    pidfilekill /run/bitlbee.pid
+    bitlbee_status || rm -f /run/bitlbee.pid
+}
+
+bitlbee_status() {
+    pidfileexists /run/bitlbee.pid
+}
