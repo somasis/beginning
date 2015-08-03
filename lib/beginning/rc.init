@@ -49,13 +49,15 @@ printf "\n"
 
 # Mount partitions required to do anything useful
 
-mkdir -p    /dev /dev/pts /dev/shm /proc /tmp /run /sys              >/dev/null 2>&1
+mkdir /dev /proc /tmp /run /sys >/dev/null 2>&1
 
 mount -n -t proc        -o nodev,noexec,nosuid      proc    /proc    >/dev/null 2>&1
 mount -n -t sysfs       -o nodev,noexec,nosuid      sys     /sys     >/dev/null 2>&1
 mount -n -t devtmpfs    -o nosuid,mode=0755         dev     /dev     >/dev/null 2>&1
+mkdir /dev/pts
 mount -n -t devpts      -o gid=5,mode=0620          devpts  /dev/pts >/dev/null 2>&1
 mount -n -t tmpfs       -o nodev,nosuid,noexec      tmpfs   /tmp     >/dev/null 2>&1
+mkdir /dev/shm
 mount -n -t tmpfs       -o nodev,nosuid,noexec      shm     /dev/shm >/dev/null 2>&1
 mount -n -t tmpfs       -o rw,nosuid,nodev,mode=755 tmpfs   /run     >/dev/null 2>&1
 
