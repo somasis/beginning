@@ -23,12 +23,13 @@ if [[ "$PPID" -ne 1 ]];then
     exit 1
 fi
 
-BEGINNING_RUNNER=init
+LIBDIR=${LIBDIR:-/lib}
+BEGINNING_DIR=${BEGINNING_DIR:-$LIBDIR/beginning}
 
-if [[ -r /lib/beginning/rc.functions ]];then
-    . /lib/beginning/rc.functions
+if [[ -r ${BEGINNING_DIR}/rc.functions ]];then
+    . ${BEGINNING_DIR}/rc.functions
 else
-    printf 'Could not find /lib/beginning/rc.functions, going into emergency shell...\n'
+    printf 'Could not find %s/rc.functions, going into emergency shell...\n' "${BEGINNING_DIR}"
     while true;do
         sulogin && exec "$0"
     done

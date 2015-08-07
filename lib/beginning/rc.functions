@@ -21,14 +21,19 @@ umask 022
 
 export PATH="/bin:/sbin"
 
-# os-release contains things such as distro name, distro's 'color'...
-[[ -r ${LIBDIR:-/lib}/os-release ]] && . ${LIBDIR:-/lib}/os-release
-[[ -r ${BEGINNING_LIB:-/lib/beginning}/rc.conf ]] && . ${BEGINNING_LIB:-/lib/beginning}/rc.conf
-[[ -r ${SYSCONFDIR:-/etc}/os-release ]] && . ${SYSCONFDIR:-/etc}/os-release
-[[ -r ${SYSCONFDIR:-/etc}/rc.conf ]] && . ${SYSCONFDIR:-/etc}/rc.conf
+LIBDIR=${LIBDIR:-/lib}
+SYSCONFDIR=${SYSCONFDIR:-/etc}
 
-if [[ ! -r ${BEGINNING_LIB:-/lib/beginning}/rc.conf && ! -f ${SYSCONFDIR:-/etc}/rc.conf ]];then
-    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' "${BEGINNING_LIB:-/lib/beginning}" "${SYSCONFDIR:-/etc}"
+BEGINNING_LIB=${LIBDIR}/beginning
+
+# os-release contains things such as distro name, distro's 'color'...
+[[ -r "${LIBDIR}"/os-release ]]     && . "${LIBDIR}"/os-release
+[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
+[[ -r "${SYSCONFDIR}"/os-release ]] && . "${SYSCONFDIR}"/os-release
+[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
+
+if [[ ! -r "${BEGINNING_LIB}"/rc.conf && ! -f "${SYSCONFDIR}"/rc.conf ]];then
+    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' "${BEGINNING_LIB}" "${SYSCONFDIR}"
     emergency_shell
 fi
 
