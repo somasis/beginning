@@ -23,13 +23,13 @@ if [[ "$PPID" -ne 1 ]];then
     exit 1
 fi
 
-BEGINNING_RUNNER=shutdown
-
 # Since we check for the readability/existence of rc.functions in rc.init,
 # we don't really need to check again. If you remove it then uh...
 # don't do that, stupid
 LIBDIR=${LIBDIR:-/lib}
 . ${BEGINNING_LIB:-$LIBDIR/beginning}/rc.functions
+
+BEGINNING_RUNNER=shutdown
 
 case "$1" in
     reboot|poweroff)
