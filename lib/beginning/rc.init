@@ -116,8 +116,9 @@ if [[ " $(</proc/cmdline) " == *" single "* ]];then
     emergency_shell
 fi
 
-beginning_daemon_start ${CORE_DAEMONS[@]} ${DAEMONS[@]}
-rchook post_daemons
+beginning_daemon_start ${CORE_DAEMONS_BEFORE[@]}
+beginning_daemon_start ${DAEMONS[@]}
+beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
 
 TABS=
 
