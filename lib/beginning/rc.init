@@ -116,11 +116,8 @@ if [[ " $(</proc/cmdline) " == *" single "* ]];then
     emergency_shell
 fi
 
-if [[ "${DAEMONS[@]}" ]];then
-    printf "Starting daemons...\n"
-    beginning_daemon_start ${DAEMONS[@]}
-    rchook post_daemons
-fi
+beginning_daemon_start ${CORE_DAEMONS[@]} ${DAEMONS[@]}
+rchook post_daemons
 
 TABS=
 
