@@ -7,7 +7,7 @@ getty_exists() {
 getty_start() {
     if [[ "${BEGINNING_RUNNER}" == init ]];then
         for (( i=1; i<=${GETTY_VTERMS}; i++ )); do
-            bash -c "while true;do setsid agetty --noclear tty${i} linux;done" &>/dev/null
+            bash -c "while true;do setsid agetty --noclear tty${i} linux;done" &>/dev/null &
         done
     else
         false

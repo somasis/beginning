@@ -121,8 +121,4 @@ rchook post_daemons
 
 TABS=
 
-for terminal in $(seq 1 ${VTERMS});do
-    bash -c "while true;do setsid agetty --noclear tty${terminal} linux;done" &>/dev/null &
-done
-
 wait
