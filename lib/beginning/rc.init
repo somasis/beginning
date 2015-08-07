@@ -35,6 +35,7 @@ else
     done
 fi
 
+BEGINNING_RUNNER=init
 TABS=true
 
 rchook pre_beginning
