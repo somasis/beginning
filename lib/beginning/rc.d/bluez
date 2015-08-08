@@ -9,7 +9,7 @@ bluez_exists() {
 }
 
 bluez_depends() {
-    echo dbus udev
+    echo dbus dev
 }
 
 bluez_start() {

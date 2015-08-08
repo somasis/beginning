@@ -9,7 +9,7 @@ connman_provides() {
 }
 
 connman_depends() {
-    echo dbus udev
+    echo dbus dev
 }
 
 connman_start() {
