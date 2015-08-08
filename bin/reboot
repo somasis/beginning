@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Beginning - an init system that doesn't try to be too clever
+# Beginning - an init system that isn't smarter than you
 #
 # Copyright (c) 2015 Kylie McClain <somasis@exherbo.org>
 #
