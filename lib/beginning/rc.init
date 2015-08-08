@@ -95,7 +95,8 @@ mkdir -p /run/beginning
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
-mount -av | egrep -v '(already|ignored)' | tab
+mount  -av | egrep -v '(already|ignored)' | tab
+swapon -av | egrep -v '(already|ignored)' | tab
 
 printf "Storing dmesg output to /var/log/dmesg.log...\n"
 dmesg > /var/log/dmesg.log
