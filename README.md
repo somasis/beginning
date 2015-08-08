@@ -32,6 +32,9 @@ Prior art: OpenBSD init, systemd, Arch Linux initscripts, sinit
 
 ### What it does not have
 - No runlevels (`telinit 1`, `systemctl start multi-user.target`, etc.)
+    - I feel as though runlevels are needless complication. You might manage to
+      convince me if you can provide a very common use-case that can't be
+      implemented with your own custom `rchooks`.
 - No network management (use a separate daemon for that)
 - No socket managing
     - Not enough possible benefits of using sockets for daemons. If you
