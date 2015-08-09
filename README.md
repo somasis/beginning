@@ -28,7 +28,26 @@ to how BSD-style inits work. Consider it an amalgamation of the very good
 parts of systemd, with the configurability and straightforwardness of
 BSD-style init.
 
-Prior art: OpenBSD init, systemd, Arch Linux initscripts, sinit
+*Prior art: OpenBSD init, systemd, Arch Linux initscripts, sinit*
+
+You could also consider this to be a demonstration of just how simple init
+systems really need to be; the most complex part of this is probably the
+daemon dependency resolution.
+The actual `init` program is just 34 SLOC, because all `init` has to do is
+`wait` forever, and handle shutdown and reboot signals. Nothing else.
+Compare this to other init systems that install a fully-functional kitchen
+sink.
+
+### What it does have
+- `PID 1`
+    - Only handles shutdown, reboot, and starting the service manager
+- Service manager
+    - Daemon starting, with dependency resolution
+    - Virtuals, with customizable providers for them (network/syslog/udev,
+      etc.)
+        - This is inspired a bit by `systemd`'s targets
+    - `rc`, for starting and stopping daemons after boot
+    - `rc.conf`, which allows for lots of configuration
 
 ### What it does not have
 - No runlevels (`telinit 1`, `systemctl start multi-user.target`, etc.)
