@@ -48,7 +48,7 @@ printf "\e[0mShutting down ${ANSI_COLOR}%s\e[0m...\n\n" "${PRETTY_NAME}"
 # Allow for ctrl-alt-del hard reboots, for if this script breaks
 echo 1 > /proc/sys/kernel/ctrl-alt-del
 
-beginning_daemon_stop $(echo ${CORE_DAEMONS[@]} ${DAEMONS[@]} | tr ' ' '\n' | tac)
+beginning_daemon_stop $(echo ${CORE_DAEMONS_BEFORE[@]} ${DAEMONS[@]} ${CORE_DAEMONS_AFTER[@]} | tr ' ' '\n' | tac)
 
 printf 'Sending TERM to all processes...\n'
 killall5 -15 && sleep 1
