@@ -6,6 +6,7 @@ consolekit_exists() {
 
 consolekit_depends() {
     echo dbus
+    [[ "${BEGINNING_PLATFORM}" == "Linux" ]] && echo cgmanager
 }
 
 consolekit_start() {

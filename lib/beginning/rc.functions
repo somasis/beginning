@@ -308,3 +308,4 @@ rchook() {
     fi
 }
 
+BEGINNING_PLATFORM=$(uname -s)
