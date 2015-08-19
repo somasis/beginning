@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cgmanager_exists() {
+    type -fPp cgmanager
+}
+
+cgmanager_start() {
+    cgmanager_status || rm -f /run/cgmanager.pid
+    cgmanager ${CGMANAGER_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/cgmanager.pid
+}
+
+cgmanager_stop() {
+    pidfilekill /run/cgmanager.pid
+    cgmanager_status || rm -f /run/cgmanager.pid
+}
+
+cgmanager_status() {
+    pidfileexists /run/cgmanager.pid
+}
+
