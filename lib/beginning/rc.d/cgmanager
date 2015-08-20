@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cgmanager_exists() {
-    type -fPp cgmanager
+    prog_exists cgmanager
 }
 
 cgmanager_start() {

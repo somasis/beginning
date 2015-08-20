@@ -5,7 +5,7 @@ rsyslog_provides() {
 }
 
 rsyslog_exists() {
-    type -fPp rsyslogd
+    prog_exists rsyslogd
 }
 
 rsyslog_start() {

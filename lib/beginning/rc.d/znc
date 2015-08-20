@@ -1,7 +1,7 @@
 #!/bin/bash
 
 znc_exists() {
-    type -fPp znc
+    prog_exists znc
 }
 
 znc_start() {

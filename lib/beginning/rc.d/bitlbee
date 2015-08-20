@@ -1,7 +1,7 @@
 #!/bin/bash
 
 bitlbee_exists() {
-    type -fPp bitlbee
+    prog_exists bitlbee
 }
 
 bitlbee_start() {

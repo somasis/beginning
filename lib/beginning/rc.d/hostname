@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hostname_exists() {
-    type -fPp hostname || [[ -r "/proc/sys/kernel/hostname" ]]
+    prog_exists hostname || [[ -r "/proc/sys/kernel/hostname" ]]
 }
 
 hostname_start() {

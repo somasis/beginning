@@ -1,11 +1,14 @@
 #!/bin/bash
 
 consolekit_exists() {
-    type -fPp console-kit-daemon
+    prog_exists console-kit-daemon
 }
 
 consolekit_depends() {
     echo dbus
+}
+
+consolekit_wants() {
     [[ "${BEGINNING_PLATFORM}" == "Linux" ]] && echo cgmanager
 }
 

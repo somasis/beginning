@@ -5,7 +5,7 @@ eudev_provides() {
 }
 
 eudev_exists() {
-    if type -fPp udevd && ! type -fPp systemctl;then
+    if prog_exists udevd && ! prog_exists systemctl;then
         true
     else
         false

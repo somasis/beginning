@@ -1,7 +1,7 @@
 #!/bin/bash
 
 transmission_exists() {
-    type -fPp transmission-daemon
+    prog_exists transmission-daemon
 }
 
 transmission_start() {

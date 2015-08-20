@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dhcpd_exists() {
-    type -fPp dhcpd
+    prog_exists dhcpd
 }
 
 dhcpd_start() {
