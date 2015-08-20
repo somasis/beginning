@@ -52,12 +52,12 @@ ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 status() {
     local stat="${1^^}";shift
     case "${stat}" in
-        STARTED)    printf "\r\e[1;42m[x]\e[0m %s\n" "$@"   ;; # green bg   [x]
-        FAILED)     printf "\r\e[1;41m[x]\e[0m %s\n" "$@"   ;; # red bg     [x]
-        STOPPED)    printf "\r\e[1;41m[ ]\e[0m %s\n" "$@"   ;; # red bg     [ ]
-        UNKNOWN)    printf "\r\e[1;40m[?]\e[0m %s\n" "$@"   ;; # black bg   [?]
-        NOTHING)    printf "\r\e[1;40m[ ]\e[0m %s\n" "$@"   ;; # black bg   [ ]
-        CUSTOM)     printf "\r\e[1;40m[ ]\e[0m %s"   "$@"   ;; # black bg   [ ]
+        STARTED)    printf "\r\e[1;42m[ ${stat} ]\e[0m %s\n" "$@"   ;; # green bg   [white]
+        FAILURE)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
+        STOPPED)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
+        UNKNOWN)    printf "\r\e[1;40m[ ${stat} ]\e[0m %s\n" "$@"   ;; # black bg   [white]
+        NOTHING)    printf "\r\e[1;40m[         ]\e[0m %s\n" "$@"   ;; # black bg   [white]
+        CUSTOM)     printf "\r\e[1;40m[         ]\e[0m %s"   "$@"   ;; # black bg   [white]
     esac
 }
 
