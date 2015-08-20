@@ -40,14 +40,7 @@ case "$1" in
         fi
         shift
         for dae in ${@};do
-            if [[ -f "/etc/rc.d/${dae}" ]];then
-                daemon_file="/etc/rc.d/${dae}"
-            elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
-                daemon_file="/lib/beginning/rc.d/${dae}"
-            else
-                printf "%s: Could not find %s.\n" "${0##*/}" "${dae}" >&2
-                exit 1
-            fi
+            daemon_file=$(beginning_daemon_file "${dae}")
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
             if func_exists beginning_daemon_${act};then
                 beginning_daemon_${act} "${dae}"
@@ -61,25 +54,10 @@ case "$1" in
         man rc
     ;;
     ''|list|status)
-        if [[ "$1" == "status" || "$1" == "list" ]] && [[ "$#" -gt 1 ]];then
-            shift
-            for dae in ${@};do
-                ALL_DAEMON=( /lib/beginning/rc.d/${dae} /etc/rc.d/${dae} )
-            done
-        else
-            ALL_DAEMON=( /lib/beginning/rc.d/* /etc/rc.d/* )
-        fi
-        ALL_DAEMONS=( )
-        for dae in ${ALL_DAEMON[@]};do
-            [[ -r "${dae}" ]] && ALL_DAEMONS+=( "${dae##*/}" )
-        done
-        for dae in ${ALL_DAEMONS[@]};do
+        [[ -n "$2" ]] || shift
+        for dae in $(beginning_daemon_list started "${@}" && beginning_daemon_list stopped "${@}");do
             status=
-            if [[ -f "/etc/rc.d/${dae}" ]];then
-                daemon_file="/etc/rc.d/${dae}"
-            elif [[ -f "/lib/beginning/rc.d/${dae}" ]];then
-                daemon_file="/lib/beginning/rc.d/${dae}"
-            fi
+            daemon_file=$(beginning_daemon_file "${dae}")
             if [[ -z "${status}" ]];then
                 . "${daemon_file}" || printf "%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
                 if func_exists ${dae##*/}_exists && ${dae##*/}_exists >/dev/null 2>&1;then
