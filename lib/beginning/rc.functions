@@ -24,10 +24,14 @@ umask 022
 
 export PATH="/bin:/sbin"
 
-LIBDIR=${LIBDIR:-/lib}
-SYSCONFDIR=${SYSCONFDIR:-/etc}
+BEGINNING_PLATFORM=$(uname -s)
 
-BEGINNING_LIB=${LIBDIR}/beginning
+LIBDIR="${LIBDIR:-/lib}"
+SYSCONFDIR="${SYSCONFDIR:-/etc}"
+
+BEGINNING_LIB="${LIBDIR}"/beginning
+BEGINNING_RC="${BEGINNING_LIB}"/rc.d
+USER_RC="${SYSCONFDIR}"/rc.d
 
 # os-release contains things such as distro name, distro's 'color'...
 [[ -r "${LIBDIR}"/os-release ]]     && . "${LIBDIR}"/os-release
@@ -84,11 +88,11 @@ beginning_daemon_provider() {
 
     d_list=
     d_list=(
-        $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
+        $(for d in $(echo ${BEGINNING_RC}/* ${USER_RC}/*);do
             if [[ -r "${USER_RC}/${d##*/}" ]];then
                 d="${USER_RC}/${d##*/}"
-            elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
-                d="${BEGINNING_LIB}/rc.d/${d##*/}"
+            elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
+                d="${BEGINNING_RC}/${d##*/}"
             fi
             . "$d"
             if type -t ${d##*/}_exists >/dev/null 2>&1 && ${d##*/}_exists >/dev/null 2>&1;then
@@ -117,14 +121,15 @@ beginning_daemon_provider() {
         return 3
     fi
 }
+
 beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
     for daemon in ${@};do
         if [[ -f "${USER_RC}/${daemon}" ]];then
             daemon_file="${USER_RC}/${daemon}"
-        elif [[ -f "${BEGINNING_LIB}/rc.d/${daemon}" ]];then
-            daemon_file="${BEGINNING_LIB}/rc.d/${daemon}"
+        elif [[ -f "${BEGINNING_RC}/${daemon}" ]];then
+            daemon_file="${BEGINNING_RC}/${daemon}"
         else
             continue
         fi
@@ -142,7 +147,7 @@ beginning_daemon_start() {
                 if ! ${daemon}_status;then
                     if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
                         BEGINNING_RESOLVING_DEPS=true
-                        type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends)
+                        type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends) || { status FAILED; continue }
                         BEGINNING_RESOLVING_DEPS=
                     fi
                     if type -t ${daemon}_start >/dev/null 2>&1;then
@@ -171,8 +176,8 @@ beginning_daemon_stop() {
         fi
         if [[ -f "${USER_RC}/${daemon}" ]];then
             daemon_file="${USER_RC}/${daemon}"
-        elif [[ -f "${BEGINNING_LIB}/rc.d/${daemon}" ]];then
-            daemon_file="${BEGINNING_LIB}/rc.d/${daemon}"
+        elif [[ -f "${BEGINNING_RC}/${daemon}" ]];then
+            daemon_file="${BEGINNING_RC}/${daemon}"
         else
             printf "Cannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
         fi
@@ -188,13 +193,16 @@ beginning_daemon_stop() {
             fi
             BEGINNING_RESOLVING_DEPS=true
             d_list=(
-                $(for d in $(echo ${BEGINNING_LIB}/rc.d/* ${USER_RC}/*);do
+                $(for d in $(echo ${BEGINNING_RC}/* ${USER_RC}/*);do
                     if [[ -r "${USER_RC}/${d##*/}" ]];then
                         d="${USER_RC}/${d##*/}"
-                    elif [[ -r "${BEGINNING_LIB}/rc.d/${d##*/}" ]];then
-                        d="${BEGINNING_LIB}/rc.d/${d##*/}"
+                    elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
+                        d="${BEGINNING_RC}/${d##*/}"
                     fi
-                    . "$d" && type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends | \
+                    . "$d" && {
+                        type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends
+                        type -t ${d##*/}_wants >/dev/null 2>&1 && ${d##*/}_wants
+                    } | \
                     while read line;do
                         [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
                     done
@@ -307,5 +315,3 @@ rchook() {
         fi
     fi
 }
-
-BEGINNING_PLATFORM=$(uname -s)
