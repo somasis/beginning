@@ -48,10 +48,11 @@ printf "\e[0mShutting down ${ANSI_COLOR}%s\e[0m...\n\n" "${PRETTY_NAME}"
 # Allow for ctrl-alt-del hard reboots, for if this script breaks
 echo 1 > /proc/sys/kernel/ctrl-alt-del
 
-beginning_daemon_stop $(echo ${CORE_DAEMONS_BEFORE[@]} ${DAEMONS[@]} ${CORE_DAEMONS_AFTER[@]} | tr ' ' '\n' | tac)
+beginning_daemon_stop $(echo ${CORE_DAEMONS_BEFORE[@]} $(beginning_daemon_list) ${DAEMONS[@]} ${CORE_DAEMONS_AFTER[@]} | tr ' ' '\n' | tac)
 
 printf 'Sending TERM to all processes...\n'
-killall5 -15 && sleep 1
+killall5 -15
+sleep 1
 
 printf 'Sending KILL to all processes...\n'
 killall5 -9
@@ -60,7 +61,7 @@ printf 'Remounting root as read-only...\n'
 mount -o remount,ro /
 
 printf 'Unmounting filesystems...\n'
-umount -a
+umount -av
 
 printf 'Syncing filesystems...\n'
 sync
