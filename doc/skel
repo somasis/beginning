@@ -1,7 +1,11 @@
 #!/bin/bash
 
 skel_exists() {
-    type -fPp skel
+    prog_exists skel
+}
+
+skel_wants() {
+    [[ "${BEGINNING_PLATFORM}" == Linux ]] && echo linux-only-daemon
 }
 
 skel_start() {
