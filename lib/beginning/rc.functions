@@ -211,6 +211,7 @@ beginning_daemon_start() {
                         beginning_daemon_start $(${daemon}_wants) || true
                     fi
                     if func_exists ${daemon}_start;then
+                        status CUSTOM "${daemon}"
                         ${daemon}_start
                         if [[ $? -eq 0 ]];then
                             status STARTED "${daemon}"
@@ -272,6 +273,7 @@ beginning_daemon_stop() {
             if func_exists ${daemon}_status;then
                 if ${daemon}_status;then
                     if func_exists ${daemon}_stop;then
+                        status CUSTOM "${daemon}"
                         ${daemon}_stop
                         if [[ $? -eq 0 ]];then
                             status STOPPED "${daemon}"
