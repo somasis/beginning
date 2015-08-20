@@ -114,7 +114,7 @@ beginning_daemon_list() {
     if [[ "$#" -gt 1 ]];then
         daes=( "$@" )
     else
-        daes=( $(beginning_daemon_list exists) )
+        daes=( ${BEGINNING_RC}/* ${USER_RC}/* )
     fi
     for daemon in "${daes[@]}";do
         daemon=${daemon##*/}
@@ -129,6 +129,11 @@ beginning_daemon_list() {
                 ;;
                 STOPPED)
                     if func_exists ${daemon}_status && ${daemon}_exists && ! ${daemon}_status;then
+                        echo ${daemon}
+                    fi
+                ;;
+                EXISTS)
+                    if func_exists ${daemon}_exists && ${daemon}_exists;then
                         echo ${daemon}
                     fi
                 ;;
@@ -166,16 +171,16 @@ beginning_daemon_provider() {
     if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
         d_list=( "${provider}" )
     elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
-        status FAILED "${daemon}: invalid provider. Possible providers: ${d_list[*]}"
+        status FAILURE "${daemon}: invalid provider. Possible providers: ${d_list[*]}"
         return 1
     elif [[ -z "${provider}" && -n "${d_list[@]}" ]];then
-        status FAILED "${daemon}: provider is not set. Possible providers: ${d_list[*]}"
+        status FAILURE "${daemon}: provider is not set. Possible providers: ${d_list[*]}"
         return 2
     fi
     if [[ -n "${d_list}" ]];then
         beginning_daemon_${action} "${d_list}"; return $?
     else
-        status FAILED "${daemon}: has no providers. You need to install one."
+        status FAILURE "${daemon}: has no providers. You need to install one."
         return 3
     fi
 }
@@ -184,15 +189,9 @@ beginning_daemon_start() {
     export BEGINNING_PHASE=start
     local daemon
     for daemon in ${@};do
-        if [[ -f "${USER_RC}/${daemon}" ]];then
-            daemon_file="${USER_RC}/${daemon}"
-        elif [[ -f "${BEGINNING_RC}/${daemon}" ]];then
-            daemon_file="${BEGINNING_RC}/${daemon}"
-        else
-            continue
-        fi
+        daemon_file=$(beginning_daemon_file "${daemon}") || continue
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || status FAILED "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" || status FAILURE "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if func_exists ${daemon}_virtual && ${daemon}_virtual;then
                 beginning_daemon_provider start "${daemon}"; continue
             fi
@@ -216,7 +215,7 @@ beginning_daemon_start() {
                         if [[ $? -eq 0 ]];then
                             status STARTED "${daemon}"
                         else
-                            status FAILED "${daemon}"
+                            status FAILURE "${daemon}"
                         fi
                     fi
                 else
@@ -234,13 +233,7 @@ beginning_daemon_stop() {
         if [[ " ${BEGINNING_SKIP_DEPS} " == *" ${daemon} "* ]];then
             continue
         fi
-        if [[ -f "${USER_RC}/${daemon}" ]];then
-            daemon_file="${USER_RC}/${daemon}"
-        elif [[ -f "${BEGINNING_RC}/${daemon}" ]];then
-            daemon_file="${BEGINNING_RC}/${daemon}"
-        else
-            printf "Cannot find rc.d script for %s. Skipping.\n" "${daemon}" >&2
-        fi
+        daemon_file=$(beginning_daemon_file "${daemon}")
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if func_exists ${daemon}_virtual && ${daemon}_virtual;then
@@ -284,11 +277,11 @@ beginning_daemon_stop() {
                         if [[ $? -eq 0 ]];then
                             status STOPPED "${daemon}"
                         else
-                            status FAILED "${daemon}"
+                            status FAILURE "${daemon}"
                         fi
                     fi
                 else
-                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && status FAILED "${daemon}: already stopped"
+                    [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && status FAILURE "${daemon}: already stopped"
                 fi
             fi
         fi
@@ -369,7 +362,7 @@ rchook() {
         if "$@";then
             status STARTED "rchook: ${@}"
         else
-            status FAILED "rchook: ${@}"
+            status FAILURE "rchook: ${@}"
         fi
     fi
 }

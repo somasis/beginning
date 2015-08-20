@@ -40,8 +40,7 @@ case "$1" in
         fi
         shift
         for dae in ${@};do
-            daemon_file=$(beginning_daemon_file "${dae}")
-            . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+            . "$(beginning_daemon_file ${dae})"
             if func_exists beginning_daemon_${act};then
                 beginning_daemon_${act} "${dae}"
             else
@@ -55,26 +54,11 @@ case "$1" in
     ;;
     ''|list|status)
         [[ -n "$2" ]] || shift
-        for dae in $(beginning_daemon_list started "${@}" && beginning_daemon_list stopped "${@}");do
-            status=
-            daemon_file=$(beginning_daemon_file "${dae}")
-            if [[ -z "${status}" ]];then
-                . "${daemon_file}" || printf "%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-                if func_exists ${dae##*/}_exists && ${dae##*/}_exists >/dev/null 2>&1;then
-                    true
-                else
-                    continue
-                fi
-                if func_exists ${dae##*/}_status;then
-                    if ${dae##*/}_status >/dev/null 2>&1;then
-                        status STARTED ${dae}
-                    else
-                        status STOPPED ${dae}
-                    fi
-                else
-                    status UNKNOWN ${dae}
-                fi
-            fi
+        for dae in $(beginning_daemon_list started "${@}");do
+            status STARTED "${dae}"
+        done
+        for dae in $(beginning_daemon_list stopped "${@}");do
+            status STOPPED "${dae}"
         done
     ;;
 esac
