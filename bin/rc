@@ -49,7 +49,7 @@ case "$1" in
                 exit 1
             fi
             . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-            if type -t beginning_daemon_${act} >/dev/null 2>&1;then
+            if func_exists beginning_daemon_${act};then
                 beginning_daemon_${act} "${dae}"
             else
                 printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
@@ -81,21 +81,20 @@ case "$1" in
                 daemon_file="/lib/beginning/rc.d/${dae}"
             fi
             if [[ -z "${status}" ]];then
-                . "${daemon_file}" || printf "\t%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
-                if type -t ${dae}_exists >/dev/null 2>&1 && ${dae}_exists >/dev/null 2>&1;then
+                . "${daemon_file}" || printf "%s's rc.d script is invalid. Skipping.\n" "${daemon}" >&2
+                if func_exists ${dae##*/}_exists && ${dae##*/}_exists >/dev/null 2>&1;then
                     true
                 else
                     continue
                 fi
-                if type -t ${dae}_status >/dev/null 2>&1;then
-                    printf "[ ] ${dae}"
-                    if ${dae}_status >/dev/null 2>&1;then
-                        status STARTED
+                if func_exists ${dae##*/}_status;then
+                    if ${dae##*/}_status >/dev/null 2>&1;then
+                        status STARTED ${dae}
                     else
-                        status STOPPED
+                        status STOPPED ${dae}
                     fi
                 else
-                    status UNKNOWN
+                    status UNKNOWN ${dae}
                 fi
             fi
         done

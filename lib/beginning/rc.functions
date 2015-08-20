@@ -46,7 +46,7 @@ fi
 
 # If os-release gives us a color, use it; if not, use the reset color code
 ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
-[[ -z "$PRETTY_NAME" ]] && PRETTY_NAME=${NAME:-Linux}
+[[ -z "$PRETTY_NAME" ]] && PRETTY_NAME="${NAME:-$BEGINNING_PLATFORM}"
 
 
 status() {
@@ -76,9 +76,67 @@ reverse() {
     fi
 }
 
-unset_phases() {
-    for func in ${daemon:-$1}_{start,reload,restart,stop,depends,exists,status};do
-        type -t "${func}" >/dev/null 2>&1 && unset -f "${func}"
+func_exists() {
+    local func err
+    for func in $@;do
+        type -t "${func}" >/dev/null 2>&1
+        err=$?
+        [[ "${err}" -eq 0 ]] || break
+    done
+    [[ "${err}" -eq 0 ]] || return $?
+}
+
+prog_exists() {
+    local prog err
+    for prog in $@;do
+        type -fPt "${prog}" >/dev/null 2>&1
+        err=$?
+        [[ "${err}" -eq 0 ]] || break
+    done
+    [[ "${err}" -eq 0 ]] || return $?
+}
+
+beginning_daemon_file() {
+    local daemon
+    for daemon in $@;do
+        if [[ -f "${USER_RC}/${daemon}" ]];then
+            echo "${USER_RC}/${daemon}"
+        elif [[ -f "${BEGINNING_RC}/${daemon}" ]];then
+            echo "${BEGINNING_RC}/${daemon}"
+        else
+            return 1
+        fi
+    done
+}
+
+beginning_daemon_list() {
+    local daemon daes=()
+    if [[ "$#" -gt 1 ]];then
+        daes=( "$@" )
+    else
+        daes=( $(beginning_daemon_list exists) )
+    fi
+    for daemon in "${daes[@]}";do
+        daemon=${daemon##*/}
+        daemon_file=$(beginning_daemon_file "${daemon}")
+        if [[ "${daemon_file}" ]];then
+            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            case "${1^^}" in
+                STARTED)
+                    if func_exists ${daemon}_status && ${daemon}_exists && ${daemon}_status;then
+                        echo "${daemon}"
+                    fi
+                ;;
+                STOPPED)
+                    if func_exists ${daemon}_status && ${daemon}_exists && ! ${daemon}_status;then
+                        echo ${daemon}
+                    fi
+                ;;
+                ALL)
+                    echo ${daemon}
+                ;;
+            esac
+        fi
     done
 }
 
@@ -95,8 +153,8 @@ beginning_daemon_provider() {
                 d="${BEGINNING_RC}/${d##*/}"
             fi
             . "$d"
-            if type -t ${d##*/}_exists >/dev/null 2>&1 && ${d##*/}_exists >/dev/null 2>&1;then
-                if [[ " $(type -t ${d##*/}_provides >/dev/null 2>&1 && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+            if func_exists ${d##*/}_exists && ${d##*/}_exists;then
+                if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                     echo "${d##*/}"
                 fi
             fi
@@ -134,29 +192,31 @@ beginning_daemon_start() {
             continue
         fi
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
-            if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
+            . "${daemon_file}" || status FAILED "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            if func_exists ${daemon}_virtual && ${daemon}_virtual;then
                 beginning_daemon_provider start "${daemon}"; continue
             fi
-            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
+            if func_exists ${daemon}_exists && ${daemon}_exists;then
                 true
             else
                 continue
             fi
-            if type -t ${daemon}_status >/dev/null 2>&1;then
+            if func_exists ${daemon}_status;then
                 if ! ${daemon}_status;then
                     if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
                         BEGINNING_RESOLVING_DEPS=true
-                        type -t ${daemon}_depends >/dev/null 2>&1 && beginning_daemon_start $(${daemon}_depends) || { status FAILED; continue }
+                        func_exists ${daemon}_depends && beginning_daemon_start $(${daemon}_depends)
                         BEGINNING_RESOLVING_DEPS=
                     fi
-                    if type -t ${daemon}_start >/dev/null 2>&1;then
-                        printf "[ ] %s" "${daemon}"
+                    if func_exists ${daemon}_wants;then
+                        beginning_daemon_start $(${daemon}_wants) || true
+                    fi
+                    if func_exists ${daemon}_start;then
                         ${daemon}_start
                         if [[ $? -eq 0 ]];then
-                            status STARTED
+                            status STARTED "${daemon}"
                         else
-                            status FAILED
+                            status FAILED "${daemon}"
                         fi
                     fi
                 else
@@ -183,10 +243,10 @@ beginning_daemon_stop() {
         fi
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
-            if type -t ${daemon}_virtual >/dev/null 2>&1 && ${daemon}_virtual;then
+            if func_exists ${daemon}_virtual && ${daemon}_virtual;then
                 beginning_daemon_provider stop "${daemon}"; continue
             fi
-            if type -t ${daemon}_exists >/dev/null 2>&1 && ${daemon}_exists >/dev/null 2>&1;then
+            if func_exists ${daemon}_exists && ${daemon}_exists;then
                 true
             else
                 continue
@@ -200,9 +260,8 @@ beginning_daemon_stop() {
                         d="${BEGINNING_RC}/${d##*/}"
                     fi
                     . "$d" && {
-                        type -t ${d##*/}_depends >/dev/null 2>&1 && ${d##*/}_depends
-                        type -t ${d##*/}_wants >/dev/null 2>&1 && ${d##*/}_wants
-                    } | \
+                        func_exists ${d##*/}_depends && ${d##*/}_depends
+                    } |
                     while read line;do
                         [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
                     done
@@ -218,15 +277,14 @@ beginning_daemon_stop() {
                 BEGINNING_SKIP_DEPS="${BEGINNING_SKIP_DEPS} ${daemon} " beginning_daemon_stop ${depends[@]}
             fi
             BEGINNING_RESOLVING_DEPS=
-            if type -t ${daemon}_status >/dev/null 2>&1;then
+            if func_exists ${daemon}_status;then
                 if ${daemon}_status;then
-                    printf "[ ] %s" "${daemon}"
-                    if type -t ${daemon}_stop >/dev/null 2>&1;then
+                    if func_exists ${daemon}_stop;then
                         ${daemon}_stop
                         if [[ $? -eq 0 ]];then
-                            status STOPPED
+                            status STOPPED "${daemon}"
                         else
-                            status FAILED
+                            status FAILED "${daemon}"
                         fi
                     fi
                 else
@@ -306,7 +364,7 @@ tab() {
 }
 
 rchook() {
-    if type -t "$@" >/dev/null 2>&1;then
+    if func_exists "$@";then
         status NOTHING "rchook: ${@}"
         if "$@";then
             status STARTED "rchook: ${@}"
