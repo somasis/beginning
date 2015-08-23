@@ -6,7 +6,12 @@ bitlbee_exists() {
 
 bitlbee_start() {
     bitlbee_status || rm -f /run/bitlbee.pid
-    bitlbee -Fn ${BITLBEE_ARGS} >/dev/null 2>&1 &
+    if [[ "${BITLBEE_USER}" ]];then
+        touch /run/bitlbee.pid && chown "${BITLBEE_USER}" /run/bitlbee.pid
+        su -s $(type -fPp sh) -c "bitlbee -n ${BITLBEE_ARGS}" "${BITLBEE_USER}" >/dev/null 2>&1 &
+    else
+        bitlbee -n ${BITLBEE_ARGS} >/dev/null 2>&1 &
+    fi
     echo $! > /run/bitlbee.pid
 }
 
