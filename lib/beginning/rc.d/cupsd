@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cupsd_exists() {
+    prog_exists cupsd
+}
+
+cupsd_start() {
+    cupsd_status || rm -f /run/cupsd.pid
+    cupsd -t -c ${CUPSD_CONFIG:-/etc/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 && \
+    cupsd -f -c ${CUPSD_CONFIG:-/etc/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/cupsd.pid
+}
+
+cupsd_stop() {
+    pidfilekill /run/cupsd.pid
+    cupsd_status || rm -f /run/cupsd.pid
+}
+
+cupsd_status() {
+    pidfileexists /run/cupsd.pid
+}
