@@ -121,7 +121,7 @@ beginning_daemon_list() {
         [[ "${daemon}" == '*' ]] && continue
         daemon_file=$(beginning_daemon_file "${daemon}")
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" >/dev/null 2>&1 || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             case "${1^^}" in
                 STARTED)
                     if func_exists ${daemon}_status && ${daemon}_exists && ${daemon}_status;then
@@ -158,7 +158,7 @@ beginning_daemon_provider() {
             elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
                 d="${BEGINNING_RC}/${d##*/}"
             fi
-            . "$d"
+            . "$d" >/dev/null 2>&1
             if func_exists ${d##*/}_exists && ${d##*/}_exists;then
                 if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                     echo "${d##*/}"
@@ -192,7 +192,7 @@ beginning_daemon_start() {
     for daemon in ${@};do
         daemon_file=$(beginning_daemon_file "${daemon}") || continue
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || status FAILURE "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" >/dev/null 2>&1 || status FAILURE "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if func_exists ${daemon}_virtual && ${daemon}_virtual;then
                 beginning_daemon_provider start "${daemon}"; continue
             fi
@@ -237,7 +237,7 @@ beginning_daemon_stop() {
         fi
         daemon_file=$(beginning_daemon_file "${daemon}")
         if [[ "${daemon_file}" ]];then
-            . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+            . "${daemon_file}" >/dev/null 2>&1 || status FAILURE "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
             if func_exists ${daemon}_virtual && ${daemon}_virtual;then
                 beginning_daemon_provider stop "${daemon}"; continue
             fi
@@ -254,7 +254,7 @@ beginning_daemon_stop() {
                     elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
                         d="${BEGINNING_RC}/${d##*/}"
                     fi
-                    . "$d" && {
+                    . "$d" >/dev/null 2>&1 && {
                         func_exists ${d##*/}_depends && ${d##*/}_depends
                     } |
                     while read line;do
