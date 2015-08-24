@@ -118,6 +118,7 @@ beginning_daemon_list() {
     fi
     for daemon in "${daes[@]}";do
         daemon=${daemon##*/}
+        [[ "${daemon}" == '*' ]] && continue
         daemon_file=$(beginning_daemon_file "${daemon}")
         if [[ "${daemon_file}" ]];then
             . "${daemon_file}" || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
