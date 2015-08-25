@@ -5,19 +5,12 @@ cups-browsed_exists() {
 }
 
 cups-browsed_depends() {
-    echo cups
-}
-
-cups-browsed_wants() {
-    if avahi_exists;then
-        echo avahi
-    fi
+    echo cups avahi
 }
 
 cups-browsed_start() {
     cups-browsed_status || rm -f /run/cups-browsed.pid
-    avahi_status && CUPS_BROWSED_ARGS="${CUPS_BROWSED_ARGS} --autoshutdown=avahi"
-    cups-browsed ${CUPS_BROWSED_ARGS} >/dev/null 2>&1 &
+    cups-browsed --autoshutdown=avahi ${CUPS_BROWSED_ARGS} >/dev/null 2>&1 &
     echo $! > /run/cups-browsed.pid
 }
 
