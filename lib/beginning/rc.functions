@@ -211,7 +211,9 @@ beginning_daemon_start() {
                     BEGINNING_RESOLVING_DEPS=
                 fi
                 if func_exists ${daemon}_wants;then
+                    BEGINNING_RESOLVING_DEPS=true
                     beginning_daemon_start $(${daemon}_wants) || true
+                    BEGINNING_RESOLVING_DEPS=
                 fi
                 if func_exists ${daemon}_start;then
                     status CUSTOM "${daemon}"
