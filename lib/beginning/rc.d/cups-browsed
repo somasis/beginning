@@ -1,0 +1,31 @@
+#!/bin/bash
+
+cups-browsed_exists() {
+    prog_exists cups-browsed
+}
+
+cups-browsed_depends() {
+    echo cups
+}
+
+cups-browsed_wants() {
+    if avahi_exists;then
+        echo avahi
+    fi
+}
+
+cups-browsed_start() {
+    cups-browsed_status || rm -f /run/cups-browsed.pid
+    avahi_status && CUPS_BROWSED_ARGS="${CUPS_BROWSED_ARGS} --autoshutdown=avahi"
+    cups-browsed ${CUPS_BROWSED_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/cups-browsed.pid
+}
+
+cups-browsed_stop() {
+    pidfilekill /run/cups-browsed.pid
+    cups-browsed_status || rm -f /run/cups-browsed.pid
+}
+
+cups-browsed_status() {
+    pidfileexists /run/cups-browsed.pid
+}
