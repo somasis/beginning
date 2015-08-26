@@ -156,12 +156,7 @@ beginning_daemon_provider() {
 
     d_list=
     d_list=(
-        $(for d in $(echo ${BEGINNING_RC}/* ${USER_RC}/*);do
-            if [[ -r "${USER_RC}/${d##*/}" ]];then
-                d="${USER_RC}/${d##*/}"
-            elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
-                d="${BEGINNING_RC}/${d##*/}"
-            fi
+        $(for d in $(beginning_daemon_list all);do
             beginning_daemon_load "$d"
             if func_exists ${d##*/}_exists && ${d##*/}_exists;then
                 if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
