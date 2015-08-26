@@ -1,24 +1,24 @@
 #!/bin/bash
 
-opensshd_exists() {
+openssh_exists() {
     prog_exists sshd
 }
 
-opensshd_start() {
-    opensshd_status || rm -f /run/sshd.pid
+openssh_start() {
+    openssh_status || rm -f /run/sshd.pid
     [[ -x $(type -fPp sshd-keygen.sh) ]] && $(type -fPp sshd-keygen.sh)
-    setsid -w $(type -fPp sshd) ${OPENSSHD_ARGS} >/dev/null 2>&1
+    setsid -w $(type -fPp sshd) ${OPENSSH_ARGS} >/dev/null 2>&1
 }
 
-opensshd_reload() {
+openssh_reload() {
     pidfilekill -HUP /run/sshd.pid
 }
 
-opensshd_stop() {
+openssh_stop() {
     setsid -w kill $(</run/sshd.pid)
-    opensshd_status || rm -f /run/sshd.pid
+    openssh_status || rm -f /run/sshd.pid
 }
 
-opensshd_status() {
+openssh_status() {
     pidfileexists /run/sshd.pid
 }
