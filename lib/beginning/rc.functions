@@ -238,29 +238,21 @@ beginning_daemon_stop() {
         if [[ " ${BEGINNING_SKIP_DEPS} " == *" ${daemon} "* ]];then
             continue
         fi
+        beginning_daemon_load "${daemon}"
         if func_exists ${daemon}_virtual && ${daemon}_virtual;then
-            beginning_daemon_provider stop "${daemon}"; continue
-        fi
-        if func_exists ${daemon}_exists && ${daemon}_exists;then
-            true
-        else
+            beginning_daemon_provider stop ${daemon}; continue
+        elif ! func_exists ${daemon}_exists || func_exists ${daemon}_exists && ! ${daemon}_exists;then
             continue
         fi
         BEGINNING_RESOLVING_DEPS=true
         d_list=(
-            $(for d in ${BEGINNING_RC}/* ${USER_RC}/*;do
-                if [[ -r "${USER_RC}/${d##*/}" ]];then
-                    d="${USER_RC}/${d##*/}"
-                elif [[ -r "${BEGINNING_RC}/${d##*/}" ]];then
-                    d="${BEGINNING_RC}/${d##*/}"
-                fi
-                beginning_daemon_load "$d" && {
-                    func_exists ${d##*/}_depends && ${d##*/}_depends
-                } |
+            $(for d in $(beginning_daemon_list all);do
+                beginning_daemon_load "$d" || true
+                func_exists ${d}_depends && ${d}_depends |
                 while read line;do
-                    [[ " $line " == *" ${daemon} "* ]] && echo "${d##*/}"
+                    [[ " $line " == *" ${daemon} "* ]] && echo "${d}"
                 done
-            done 2>/dev/null)
+            done)
         )
         depends=( )
         for dep in ${d_list[@]};do
