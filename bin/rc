@@ -29,25 +29,8 @@ fi
 case "$1" in
     restart)
         shift
-        rc stop "$@"
-        rc start "$@"
-    ;;
-    start|stop|reload)
-        act="$1"
-        if [[ $UID -ne 0 ]];then
-            printf '%s: Must be root to %s daemons.\n' "${0##*/}" "${act}" >&2
-            exit 2
-        fi
-        shift
-        for dae in ${@};do
-            . "$(beginning_daemon_file ${dae})"
-            if func_exists beginning_daemon_${act};then
-                beginning_daemon_${act} "${dae}"
-            else
-                printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
-                exit 4
-            fi
-        done
+        "$0" stop "$@"
+        "$0" start "$@"
     ;;
     -h|--help|help)
         man rc
@@ -60,6 +43,25 @@ case "$1" in
         for dae in $(beginning_daemon_list stopped "${@}");do
             status STOPPED "${dae}"
         done
+    ;;
+    *)
+        [[ $# -le 1 ]] && help && exit 2
+        [[ $# -gt 1 ]] && act="$1"; shift
+        for dae in ${@};do
+            err=
+            beginning_daemon_load "${dae}" >/dev/null 2>&1
+            if func_exists beginning_daemon_${act};then
+                beginning_daemon_${act} "${dae}"
+            elif func_exists ${dae}_${act};then
+                ${dae}_${act}
+            else
+                err=1
+            fi
+            err=${err:-$?}
+        done
+        [[ "$err" -eq 4 ]] && printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
+        [[ "$err" -eq 3 ]] && printf "%s: %s: script not found.\n" "${0##*/}" "${dae}" >&2
+        exit $err
     ;;
 esac
 
