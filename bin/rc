@@ -44,7 +44,7 @@ case "$1" in
     help)
         help
     ;;
-    ''|list|status)
+    list|ls|status|'')
         [[ -n "$2" ]] || shift
         for dae in $(beginning_daemon_list started "${@}");do
             status STARTED "${dae}"
