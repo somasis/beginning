@@ -97,9 +97,15 @@ prog_exists() {
 }
 
 beginning_daemon_load() {
-    local daemon
+    local daemon file
     for daemon in $@;do
-        . $(beginning_daemon_file "${daemon}") >/dev/null 2>&1 || printf "%s: invalid script, possible syntax errors.\n" "${daemon}" >&2
+        file=$(beginning_daemon_file "${daemon}" 2>/dev/null)
+        if [[ "${file}" ]];then
+            . "${file}" >/dev/null 2>&1 || printf "%s: invalid script. possible syntax errors?\n" "${daemon}" >&2 && return 4
+        else
+            printf "%s: script not found." "${daemon}" >&2
+            return 3
+        fi
     done
 }
 
