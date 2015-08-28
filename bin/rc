@@ -27,6 +27,15 @@ else
 fi
 
 case "$1" in
+    restart|start|stop|reload)
+        if [[ "$UID" -eq 0 ]];then
+            printf '%s: must be root to %s daemons.\n' "${0##*/}" "${1}" >&2
+            exit 5
+        fi
+    ;;
+esac
+
+case "$1" in
     restart)
         shift
         "$0" stop "$@"
