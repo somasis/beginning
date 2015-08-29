@@ -63,7 +63,7 @@ status() {
 
 emergency_shell() {
     while true;do
-        sulogin && exec "$@"
+        setsid sulogin && exec "$@"
     done
 }
 
