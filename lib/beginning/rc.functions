@@ -149,6 +149,16 @@ beginning_daemon_list() {
                     echo ${daemon}
                 fi
             ;;
+            DAEMONS)
+                if ! func_exists ${daemon}_virtual;then
+                    echo ${daemon}
+                fi
+            ;;
+            VIRTUALS)
+                if func_exists ${daemon}_virtual;then
+                    echo ${daemon}
+                fi
+            ;;
             ALL)
                 echo ${daemon}
             ;;
