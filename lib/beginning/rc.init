@@ -85,7 +85,9 @@ ln -sf /proc/self/fd    /dev/fd
 rchook pre_fsck
 
 printf "Checking filesystems...\n"
+trap 'killall fsck' INT
 fsck -ATy | tab
+trap - INT
 
 rchook post_fsck
 rchook pre_root_rw
