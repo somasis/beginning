@@ -112,7 +112,7 @@ else
     chmod 0644 /var/log/dmesg.log
 fi
 
-: > /var/run/utmp
+[[ -w /var/run/utmp || ! -f /var/run/utmp ]] && : > /var/run/utmp
 
 rchook post_boot
 
