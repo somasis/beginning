@@ -72,6 +72,8 @@ if [[ " $(</proc/cmdline) " == *" verbose "* ]];then
 else
     dmesg -n "${LOG_LEVEL:-3}"
 fi
+
+printf "Remounting root as read-only...\n"
 mount -o remount,ro /
 
 # Set correct locations for /dev/std{in,out,err}
