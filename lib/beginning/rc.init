@@ -94,7 +94,7 @@ rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
-rm -rf /tmp/* /run/*
+rm -rf /tmp/* /run/beginning >/dev/null 2>&1
 mkdir -p /run/beginning
 
 rchook pre_fstab_mount
