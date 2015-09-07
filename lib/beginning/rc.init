@@ -117,13 +117,15 @@ fi
 rchook post_boot
 
 if [[ " $(</proc/cmdline) " == *" single "* ]];then
-    printf "Going into single user mode..."
+    printf "Going into single user mode...\n"
+    beginning_daemon_start ${CORE_DAEMONS_BEFORE[@]}
+    beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
     emergency_shell
+else
+    beginning_daemon_start ${CORE_DAEMONS_BEFORE[@]}
+    beginning_daemon_start ${DAEMONS[@]}
+    beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
 fi
-
-beginning_daemon_start ${CORE_DAEMONS_BEFORE[@]}
-beginning_daemon_start ${DAEMONS[@]}
-beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
 
 TABS=
 
