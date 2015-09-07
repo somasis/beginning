@@ -14,6 +14,10 @@ getty_start() {
     fi
 }
 
+getty_reload() {
+    agetty --reload
+}
+
 getty_stop() {
     # stopping login terminals is almost always a bad idea.
     # don't allow it. if it's not desired then the user should be
