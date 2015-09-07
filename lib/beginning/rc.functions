@@ -34,10 +34,23 @@ BEGINNING_RC="${BEGINNING_LIB}"/rc.d
 USER_RC="${SYSCONFDIR}"/rc.d
 
 # os-release contains things such as distro name, distro's 'color'...
-[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
-[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
 [[ -r "${LIBDIR}"/os-release ]]     && . "${LIBDIR}"/os-release
 [[ -r "${SYSCONFDIR}"/os-release ]] && . "${SYSCONFDIR}"/os-release
+[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
+[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
+
+if [[ -d "${BEGINNING_LIB}"/rc.conf.d ]];then
+    for file in "${BEGINNING_LIB}"/rc.conf.d/*;do
+        . "${file}"
+    done
+    file=
+fi
+if [[ -d "${SYSCONFDIR}"/rc.conf.d ]];then
+    for file in "${SYSCONFDIR}"/rc.conf.d/*;do
+        . "${file}"
+    done
+    file=
+fi
 
 if [[ ! -r "${BEGINNING_LIB}"/rc.conf && ! -f "${SYSCONFDIR}"/rc.conf ]];then
     printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' "${BEGINNING_LIB}" "${SYSCONFDIR}"
