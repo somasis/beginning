@@ -14,6 +14,10 @@ skel_start() {
     echo $! > /run/skel.pid
 }
 
+skel_reload() {
+    skel --reload
+}
+
 skel_stop() {
     pidfilekill /run/skel.pid
     skel_status || rm -f /run/skel.pid
