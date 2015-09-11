@@ -1,0 +1,24 @@
+#!/bin/bash
+
+toybox-syslog_provides() {
+    echo syslog
+}
+
+toybox-syslog_exists() {
+    prog_exists toybox && toybox | grep -q syslogd && toybox | grep -q klogd
+}
+
+toybox-syslog_start() {
+    toybox-syslog_status || rm -f /run/toybox-syslog.pid
+    toybox syslogd -n ${TOYBOX_SYSLOGD_CONF:+-f ${TOYBOX_SYSLOGD_CONF}} ${TOYBOX_SYSLOGD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/toybox-syslog.pid
+}
+
+toybox-syslog_stop() {
+    pidfilekill /run/toybox-syslog.pid
+    toybox-syslog_status || rm -f /run/toybox-syslog.pid
+}
+
+toybox-syslog_status() {
+    pidfileexists /run/toybox-syslog.pid
+}
