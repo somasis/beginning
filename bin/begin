@@ -24,10 +24,12 @@ fi
 
 cd /
 
-if [[ -r /lib/beginning/rc.functions ]];then
-    . /lib/beginning/rc.functions
+BEGINNING_LIB="${LIBDIR:-/lib}"/beginning
+
+if [[ -r "${BEGINNING_LIB}"/rc.functions ]];then
+    . "${BEGINNING_LIB}"/rc.functions
 else
-    printf 'Could not find /lib/beginning/rc.functions, dying...\n'
+    printf 'Could not find %s/rc.functions, dying...\n' "${BEGINNING_LIB}"
     exit 2
 fi
 

@@ -22,8 +22,10 @@ if [[ "$UID" -ne 0 ]];then
     exit 1
 fi
 
-if [[ -r /lib/beginning/rc.functions ]];then
-    . /lib/beginning/rc.functions
+BEGINNING_LIB="${LIBDIR:-/lib}"/beginning
+
+if [[ -r "${BEGINNING_LIB}"/rc.functions ]];then
+    . "${BEGINNING_LIB}"/rc.functions
 else
     printf 'Could not find /lib/beginning/rc.functions, dying...\n'
     exit 2
