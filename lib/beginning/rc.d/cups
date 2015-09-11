@@ -13,7 +13,7 @@ cups_start() {
 
 cups_stop() {
     pidfilekill /run/cupsd.pid
-    cupsd_status || rm -f /run/cupsd.pid
+    cups_status || rm -f /run/cupsd.pid
 }
 
 cups_status() {
