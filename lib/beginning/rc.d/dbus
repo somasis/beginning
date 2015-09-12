@@ -12,6 +12,11 @@ dbus_start() {
     dbus-daemon --system --fork --nopidfile --print-pid ${DBUS_ARGS} > /run/dbus.pid
 }
 
+dbus_reload() {
+    dbus_status || return 1
+    kill -1 $(</run/dbus.pid)
+}
+
 dbus_stop() {
     pidfilekill /run/dbus.pid
     dbus_status || rm -f /run/dbus.pid
