@@ -5,7 +5,11 @@ toybox-syslog_provides() {
 }
 
 toybox-syslog_exists() {
-    prog_exists toybox && toybox | grep -q syslogd && toybox | grep -q klogd
+    [[ "${BEGINNING_PLATFORM}" == "Linux" ]] && echo toybox-klog
+}
+
+toybox-syslog_exists() {
+    prog_exists toybox && toybox | grep -q syslogd
 }
 
 toybox-syslog_start() {
