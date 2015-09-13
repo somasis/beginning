@@ -1,0 +1,20 @@
+#!/bin/bash
+
+busybox-klog_exists() {
+    prog_exists busybox && busybox | grep -q klogd
+}
+
+busybox-klog_start() {
+    busybox-klog_status || rm -f /run/busybox-klog.pid
+    busybox klogd -n ${BUSYBOX_KLOGD_CONF:+-f ${BUSYBOX_KLOGD_CONF}} ${BUSYBOX_KLOGD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/busybox-klog.pid
+}
+
+busybox-klog_stop() {
+    pidfilekill /run/busybox-klog.pid
+    busybox-klog_status || rm -f /run/busybox-klog.pid
+}
+
+busybox-klog_status() {
+    pidfileexists /run/busybox-klog.pid
+}
