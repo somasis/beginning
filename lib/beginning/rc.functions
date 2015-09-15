@@ -197,6 +197,10 @@ beginning_daemon_provider() {
     local provider=
     local provider=${daemon^^}_PROVIDER
     local provider=${!provider}
+    if [[ -z ${d_list[*]} ]];then
+        status FAILURE "${daemon}: has no providers. You need to install one."
+        return 3
+    fi
     if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
         d_list=( "${provider}" )
     elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
@@ -206,11 +210,8 @@ beginning_daemon_provider() {
         status FAILURE "${daemon}: provider is not set. Possible providers: ${d_list[*]}"
         return 2
     fi
-    if [[ -n "${d_list}" ]];then
+    if [[ -n ${d_list} ]];then # space removal intentional
         beginning_daemon_${action} "${d_list}"; return $?
-    else
-        status FAILURE "${daemon}: has no providers. You need to install one."
-        return 3
     fi
 }
 
