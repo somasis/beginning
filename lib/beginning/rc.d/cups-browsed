@@ -5,7 +5,7 @@ cups-browsed_exists() {
 }
 
 cups-browsed_depends() {
-    echo cups avahi
+    echo cupsd avahi-daemon
 }
 
 cups-browsed_start() {
