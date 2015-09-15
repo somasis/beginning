@@ -1,0 +1,27 @@
+#!/bin/bash
+
+avahi-daemon_exists() {
+    prog_exists avahi-daemon
+}
+
+avahi-daemon_depends() {
+    echo dbus
+}
+
+avahi-daemon_start() {
+    avahi-daemon_status || rm -f /run/avahi-daemon/pid
+    avahi-daemon -Ds ${AVAHI_DAEMON_ARGS}
+}
+
+avahi-daemon_reload() {
+    avahi-daemon -r
+}
+
+avahi-daemon_stop() {
+    pidfilekill /run/avahi-daemon/pid
+    avahi-daemon_status || rm -f /run/avahi-daemon/pid
+}
+
+avahi-daemon_status() {
+    avahi-daemon -c >/dev/null 2>&1
+}
