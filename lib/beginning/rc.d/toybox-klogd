@@ -1,0 +1,24 @@
+#!/bin/bash
+
+toybox-klogd_provides() {
+    echo klog
+}
+
+toybox-klogd_exists() {
+    prog_exists toybox && toybox | grep -q klogd
+}
+
+toybox-klogd_start() {
+    toybox-klogd_status || rm -f /run/toybox-klogd.pid
+    toybox klogd -n ${TOYBOX_KLOGD_CONF:+-f ${TOYBOX_KLOGD_CONF}} ${TOYBOX_KLOGD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/toybox-klogd.pid
+}
+
+toybox-klogd_stop() {
+    pidfilekill /run/toybox-klogd.pid
+    toybox-klogd_status || rm -f /run/toybox-klogd.pid
+}
+
+toybox-klogd_status() {
+    pidfileexists /run/toybox-klogd.pid
+}

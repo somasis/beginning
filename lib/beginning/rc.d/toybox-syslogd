@@ -1,0 +1,28 @@
+#!/bin/bash
+
+toybox-syslogd_provides() {
+    echo syslog
+}
+
+toybox-syslogd_exists() {
+    [[ "${BEGINNING_PLATFORM}" == "Linux" ]] && echo toybox-klogd
+}
+
+toybox-syslogd_exists() {
+    prog_exists toybox && toybox | grep -q syslogd
+}
+
+toybox-syslogd_start() {
+    toybox-syslogd_status || rm -f /run/toybox-syslogd.pid
+    toybox syslogd -n ${TOYBOX_SYSLOGD_CONF:+-f ${TOYBOX_SYSLOGD_CONF}} ${TOYBOX_SYSLOGD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/toybox-syslogd.pid
+}
+
+toybox-syslogd_stop() {
+    pidfilekill /run/toybox-syslogd.pid
+    toybox-syslogd_status || rm -f /run/toybox-syslogd.pid
+}
+
+toybox-syslogd_status() {
+    pidfileexists /run/toybox-syslogd.pid
+}
