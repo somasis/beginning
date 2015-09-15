@@ -1,28 +1,28 @@
 #!/bin/bash
 
-connman_exists() {
+connmand_exists() {
     prog_exists connmand
 }
 
-connman_provides() {
+connmand_provides() {
     echo network
 }
 
-connman_depends() {
+connmand_depends() {
     echo dbus dev
 }
 
-connman_start() {
-    connman_status || rm -f /run/connman.pid
+connmand_start() {
+    connmand_status || rm -f /run/connmand.pid
     connmand -n ${CONNMAN_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/connman.pid
+    echo $! > /run/connmand.pid
 }
 
-connman_stop() {
-    pidfilekill /run/connman.pid
-    connman_status || rm -f /run/connman.pid
+connmand_stop() {
+    pidfilekill /run/connmand.pid
+    connmand_status || rm -f /run/connmand.pid
 }
 
-connman_status() {
-    pidfileexists /run/connman.pid
+connmand_status() {
+    pidfileexists /run/connmand.pid
 }
