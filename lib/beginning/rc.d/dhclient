@@ -1,9 +1,5 @@
 #!/bin/bash
 
-dhclient_depends() {
-    echo net-interfaces
-}
-
 dhclient_exists() {
     prog_exists dhclient
 }
