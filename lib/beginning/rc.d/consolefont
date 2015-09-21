@@ -9,7 +9,7 @@ consolefont_start() {
     [[ "${CONSOLEFONT_MAP}" ]] && CONSOLEFONT_SETFONT_ARGS="${CONSOLEFONT_SETFONT_ARGS} -m ${CONSOLEFONT_MAP}"
     [[ "${CONSOLEFONT_UNIMAP}" ]] && CONSOLEFONT_SETFONT_ARGS="${CONSOLEFONT_SETFONT_ARGS} -u ${CONSOLEFONT_UNIMAP}"
     local err tty
-    for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
+    for tty in $(for i in $(seq 1 ${CONSOLEFONT_VTERMS:-$GETTY_VTERMS});do echo /dev/tty${i};done);do
         if setfont -C "$tty" ${CONSOLEFONT_SETFONT_ARGS} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"};then
             err=$?
         else
