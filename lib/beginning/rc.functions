@@ -69,7 +69,7 @@ status() {
         FAILURE)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
         STOPPED)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
         UNKNOWN)    printf "\r\e[1;40m[ ${stat} ]\e[0m %s\n" "$@"   ;; # black bg   [white]
-        NOTHING)    printf "\r\e[1;40m[         ]\e[0m %s\n" "$@"   ;; # black bg   [white]
+        NOTHING)    printf "\r\e[1;40m[         ]\e[0m %s"   "$@"   ;; # black bg   [white]
         CUSTOM)     printf "\r\e[1;40m[         ]\e[0m %s"   "$@"   ;; # black bg   [white]
     esac
 }
@@ -116,7 +116,7 @@ beginning_daemon_load() {
         if [[ "${file}" ]];then
             . "${file}" >/dev/null 2>&1 || printf "%s: invalid script. possible syntax errors?\n" "${daemon}" >&2 && return 4
         else
-            printf "%s: script not found." "${daemon}" >&2
+            printf "%s: script not found.\n" "${daemon}" >&2
             return 3
         fi
     done
