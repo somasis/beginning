@@ -15,7 +15,28 @@ plan on installing this, until it is stable.
 - agetty, if you wish to log in from the console
 
 ## Installation
-Well that's a bad idea
+1.  `git clone https://github.com/somasis/beginning`, or [download a release]
+
+2.  `make`
+
+    Beginning is written entirely in `bash`, and as such does not require any
+    compilation, only a `bash` shell. (at this point in time, POSIX shell may be
+    considered)
+
+3.  `make install`
+
+    The makefile follows standard variables, and can be influenced by variables
+    such as `DESTDIR`, `BINDIR`, `LIBDIR`, `DOCDIR`, `SYSCONFDIR`, and `PREFIX`.
+
+[download a release]: https://github.com/somasis/beginning/releases
+
+### Defaults
+-   The `PID 1` will be installed to `$(PREFIX)$(BINDIR)/begin`. To use it as
+    the default init system, either add `init=/bin/begin` to your kernel's boot
+    parameters, or make a symlink at `/bin/init` that points to `begin`.
+-   A reboot/shutdown/poweroff/halt program is installed to
+    `$(PREFIX)$(BINDIR)/reboot`. Run it as root to reboot, make a symlink to it
+    named `poweroff`, `halt`, and `shutdown` in order to turn off the system.
 
 ## Usage
 After installation, `/bin/begin` will need to be linked to `/bin/init`. Or,
