@@ -33,11 +33,11 @@ BEGINNING_LIB="${LIBDIR}"/beginning
 BEGINNING_RC="${BEGINNING_LIB}"/rc.d
 USER_RC="${SYSCONFDIR}"/rc.d
 
+[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
+[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
 # os-release contains things such as distro name, distro's 'color'...
 [[ -r "${LIBDIR}"/os-release ]]     && . "${LIBDIR}"/os-release
 [[ -r "${SYSCONFDIR}"/os-release ]] && . "${SYSCONFDIR}"/os-release
-[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
-[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
 
 if [[ -d "${BEGINNING_LIB}"/rc.conf.d ]];then
     for file in "${BEGINNING_LIB}"/rc.conf.d/*;do
