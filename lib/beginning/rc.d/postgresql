@@ -1,0 +1,32 @@
+#!/bin/bash
+
+pg_ctl() {
+    PGDATA=${POSTGRESQL_DATA}
+    su -c "PGDATA=${PGDATA} pg_ctl $*" ${POSTGRESQL_USER}
+    return $?
+}
+
+postgresql_exists() {
+    prog_exists pg_ctl
+}
+
+postgresql_start() {
+    pg_ctl start -t ${POSTGRESQL_START_TIMEOUT} -w -s ${POSTGRESQL_ARGS} >/dev/null 2>&1
+}
+
+postgresql_reload() {
+    pg_ctl reload -s
+}
+
+postgresql_stop() {
+    local mode
+    for mode in smart fast immediate; do
+        pg_ctl stop -s -t ${POSTGRESQL_STOP_TIMEOUT} -w -m ${mode} >/dev/null 2>&1
+        [[ $? -eq 0 ]] && break
+    done
+    return 0
+}
+
+postgresql_status() {
+    pg_ctl status >/dev/null 2>&1 
+}
