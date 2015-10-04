@@ -1,0 +1,28 @@
+#!/bin/bash
+
+MAIL_CONFIG=${POSTFIX_CONF}
+
+postfix() {
+    command postfix ${POSTFIX_ARGS} "$@"
+}
+
+postfix_exists() {
+    prog_exists postfix
+}
+
+postfix_start() {
+    postfix check >/dev/null 2>&1 && postfix start >/dev/null 2>&1 && return 0
+    return 1
+}
+
+postfix_reload() {
+    postfix reload >/dev/null 2>&1
+}
+
+postfix_stop() {
+    postfix stop >/dev/null 2>&1
+}
+
+postfix_status() {
+    postfix status >/dev/null 2>&1
+}
