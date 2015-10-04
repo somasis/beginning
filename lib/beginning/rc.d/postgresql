@@ -28,5 +28,5 @@ postgresql_stop() {
 }
 
 postgresql_status() {
-    pg_ctl status >/dev/null 2>&1 
+    pg_ctl status >/dev/null 2>&1
 }
