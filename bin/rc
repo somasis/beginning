@@ -26,14 +26,10 @@ else
     exit 2
 fi
 
-case "$1" in
-    restart|start|stop|reload)
-        if [[ "$UID" -ne 0 ]];then
-            printf '%s: must be root to %s daemons.\n' "${0##*/}" "${1}" >&2
-            exit 5
-        fi
-    ;;
-esac
+if [[ "${UID}" -ne 0 ]];then
+    printf 'Must be root to use %s.\n' "${0##*/}"
+    exit 4
+fi
 
 case "$1" in
     restart)
