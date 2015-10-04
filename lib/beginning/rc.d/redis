@@ -2,7 +2,7 @@
 
 _redis_server() {
     pushd /var/db/redis >/dev/null 2>&1 || return $?
-    su -c "redis-server ${REDIS_ARGS} $*" ${REDIS_USER}; local err=$?
+    su -s $(type -fPp sh) -c "redis-server ${REDIS_ARGS} $*" ${REDIS_USER}; local err=$?
     popd /var/db/redis >/dev/null 2>&1 || return $?
     return $err
 }

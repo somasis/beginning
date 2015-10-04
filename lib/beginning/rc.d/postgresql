@@ -2,7 +2,7 @@
 
 pg_ctl() {
     PGDATA=${POSTGRESQL_DATA}
-    su -c "PGDATA=${PGDATA} pg_ctl $*" ${POSTGRESQL_USER}
+    su -s $(type -fPp sh) -c "PGDATA=${PGDATA} pg_ctl $*" ${POSTGRESQL_USER}
     return $?
 }
 
