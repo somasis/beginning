@@ -5,17 +5,17 @@ lighttpd_exists() {
 }
 
 lighttpd_start() {
-    lighttpd_status || rm -f /run/lighttpd.pid
-    lighttpd -t -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 && \
+    lighttpd_status || rm -f /run/beginning/lighttpd.pid
+    lighttpd -t -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 || return $?
     lighttpd -D -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/lighttpd.pid
+    echo $! > /run/beginning/lighttpd.pid
+    pidfileexists /run/beginning/lighttpd.pid || return 1
 }
 
 lighttpd_stop() {
-    pidfilekill /run/lighttpd.pid
-    lighttpd_status || rm -f /run/lighttpd.pid
+    pidfilekill /run/beginning/lighttpd.pid
 }
 
 lighttpd_status() {
-    pidfileexists /run/lighttpd.pid
+    pidfileexists /run/beginning/lighttpd.pid
 }
