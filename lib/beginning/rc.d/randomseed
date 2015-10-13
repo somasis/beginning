@@ -23,7 +23,7 @@ randomseed_stop() {
     randomseed_status
     local err
     # save random state
-    dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${RANDOMSEED_POOLSIZE} || err=$?
+    dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${RANDOMSEED_POOLSIZE} >/dev/null 2>&1 || err=$?
     [[ "$err" -eq 0 ]] && rm -f /run/beginning/randomseed
     return $err
 }
