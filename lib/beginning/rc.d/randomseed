@@ -1,33 +1,33 @@
 #!/bin/bash
 
+RANDOMSEED_POOLSIZE=$(echo $(</proc/sys/kernel/random/poolsize) || echo 512)
+
 randomseed_exists() {
-    [[ -e /dev/urandom ]]
+    [[ -w /dev/urandom ]]
 }
 
 randomseed_start() {
     randomseed_status
-    local err poolsize
+    local err
+    # read previous random state, then remove it
     if [[ -r "${RANDOMSEED_FILE}" ]];then
         cat "${RANDOMSEED_FILE}" > /dev/urandom || err=$?
-    else
-        poolsize=/proc/sys/kernel/random/poolsize
-        if [[ -r "${poolsize}" ]];then
-            poolsize=$(<"${poolsize}")
-        else
-            poolsize=512
-        fi
-        dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${poolsize} >/dev/null 2>&1 || err=$?
+        rm -f "${RANDOMSEED_FILE}"
     fi
-    date +%s > /run/beginning/started.randomseed
+    echo "RANDOMSEED_FILE=${RANDOMSEED_FILE}" > /run/beginning/randomseed
+    echo "RANDOMSEED_POOLSIZE=${RANDOMSEED_POOLSIZE}" >> /run/beginning/randomseed
     return $err
 }
 
 randomseed_stop() {
     randomseed_status
-    rm -f /run/beginning/started.randomseed
-    return 0
+    local err
+    # save random state
+    dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${RANDOMSEED_POOLSIZE} || err=$?
+    [[ "$err" -eq 0 ]] && rm -f /run/beginning/randomseed
+    return $err
 }
 
 randomseed_status() {
-    [[ -r /run/beginning/started.randomseed ]]
+    [[ -r /run/beginning/randomseed ]]
 }
