@@ -17,7 +17,9 @@ consolefont_start() {
             break
         fi
     done
-    date +%s > /run/beginning/started.consolefont
+    echo "CONSOLEFONT_FONT=${CONSOLEFONT_FONT}"     > /run/beginning/consolefont
+    echo "CONSOLEFONT_MAP=${CONSOLEFONT_MAP}"       > /run/beginning/consolefont
+    echo "CONSOLEFONT_UNIMAP=${CONSOLEFONT_UNIMAP}" > /run/beginning/consolefont
     return $err
 }
 
@@ -31,10 +33,10 @@ consolefont_stop() {
             break
         fi
     done
-    rm -f /run/beginning/started.consolefont
+    rm -f /run/beginning/consolefont
     return $err
 }
 
 consolefont_status() {
-    [[ -r /run/beginning/started.consolefont ]]
+    [[ -r /run/beginning/consolefont ]]
 }
