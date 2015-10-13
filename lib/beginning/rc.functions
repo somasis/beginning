@@ -61,16 +61,35 @@ fi
 ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
 [[ -z "$PRETTY_NAME" ]] && PRETTY_NAME="${NAME:-$BEGINNING_PLATFORM}"
 
-
 status() {
-    local stat="${1^^}";shift
+    local bold='\e[1m'
+    local fg_black='\e[30m'
+    local fg_red='\e[31m'
+    local fg_green='\e[32m'
+    local fg_white='\e[37m'
+    local bg_black='\e[40m'
+    local bg_red='\e[41m'
+    local bg_green='\e[42m'
+    local bg_white='\e[47m'
+    local reset='\e[0m'
+    local stat="${1^^}"
+    STATUS_SUCCESS="${bold}${fg_white}${bg_green}"
+    STATUS_STARTED=${STATUS_SUCCESS}
+    STATUS_FAILURE="${bold}${fg_white}${bg_red}"
+    STATUS_STOPPED=${STATUS_FAILURE}
+    STATUS_UNKNOWN="${bold}${fg_white}${bg_black}"
+    STATUS_NOTHING=${STATUS_UNKNOWN}
+    STATUS_CUSTOM=${STATUS_UNKNOWN}
+    shift
+
     case "${stat}" in
-        STARTED)    printf "\r\e[1;42m[ ${stat} ]\e[0m %s\n" "$@"   ;; # green bg   [white]
-        FAILURE)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
-        STOPPED)    printf "\r\e[1;41m[ ${stat} ]\e[0m %s\n" "$@"   ;; # red bg     [white]
-        UNKNOWN)    printf "\r\e[1;40m[ ${stat} ]\e[0m %s\n" "$@"   ;; # black bg   [white]
-        NOTHING)    printf "\r\e[1;40m[         ]\e[0m %s"   "$@"   ;; # black bg   [white]
-        CUSTOM)     printf "\r\e[1;40m[         ]\e[0m %s"   "$@"   ;; # black bg   [white]
+        STARTED)    printf "\e[2K\r${STATUS_STARTED}[ ${stat} ]${reset} %s\n" "$@"   ;; # green bg   [white]
+        SUCCESS)    printf "\e[2K\r${STATUS_SUCCESS}[ ${stat} ]${reset} %s\n" "$@"   ;; # green bg   [white]
+        FAILURE)    printf "\e[2K\r${STATUS_FAILURE}[ ${stat} ]${reset} %s\n" "$@"   ;; # red bg     [white]
+        STOPPED)    printf "\e[2K\r${STATUS_STOPPED}[ ${stat} ]${reset} %s\n" "$@"   ;; # red bg     [white]
+        UNKNOWN)    printf "\e[2K\r${STATUS_UNKNOWN}[ ${stat} ]${reset} %s\n" "$@"   ;; # black bg   [white]
+        NOTHING)    printf "\e[2K\r${STATUS_NOTHING}[         ]${reset} %s"   "$@"   ;; # black bg   [white]
+        CUSTOM)     printf "\e[2K\r${STATUS_CUSTOM}[         ]${reset} %s"   "$@"   ;; # black bg   [white]
     esac
 }
 
