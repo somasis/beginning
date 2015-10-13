@@ -8,6 +8,7 @@ cgmanager_start() {
     cgmanager_status || rm -f /run/cgmanager.pid
     cgmanager ${CGMANAGER_ARGS} >/dev/null 2>&1 &
     echo $! > /run/cgmanager.pid
+    cgmanger_status; return $?
 }
 
 cgmanager_stop() {
