@@ -7,7 +7,6 @@ cgmanager_exists() {
 cgmanager_start() {
     cgmanager ${CGMANAGER_ARGS} >/dev/null 2>&1 &
     echo $! > /run/cgmanager.pid
-    cgmanger_status; return $?
 }
 
 cgmanager_stop() {
