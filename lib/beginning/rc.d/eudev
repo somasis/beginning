@@ -13,7 +13,6 @@ eudev_exists() {
 }
 
 eudev_start() {
-    eudev_status || rm -f /run/eudev.pid
     udevd &
     local pid=$!
     udevadm trigger --action=add --type=subsystems
@@ -28,7 +27,6 @@ eudev_reload() {
 
 eudev_stop() {
     udevadm control --exit
-    eudev_status || rm -f /run/eudev.pid
 }
 
 eudev_status() {

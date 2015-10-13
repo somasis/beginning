@@ -20,7 +20,6 @@ bluez_start() {
 
 bluez_stop() {
     pidfilekill /run/bluetooth.pid
-    bluez_status || rm -f /run/bluetooth.pid
 }
 
 bluez_status() {

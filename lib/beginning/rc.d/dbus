@@ -7,7 +7,6 @@ dbus_exists() {
 dbus_start() {
     mkdir /run/dbus >/dev/null 2>&1
     [[ -d "/run/dbus" ]] || return 1
-    dbus_status || rm -f /run/dbus.pid
     dbus-uuidgen --ensure
     dbus-daemon --system --fork --nopidfile --print-pid ${DBUS_ARGS} > /run/dbus.pid
 }
@@ -19,7 +18,6 @@ dbus_reload() {
 
 dbus_stop() {
     pidfilekill /run/dbus.pid
-    dbus_status || rm -f /run/dbus.pid
 }
 
 dbus_status() {

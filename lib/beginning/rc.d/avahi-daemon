@@ -9,7 +9,6 @@ avahi-daemon_depends() {
 }
 
 avahi-daemon_start() {
-    avahi-daemon_status || rm -f /run/avahi-daemon/pid
     avahi-daemon -Ds ${AVAHI_DAEMON_ARGS}
 }
 
@@ -19,7 +18,6 @@ avahi-daemon_reload() {
 
 avahi-daemon_stop() {
     pidfilekill /run/avahi-daemon/pid
-    avahi-daemon_status || rm -f /run/avahi-daemon/pid
 }
 
 avahi-daemon_status() {

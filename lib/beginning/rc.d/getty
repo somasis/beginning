@@ -22,12 +22,13 @@ getty_stop() {
     # stopping login terminals is almost always a bad idea.
     # don't allow it. if it's not desired then the user should be
     # smart enough to remove it from CORE_DAEMONS
-    [[ "$BEGINNING_RUNNER" == shutdown ]] || false
+    [[ "$BEGINNING_RUNNER" == shutdown ]] || return 1
+    return 0
 }
 
 getty_status() {
     if [[ "$BEGINNING_RUNNER" == shutdown ]];then
-        false
+        return 1
     else
         pgrep agetty >/dev/null 2>&1; return $?
     fi

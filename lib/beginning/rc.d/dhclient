@@ -9,13 +9,11 @@ dhclient_provides() {
 }
 
 dhclient_start() {
-    dhclient_status || rm -f /run/dhclient.pid
     dhclient -pf /run/dhclient.pid -q ${DHCLIENT_CONF:+-cf ${DHCLIENT_CONF}} ${DHCLIENT_ARGS} ${DHCLIENT_IFACE} || return $?
 }
 
 dhclient_stop() {
     pidfilekill /run/dhclient.pid
-    dhclient_status || rm -f /run/dhclient.pid
 }
 
 dhclient_status() {

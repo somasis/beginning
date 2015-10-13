@@ -9,14 +9,12 @@ cups-browsed_depends() {
 }
 
 cups-browsed_start() {
-    cups-browsed_status || rm -f /run/cups-browsed.pid
     cups-browsed --autoshutdown=avahi ${CUPS_BROWSED_ARGS} >/dev/null 2>&1 &
     echo $! > /run/cups-browsed.pid
 }
 
 cups-browsed_stop() {
     pidfilekill /run/cups-browsed.pid
-    cups-browsed_status || rm -f /run/cups-browsed.pid
 }
 
 cups-browsed_status() {

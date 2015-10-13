@@ -9,14 +9,12 @@ cronie_provides() {
 }
 
 cronie_start() {
-    cronie_status || rm -f /run/cronie.pid
     crond -n ${CRONIE_ARGS} &
     echo $! > /run/cronie.pid
 }
 
 cronie_stop() {
     pidfilekill /run/cronie.pid
-    cronie_status || rm -f /run/cronie.pid
 }
 
 cronie_status() {

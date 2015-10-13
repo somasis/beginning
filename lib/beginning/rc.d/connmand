@@ -13,14 +13,12 @@ connmand_depends() {
 }
 
 connmand_start() {
-    connmand_status || rm -f /run/connmand.pid
     connmand -n ${CONNMAN_ARGS} >/dev/null 2>&1 &
     echo $! > /run/connmand.pid
 }
 
 connmand_stop() {
     pidfilekill /run/connmand.pid
-    connmand_status || rm -f /run/connmand.pid
 }
 
 connmand_status() {

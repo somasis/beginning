@@ -50,7 +50,6 @@ hostname_start() {
 }
 
 hostname_stop() {
-    hostname_status && rm /run/beginning/hostname
     hostname_lo_down
     return $?
 }

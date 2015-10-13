@@ -13,14 +13,12 @@ busybox-syslogd_exists() {
 }
 
 busybox-syslogd_start() {
-    busybox-syslogd_status || rm -f /run/busybox-syslogd.pid
     busybox syslogd -n ${BUSYBOX_SYSLOGD_CONF:+-f ${BUSYBOX_SYSLOGD_CONF}} ${BUSYBOX_SYSLOGD_ARGS} >/dev/null 2>&1 &
     echo $! > /run/busybox-syslogd.pid
 }
 
 busybox-syslogd_stop() {
     pidfilekill /run/busybox-syslogd.pid
-    busybox-syslogd_status || rm -f /run/busybox-syslogd.pid
 }
 
 busybox-syslogd_status() {

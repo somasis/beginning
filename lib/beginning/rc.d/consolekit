@@ -13,13 +13,11 @@ consolekit_wants() {
 }
 
 consolekit_start() {
-    consolekit_status || rm -f /run/console-kit-daemon.pid
     console-kit-daemon ${CONSOLEKIT_ARGS} >/dev/null 2>&1
 }
 
 consolekit_stop() {
     pidfilekill /run/console-kit-daemon.pid
-    consolekit_status || rm -f /run/console-kit-daemon.pid
 }
 
 consolekit_status() {

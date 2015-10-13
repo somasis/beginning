@@ -9,13 +9,11 @@ rsyslogd_exists() {
 }
 
 rsyslogd_start() {
-    rsyslogd_status || rm -f /run/rsyslogd.pid
     rsyslogd -n -i "/run/rsyslogd.pid" ${RSYSLOGD_ARGS} >/dev/null 2>&1 &
 }
 
 rsyslogd_stop() {
     pidfilekill /run/rsyslogd.pid
-    rsyslogd_status || rm -f /run/rsyslogd.pid
 }
 
 rsyslogd_status() {
