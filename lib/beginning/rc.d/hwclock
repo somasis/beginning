@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hwclock_exists() {
-    if prog_exists hwclock && [[ -e /dev/rtc ]];then
+    if prog_exists hwclock && [[ -e /dev/rtc0 ]];then
         return 0
     else
         return 1
@@ -9,7 +9,6 @@ hwclock_exists() {
 }
 
 hwclock_start() {
-    hwclock_status
     local err
     export TZ=${HWCLOCK_TZ}
     case ${HWCLOCK_TYPE,,} in
@@ -29,7 +28,6 @@ hwclock_start() {
 }
 
 hwclock_stop() {
-    hwclock_status
     local err
     export TZ=${HWCLOCK_TZ}
     case ${HWCLOCK_TYPE,,} in
