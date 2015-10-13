@@ -45,16 +45,16 @@ hostname_start() {
         hostname "${HOSTNAME}" || err=$?
     fi
     hostname_lo_up || err=$?
-    [[ $err -eq 0 ]] && date +%s > /run/beginning/started.hostname
+    [[ $err -eq 0 ]] && echo "${HOSTNAME}" > /run/beginning/hostname
     return $err
 }
 
 hostname_stop() {
-    hostname_status && rm /run/beginning/started.hostname
+    hostname_status && rm /run/beginning/hostname
     hostname_lo_down
     return $?
 }
 
 hostname_status() {
-    hostname_lo_status && [[ -r /run/beginning/started.hostname ]]
+    hostname_lo_status && [[ -r /run/beginning/hostname ]]
 }
