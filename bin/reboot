@@ -31,9 +31,11 @@ else
     exit 2
 fi
 
-if [[ "$#" -eq 0 ]];then
-    bin="${0##*/}"
-    bin="${bin##beginning.}"
+bin="${0##*/}"
+bin="${bin##beginning.}"
+if [[ "${PPID}" -eq 1 ]];then
+    busybox "${bin}" "$@" # TODO: remove dependency on busybox
+else
     case "${bin}" in
         reboot)
             kill -2 1
@@ -42,6 +44,4 @@ if [[ "$#" -eq 0 ]];then
             kill -10 1
         ;;
     esac
-elif [[ "$1" || "${PPID}" -eq 1 ]];then
-    busybox "${0##*/}" "$@" # TODO: remove dependency on busybox
 fi 
