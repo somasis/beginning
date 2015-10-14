@@ -33,7 +33,7 @@ fi
 
 bin="${0##*/}"
 bin="${bin##beginning.}"
-if [[ "${PPID}" -eq 1 ]];then
+if [[ " $@ " == *"-"*"f"* ]];then
     busybox "${bin}" "$@" # TODO: remove dependency on busybox
 else
     case "${bin}" in
