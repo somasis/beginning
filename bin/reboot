@@ -33,15 +33,20 @@ fi
 
 bin="${0##*/}"
 bin="${bin##beginning.}"
-if [[ " $@ " == *"-"*"f"* ]];then
-    busybox "${bin}" "$@" # TODO: remove dependency on busybox
-else
-    case "${bin}" in
-        reboot)
+
+case "${bin}" in
+    reboot)
+        if [[ "${BEGINNING_RUNNER}" == "rc.shutdown" ]];then
+            busybox reboot -n -f
+        else
             kill -2 1
-        ;;
-        poweroff|shutdown|halt)
+        fi
+    ;;
+    poweroff|shutdown|halt)
+        if [[ "${BEGINNING_RUNNER}" == "rc.shutdown" ]];then
+            busybox "${bin}" -n -f
+        else
             kill -10 1
-        ;;
-    esac
-fi 
+        fi
+    ;;
+esac

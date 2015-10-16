@@ -66,12 +66,14 @@ umount -av
 printf 'Syncing filesystems...\n'
 sync
 
+printf 'Rebooting...\n'
+
 case "$1" in
     reboot)
-        reboot -nf
+        reboot
     ;;
     poweroff)
-        poweroff -nf
+        poweroff
     ;;
 esac
 
