@@ -19,7 +19,7 @@
 
 ## Start
 if [[ "$PPID" -ne 1 ]];then
-    printf "This script should only be ran from init.\n" >&2
+    printf 'This script should only be ran from `begin`.\n' >&2
     exit 1
 fi
 
@@ -35,7 +35,7 @@ else
     done
 fi
 
-BEGINNING_RUNNER=init
+BEGINNING_RUNNER=rc.init
 TABS=true
 
 rchook pre_beginning

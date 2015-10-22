@@ -19,7 +19,7 @@
 
 ## start
 if [[ "$PPID" -ne 1 ]];then
-    printf "This script should only be ran from init.\n" >&2
+    printf 'This script should only be ran from `begin`.\n' >&2
     exit 1
 fi
 
@@ -29,7 +29,7 @@ fi
 LIBDIR=${LIBDIR:-/lib}
 . ${BEGINNING_LIB:-$LIBDIR/beginning}/rc.functions
 
-BEGINNING_RUNNER=shutdown
+BEGINNING_RUNNER=rc.shutdown
 
 case "$1" in
     reboot|poweroff)

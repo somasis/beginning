@@ -17,9 +17,6 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-# prevent any funny business
-BEGINNING_RUNNER=
-
 umask 022
 
 export PATH="/bin:/sbin"
@@ -269,7 +266,7 @@ beginning_daemon_start() {
                     fi
                 fi
             else
-                [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && [[ "${BEGINNING_RUNNER}" != init ]] && status STARTED "${daemon}: already started"
+                [[ -z "${BEGINNING_RESOLVING_DEPS}" ]] && [[ "${BEGINNING_RUNNER}" != rc.init ]] && status STARTED "${daemon}: already started"
             fi
         fi
     done
