@@ -32,13 +32,16 @@ LIBDIR=${LIBDIR:-/lib}
 BEGINNING_RUNNER=rc.shutdown
 
 case "$1" in
-    reboot|poweroff)
-        true
-        ;;
+    reboot)
+        word="Rebooting"
+    ;;
+    poweroff)
+        word="Shutting down"
+    ;;
     *)
         printf "Invalid action '$1' for rc.shutdown\n" 1>&2
         exit 1
-        ;;
+    ;;
 esac
 
 clear;printf '\n';tput reset;chvt 1
@@ -66,14 +69,14 @@ umount -av
 printf 'Syncing filesystems...\n'
 sync
 
-printf 'Rebooting...\n'
+printf '%s...\n' "${word}"
 
 case "$1" in
     reboot)
-        reboot
+        reboot -f
     ;;
     poweroff)
-        poweroff
+        poweroff -f
     ;;
 esac
 
