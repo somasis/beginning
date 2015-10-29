@@ -23,7 +23,7 @@ export PATH="/bin:/sbin"
 
 BEGINNING_PLATFORM=$(uname -s)
 
-LIBEXEC="${LIBEXECDIR:-/usr/libexec}"
+LIBEXECDIR="${LIBEXECDIR:-/usr/libexec}"
 LIBDIR="${LIBDIR:-/lib}"
 SYSCONFDIR="${SYSCONFDIR:-/etc}"
 

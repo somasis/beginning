@@ -6,8 +6,8 @@ BUILD?=$(PWD)/build
 DESTDIR?=$(PWD)/image
 BINDIR?=$(PREFIX)/bin
 LIBDIR?=$(PREFIX)/lib
-LIBEXECDIR?=$(PREFIX)/libexec
-DOCDIR?=$(PREFIX)/share/doc/beginning
+LIBEXECDIR?=$(PREFIX)/usr/libexec
+DOCDIR?=$(PREFIX)/usr/share/doc/beginning
 SYSCONFDIR?=$(PREFIX)/etc
 
 build:
