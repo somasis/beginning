@@ -10,6 +10,7 @@ plan on installing this, until it is stable.
 
 ## Requirements
 - bash
+- C compiler (for the executables in libexec/)
 - coreutils
 - syslogd
 - agetty, if you wish to log in from the console
@@ -19,14 +20,11 @@ plan on installing this, until it is stable.
 
 2.  `make`
 
-    Beginning is written entirely in `bash`, and as such does not require any
-    compilation, only a `bash` shell. (at this point in time, POSIX shell may be
-    considered)
-
 3.  `make install`
 
     The makefile follows standard variables, and can be influenced by variables
-    such as `DESTDIR`, `BINDIR`, `LIBDIR`, `DOCDIR`, `SYSCONFDIR`, and `PREFIX`.
+    such as `DESTDIR`, `BINDIR`, `LIBDIR`, `LIBEXECDIR`,`DOCDIR`, `SYSCONFDIR`,
+    and `PREFIX`.
 
 [download a release]: https://github.com/somasis/beginning/releases
 

@@ -22,6 +22,7 @@ if [[ "$UID" -ne 0 ]];then
     exit 1
 fi
 
+BEGINNING_LIBEXEC="${LIBEXECDIR:-/usr/libexec}"/beginning
 BEGINNING_LIB="${LIBDIR:-/lib}"/beginning
 
 if [[ -r "${BEGINNING_LIB}"/rc.functions ]];then
@@ -37,14 +38,27 @@ bin="${bin##beginning.}"
 case "${bin}" in
     reboot)
         if [[ "${BEGINNING_RUNNER}" == "rc.shutdown" ]];then
-            busybox reboot -n -f
+            # if being ran by one of the init scripts, run the binary
+            # that actually calls reboot()
+            exec "${BEGINNING_LIBEXEC}"/reboot
         else
             kill -2 1
         fi
     ;;
-    poweroff|shutdown|halt)
+    shutdown)
         if [[ "${BEGINNING_RUNNER}" == "rc.shutdown" ]];then
-            busybox "${bin}" -n -f
+            exec "${BEGINNING_LIBEXEC}"/poweroff
+        else
+            if [[ "$1" == '-r' ]];then
+                exec reboot
+            else
+                kill -10 1
+            fi
+        fi
+    ;;
+    poweroff|halt)
+        if [[ "${BEGINNING_RUNNER}" == "rc.shutdown" ]];then
+            exec "${BEGINNING_LIBEXEC}"/"${bin}"
         else
             kill -10 1
         fi
