@@ -20,7 +20,7 @@ install: build
 	mkdir -p $(DESTDIR)$(BINDIR)
 	cp -r bin/* $(DESTDIR)$(BINDIR)
 	mkdir -p $(DESTDIR)$(LIBDIR)/beginning
-	cp -r lib/* $(DESTDIR)$(LIBDIR)
+	cp -r lib/* $(DESTDIR)$(LIBDIR)/beginning
 	mkdir -p $(DESTDIR)$(LIBEXECDIR)/beginning
 	cp $(BUILD)/reboot $(BUILD)/halt $(BUILD)/poweroff $(DESTDIR)$(LIBEXECDIR)/beginning
 	mkdir -p $(DESTDIR)$(SYSCONFDIR)
