@@ -23,10 +23,12 @@ export PATH="/bin:/sbin"
 
 BEGINNING_PLATFORM=$(uname -s)
 
+LIBEXEC="${LIBEXECDIR:-/usr/libexec}"
 LIBDIR="${LIBDIR:-/lib}"
 SYSCONFDIR="${SYSCONFDIR:-/etc}"
 
 BEGINNING_LIB="${LIBDIR}"/beginning
+BEGINNING_LIBEXEC="${LIBEXECDIR}"/beginning
 BEGINNING_RC="${BEGINNING_LIB}"/rc.d
 USER_RC="${SYSCONFDIR}"/rc.d
 
