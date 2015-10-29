@@ -46,7 +46,7 @@ esac
 
 clear;printf '\n';tput reset;chvt 1
 
-printf "\e[0mShutting down ${ANSI_COLOR}%s\e[0m...\n\n" "${PRETTY_NAME}"
+printf "\e[0m%s ${ANSI_COLOR}%s\e[0m...\n\n" "${word}" "${PRETTY_NAME}"
 
 # Allow for ctrl-alt-del hard reboots, for if this script breaks
 echo 1 > /proc/sys/kernel/ctrl-alt-del
@@ -65,9 +65,6 @@ mount -o remount,ro /
 
 printf 'Unmounting filesystems...\n'
 umount -av
-
-printf 'Syncing filesystems...\n'
-sync
 
 printf '%s...\n' "${word}"
 
