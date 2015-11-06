@@ -10,31 +10,29 @@ consolefont_start() {
     [[ "${CONSOLEFONT_UNIMAP}" ]] && CONSOLEFONT_SETFONT_ARGS="${CONSOLEFONT_SETFONT_ARGS} -u ${CONSOLEFONT_UNIMAP}"
     local err tty
     for tty in $(for i in $(seq 1 ${CONSOLEFONT_VTERMS:-$GETTY_VTERMS});do echo /dev/tty${i};done);do
-        if setfont -C "$tty" ${CONSOLEFONT_SETFONT_ARGS} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"};then
+        if setfont -C "$tty" ${CONSOLEFONT_SETFONT_ARGS} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"} >/dev/null 2>&1;then
             err=$?
         else
             err=1
-            break
+            return $err
         fi
     done
     echo "CONSOLEFONT_FONT=${CONSOLEFONT_FONT}"     > /run/beginning/consolefont
     echo "CONSOLEFONT_MAP=${CONSOLEFONT_MAP}"       > /run/beginning/consolefont
     echo "CONSOLEFONT_UNIMAP=${CONSOLEFONT_UNIMAP}" > /run/beginning/consolefont
-    return $err
 }
 
 consolefont_stop() {
     local err tty
     for tty in $(for i in $(seq 1 ${VTERMS});do echo /dev/tty${i};done);do
-        if setfont -C "$tty";then
+        if setfont -C "$tty" >/dev/null 2>&1;then
             err=0
         else
             err=1
-            break
+            return $err
         fi
     done
     rm -f /run/beginning/consolefont
-    return $err
 }
 
 consolefont_status() {
