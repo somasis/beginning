@@ -1,0 +1,26 @@
+#!/bin/bash
+
+wicd_exists() {
+    prog_exists wicd
+}
+
+wicd_provides() {
+    echo network
+}
+
+wicd_depends() {
+    echo dbus dev
+}
+
+wicd_start() {
+    wicd --no-daemon ${WICD_ARGS} >/dev/null 2>&1 &
+    echo $! > /run/wicd.pid
+}
+
+wicd_stop() {
+    pidfilekill /run/wicd.pid
+}
+
+wicd_status() {
+    pidfileexists /run/wicd.pid
+}
