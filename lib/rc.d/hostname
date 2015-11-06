@@ -39,10 +39,10 @@ hostname_lo_status() {
 
 hostname_start() {
     local err
-    if [[ -w "/proc/sys/kernel/hostname" ]];then
-        echo "${HOSTNAME}" > /proc/sys/kernel/hostname || err=$?
-    else
+    if prog_exists hostname;then
         hostname "${HOSTNAME}" || err=$?
+    elif [[ -w "/proc/sys/kernel/hostname" ]];then
+        echo "${HOSTNAME}" > /proc/sys/kernel/hostname || err=$?
     fi
     hostname_lo_up || err=$?
     [[ $err -eq 0 ]] && echo "${HOSTNAME}" > /run/beginning/hostname
