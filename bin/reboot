@@ -18,7 +18,7 @@
 #
 
 if [[ "$UID" -ne 0 ]];then
-    printf "This program should only be ran as root.\n" >&2
+    printf "This program should only be run as root.\n" >&2
     exit 1
 fi
 
