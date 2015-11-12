@@ -354,6 +354,7 @@ pidfilekill() {
 
 killall5() {
     for pid in $(pgrep . | egrep -v "^(1|$$|$PPID)$");do
+        disown "$pid" >/dev/null 2>&1 # hide Killed message from bash
         kill "${1:--15}" "$pid" >/dev/null 2>&1
     done
 }
