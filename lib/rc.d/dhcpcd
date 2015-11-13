@@ -1,0 +1,21 @@
+#!/bin/bash
+
+dhcpcd_exists() {
+    prog_exists dhcpcd
+}
+
+dhcpcd_provides() {
+    echo network
+}
+
+dhcpcd_start() {
+    dhcpcd -q ${DHCPCD_CONF:+-f ${DHCPCD_CONF}} ${DHCPCD_ARGS} ${DHCPCD_IFACE} >/dev/null 2>&1 || return $?
+}
+
+dhcpcd_stop() {
+    pidfilekill /run/dhcpcd.pid
+}
+
+dhcpcd_status() {
+    pidfileexists /run/dhcpcd.pid
+}
