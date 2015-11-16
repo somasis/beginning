@@ -208,6 +208,9 @@ beginning_daemon_provider() {
             beginning_daemon_load "$d"
             if func_exists ${d##*/}_exists && ! ${d##*/}_exists;then
                 [[ "${type}" == "installed" ]] && continue
+                if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
+                    echo "${d##*/}"
+                fi
             elif func_exists ${d##*/}_exists && ${d##*/}_exists;then
                 if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                     echo "${d##*/}"

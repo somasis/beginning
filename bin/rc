@@ -67,7 +67,7 @@ case "$1" in
         shift
         BEGINNING_PROVIDER_LIST_ONLY=true
         beginning_daemon_load "${1}" >/dev/null 2>&1
-        providers=$(beginning_daemon_provider "" "$1")
+        providers=$(beginning_daemon_provider "" "$1" "installed")
         possible=$(beginning_daemon_provider "" "$1" "all")
         if [[ "${providers}" ]];then
             for p in ${providers};do
