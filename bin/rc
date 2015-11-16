@@ -33,26 +33,62 @@ if [[ "${UID}" -ne 0 ]];then
 fi
 
 help() {
-    echo "usage: ${0##*/} <start|stop|restart|reload|list|status> [daemon ...]"
+    echo "usage: ${0##*/} <start|stop|restart|reload|list|status|providers> [daemon ...]"
 }
 
 case "$1" in
+    # non-daemon actions
+    help)
+        help
+    ;;
+    version)
+        version
+    ;;
+
+    # informative
+    list|ls|status|'')
+        [[ -n "$2" ]] || shift
+        case "$2" in
+            '')
+                for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
+                    status STARTED "${dae}"
+                done
+                for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
+                    status STOPPED "${dae}"
+                done
+            ;;
+            virtuals|all|started|stopped|exists|daemons)
+                beginning_daemon_list "${2^^}" 2>/dev/null
+            ;;
+        esac
+    ;;
+    providers)
+        [[ $# -ne 2 ]] && help && exit 2
+        shift
+        BEGINNING_PROVIDER_LIST_ONLY=true
+        beginning_daemon_load "${1}" >/dev/null 2>&1
+        providers=$(beginning_daemon_provider "" "$1")
+        possible=$(beginning_daemon_provider "" "$1" "all")
+        if [[ "${providers}" ]];then
+            for p in ${providers};do
+                echo "$p"
+            done
+        elif ! "${1}"_virtual >/dev/null 2>&1;then
+            printf '%s: %s is not a virtual and therefore has no providers.\n' "${0##*/}" "$1" >&2
+            exit 20
+        elif [[ -z "${possible}" ]];then
+            printf '%s: %s does not have any providers, installed or nonexistant.\n' "${0##*/}" "$1" >&2
+        elif [[ -z "${providers}" ]];then
+            printf '%s: %s does not have any providers installed. Possible providers: %s\n' "${0##*/}" "$1" "${possible}" >&2
+            exit 30
+        fi
+    ;;
+
+    # acting on daemons
     restart)
         shift
         "$0" stop "$@"
         "$0" start "$@"
-    ;;
-    help)
-        help
-    ;;
-    list|ls|status|'')
-        [[ -n "$2" ]] || shift
-        for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
-            status STARTED "${dae}"
-        done
-        for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
-            status STOPPED "${dae}"
-        done
     ;;
     *)
         [[ $# -le 1 ]] && help && exit 2
