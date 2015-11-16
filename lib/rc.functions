@@ -324,6 +324,26 @@ beginning_daemon_stop() {
     done
 }
 
+beginning_daemon_do() {
+    local daemon="$1" action="$2" require_started="${3:-true}"
+    if func_exists ${daemon}_${action};then
+        if [[ "${require_started,,}" == "true" ]];then
+            if ! ${daemon}_status;then
+                status FAILURE "${daemon}: must be running for \`${action}\`"
+                return 1
+            fi
+        fi
+        status CUSTOM "${daemon}: ${action}"
+        ${daemon}_${action}
+        if [[ $? -eq 0 ]];then
+            status SUCCESS "${daemon}"
+        else
+            status FAILURE "${daemon}"
+            return 2
+        fi
+    fi
+}
+
 # check if $1's contents is a pid which is exists
 # if we are root, we use the bash builtin kill, and if not we use ps
 # since kill will return 'operation not permitted' with a 1 errcode, which
