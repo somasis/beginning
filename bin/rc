@@ -32,6 +32,10 @@ if [[ "${UID}" -ne 0 ]];then
     exit 4
 fi
 
+help() {
+    echo "usage: ${0##*/} <start|stop|restart|reload|list|status> [daemon ...]"
+}
+
 case "$1" in
     restart)
         shift
