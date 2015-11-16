@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# vixie-cron uses `cron`, cronie is `crond`
 cronie_exists() {
-    prog_exists crond
+    prog_exists crond && ! prog_exists cron && [[ "$(readlink -f $(type -fPp crond))" != */busybox ]]
 }
 
 cronie_provides() {
