@@ -200,18 +200,22 @@ beginning_daemon_list() {
 beginning_daemon_provider() {
     local action="${1}"
     local daemon="${2}"
+    local type="${3:-installed}"
 
     d_list=
     d_list=(
         $(for d in $(beginning_daemon_list all);do
             beginning_daemon_load "$d"
-            if func_exists ${d##*/}_exists && ${d##*/}_exists;then
+            if func_exists ${d##*/}_exists && ! ${d##*/}_exists;then
+                [[ "${type}" == "installed" ]] && continue
+            elif func_exists ${d##*/}_exists && ${d##*/}_exists;then
                 if [[ " $(func_exists ${d##*/}_provides && ${d##*/}_provides) " == *" ${daemon} "* ]];then
                     echo "${d##*/}"
                 fi
             fi
         done 2>/dev/null)
     )
+    [[ "${BEGINNING_PROVIDER_LIST_ONLY}" ]] && echo "${d_list[*]}" && return 0
     local provider=
     local provider=${daemon^^}_PROVIDER
     local provider=${!provider}
@@ -219,6 +223,7 @@ beginning_daemon_provider() {
         status FAILURE "${daemon}: has no providers. You need to install one."
         return 3
     fi
+
     if [[ -n "${provider}" && " ${d_list[@]} " == *" ${provider} "* ]];then
         d_list=( "${provider}" )
     elif [[ -n "${provider}" && " ${d_list[@]} " != *" ${provider} "* ]];then
