@@ -63,7 +63,7 @@ case "$1" in
             if func_exists beginning_daemon_${act};then
                 beginning_daemon_${act} "${dae}"
             elif func_exists ${dae}_${act};then
-                ${dae}_${act}
+                beginning_daemon_do ${dae} ${act}
             else
                 err=1
             fi
