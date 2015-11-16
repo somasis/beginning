@@ -36,7 +36,6 @@ else
 fi
 
 BEGINNING_RUNNER=rc.init
-TABS=true
 
 rchook pre_beginning
 
@@ -87,7 +86,8 @@ rchook pre_fsck
 
 printf "Checking filesystems...\n"
 trap 'killall fsck' INT
-fsck -ATy | tab
+fsck -ATy
+
 trap - INT
 
 rchook post_fsck
@@ -100,8 +100,8 @@ mkdir -p /run/beginning
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
-mount  -av | egrep -v '(already|ignored)' | tab
-swapon -av | egrep -v '(already|ignored)' | tab
+mount  -av | egrep -v '(already|ignored)'
+swapon -av | egrep -v '(already|ignored)'
 
 printf "Storing dmesg output to /var/log/dmesg.log...\n"
 dmesg > /var/log/dmesg.log
@@ -127,7 +127,5 @@ else
     beginning_daemon_start ${DAEMONS[@]}
     beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
 fi
-
-TABS=
 
 wait
