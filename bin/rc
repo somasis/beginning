@@ -118,11 +118,14 @@ case "$1" in
     ;;
     *)
         [[ $# -le 1 ]] && help && exit 2
-        [[ $# -gt 1 ]] && act="$1"; shift
+        act="$1"
+        shift
         for dae in ${@};do
             err=
-            beginning_daemon_load "${dae}" >/dev/null 2>&1
-            if func_exists beginning_daemon_${act};then
+            beginning_daemon_load "${dae}"
+            if func_exists ${dae}_exists && ! ${dae}_exists;then
+                err=5
+            elif func_exists beginning_daemon_${act};then
                 beginning_daemon_${act} "${dae}"
             elif func_exists ${dae}_${act};then
                 beginning_daemon_do ${dae} ${act}
@@ -131,6 +134,7 @@ case "$1" in
             fi
             err=${err:-$?}
         done
+        [[ "$err" -eq 5 ]] && printf "%s: %s isn't installed.\n" "${0##*/}" "${dae}" >&2
         [[ "$err" -eq 4 ]] && printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
         [[ "$err" -eq 3 ]] && printf "%s: %s: script not found.\n" "${0##*/}" "${dae}" >&2
         exit $err
