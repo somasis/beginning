@@ -12,6 +12,10 @@ consolefont_start() {
     for tty in $(for i in $(seq 1 ${CONSOLEFONT_VTERMS:-$GETTY_VTERMS});do echo /dev/tty${i};done);do
         if setfont -C "$tty" ${CONSOLEFONT_SETFONT_ARGS} ${CONSOLEFONT_FONT:+"${CONSOLEFONT_FONT}"} >/dev/null 2>&1;then
             err=$?
+        elif [[ $? -eq 66 ]];then
+            err=66
+            BEGINNING_FAILURE="\"${CONSOLEFONT_FONT}\" does not exist"
+            return $err
         else
             err=1
             return $err
