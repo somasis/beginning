@@ -82,13 +82,13 @@ status() {
     shift
 
     case "${stat}" in
-        STARTED)    printf "\e[2K\r${STATUS_STARTED}[ ${stat} ]${reset} %s\n" "$@"   ;; # green bg   [white]
-        SUCCESS)    printf "\e[2K\r${STATUS_SUCCESS}[ ${stat} ]${reset} %s\n" "$@"   ;; # green bg   [white]
-        FAILURE)    printf "\e[2K\r${STATUS_FAILURE}[ ${stat} ]${reset} %s\n" "$@"   ;; # red bg     [white]
-        STOPPED)    printf "\e[2K\r${STATUS_STOPPED}[ ${stat} ]${reset} %s\n" "$@"   ;; # red bg     [white]
-        UNKNOWN)    printf "\e[2K\r${STATUS_UNKNOWN}[ ${stat} ]${reset} %s\n" "$@"   ;; # black bg   [white]
-        NOTHING)    printf "\e[2K\r${STATUS_NOTHING}[         ]${reset} %s"   "$@"   ;; # black bg   [white]
-        CUSTOM)     printf "\e[2K\r${STATUS_CUSTOM}[         ]${reset} %s"   "$@"   ;; # black bg   [white]
+        STARTED)    printf "\e[2K\r${STATUS_STARTED}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_STARTED:+: ${BEGINNING_STARTED}}"   ;; # green bg   [white]
+        SUCCESS)    printf "\e[2K\r${STATUS_SUCCESS}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_SUCCESS:+: ${BEGINNING_SUCCESS}}"   ;; # green bg   [white]
+        FAILURE)    printf "\e[2K\r${STATUS_FAILURE}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_FAILURE:+: ${BEGINNING_FAILURE}}"   ;; # red bg     [white]
+        STOPPED)    printf "\e[2K\r${STATUS_STOPPED}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_STOPPED:+: ${BEGINNING_STOPPED}}"   ;; # red bg     [white]
+        UNKNOWN)    printf "\e[2K\r${STATUS_UNKNOWN}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_UNKNOWN:+: ${BEGINNING_UNKNOWN}}"   ;; # black bg   [white]
+        NOTHING)    printf "\e[2K\r${STATUS_NOTHING}[         ]${reset} %s"   "$@${BEGINNING_NOTHING:+: ${BEGINNING_NOTHING}}"   ;; # black bg   [white]
+        CUSTOM)     printf  "\e[2K\r${STATUS_CUSTOM}[         ]${reset} %s"   "$@${BEGINNING_CUSTOM:+: ${BEGINNING_CUSTOM}}"     ;; # black bg   [white]
     esac
 }
 
@@ -341,7 +341,7 @@ beginning_daemon_do() {
                 return 1
             fi
         fi
-        status CUSTOM "${daemon}: ${action}"
+        status CUSTOM "${daemon}${action:+: $action}"
         ${daemon}_${action}
         if [[ $? -eq 0 ]];then
             status SUCCESS "${daemon}"
