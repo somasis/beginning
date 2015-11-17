@@ -46,7 +46,7 @@ case "$1" in
     ;;
 
     # informative
-    list|ls|status|'')
+    list|ls|'')
         [[ -n "$2" ]] || shift
         case "$2" in
             '')
@@ -57,11 +57,29 @@ case "$1" in
                     status STOPPED "${dae}"
                 done
             ;;
-            virtuals|all|started|stopped|exists|daemons)
-                beginning_daemon_list "${2^^}" 2>/dev/null
+            virtuals|all|started|stopped|existant|nonexistant|daemons)
+                beginning_daemon_list "${2}" 2>/dev/null
+            ;;
+            *)
+                help
             ;;
         esac
     ;;
+    status)
+        #[[ $# -lt 2 ]] && help && exit 3
+        shift
+        beginning_daemon_list all 2>/dev/null | for dae in "${@}";do
+            grep -q "^${dae}$" || { help; exit 5; }
+        done
+ 
+        for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
+            status STARTED "${dae}"
+        done
+        for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
+            status STOPPED "${dae}"
+        done
+    ;;
+
     providers)
         [[ $# -ne 2 ]] && help && exit 2
         shift

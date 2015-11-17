@@ -154,8 +154,9 @@ beginning_daemon_file() {
 }
 
 beginning_daemon_list() {
-    local daemon daes=()
+    local daemon daes=() list="${1}"
     if [[ "$#" -gt 1 ]];then
+        shift
         daes=( "$@" )
     else
         daes=( ${BEGINNING_RC}/* ${USER_RC}/* )
@@ -163,8 +164,8 @@ beginning_daemon_list() {
     for daemon in "${daes[@]}";do
         daemon=${daemon##*/}
         [[ "${daemon}" == '*' ]] && continue
-        beginning_daemon_load "${daemon}"
-        case "${1^^}" in
+        beginning_daemon_load "${daemon}" 2>/dev/null
+        case "${list^^}" in
             STARTED)
                 if func_exists ${daemon}_status && ${daemon}_exists && ${daemon}_status;then
                     echo "${daemon}"
@@ -175,7 +176,12 @@ beginning_daemon_list() {
                     echo ${daemon}
                 fi
             ;;
-            EXISTS)
+            NONEXISTANT)
+                if func_exists ${daemon}_exists && ! ${daemon}_exists;then
+                    echo ${daemon}
+                fi
+            ;;
+            EXISTANT)
                 if func_exists ${daemon}_exists && ${daemon}_exists;then
                     echo ${daemon}
                 fi
