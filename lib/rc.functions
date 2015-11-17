@@ -176,12 +176,12 @@ beginning_daemon_list() {
                     echo ${daemon}
                 fi
             ;;
-            NONEXISTANT)
+            NONEXISTENT)
                 if func_exists ${daemon}_exists && ! ${daemon}_exists;then
                     echo ${daemon}
                 fi
             ;;
-            EXISTANT)
+            EXISTENT)
                 if func_exists ${daemon}_exists && ${daemon}_exists;then
                     echo ${daemon}
                 fi

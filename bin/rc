@@ -65,7 +65,7 @@ case "$1" in
                     status STOPPED "${dae}"
                 done
             ;;
-            virtuals|all|started|stopped|existant|nonexistant|daemons)
+            virtuals|all|started|stopped|existent|nonexistent|daemons)
                 beginning_daemon_list "${2}" 2>/dev/null
             ;;
             *)
@@ -103,7 +103,7 @@ case "$1" in
             printf '%s: %s is not a virtual and therefore has no providers.\n' "${0##*/}" "$1" >&2
             exit 20
         elif [[ -z "${possible}" ]];then
-            printf '%s: %s does not have any providers, installed or nonexistant.\n' "${0##*/}" "$1" >&2
+            printf '%s: %s does not have any providers, installed or nonexisttent.\n' "${0##*/}" "$1" >&2
         elif [[ -z "${providers}" ]];then
             printf '%s: %s does not have any providers installed. Possible providers: %s\n' "${0##*/}" "$1" "${possible}" >&2
             exit 30
