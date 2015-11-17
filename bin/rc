@@ -45,6 +45,14 @@ case "$1" in
         version
     ;;
 
+    # internal functions
+    beginning_daemon_*)
+        [[ $# -lt 2 ]] && help && exit 2
+        act="$1"
+        shift
+        "${act}" "$@"; exit $?
+    ;;
+
     # informative
     list|ls|'')
         [[ -n "$2" ]] || shift
