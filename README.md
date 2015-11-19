@@ -1,17 +1,19 @@
 # Beginning, an init system that isn't smarter than you
 
+"_Omnium rerum principia parva sunt._" --Marcus Tullius Cicero
+
 An [ISC-licensed](LICENSE) init system and service manager, designed to be
 deterministic and not do anything unexpected.
 
-Beginning is still a work-in-progress; it is not finalized. Design choices
-may still change, and configurations may need to be updated often. You
-should keep an eye on the commit log and actually read the changes if you
-plan on installing this, until it is stable.
+Beginning is still a work-in-progress. Design choices may still change, and
+configurations may need to be updated often. You should keep an eye on the
+commit log and actually read the changes if you plan on installing this,
+until it is stable.
 
 ## Requirements
 - bash
 - C compiler (for the executables in libexec/)
-- coreutils
+- coreutils (busybox is more than enough)
 - syslogd
 - agetty, if you wish to log in from the console
 
@@ -60,12 +62,11 @@ sink.
 ### What it does have
 - `PID 1`
     - Only handles shutdown, reboot, and starting the service manager
-- Service manager
+- Service management
     - Daemon starting, with dependency resolution
     - Virtuals, with customizable providers for them (network/syslog/udev,
       etc.)
-        - This is inspired a bit by `systemd`'s targets
-    - `rc`, for starting and stopping daemons after boot
+    - `rc`, the main way for interacting with Beginning
     - `rc.conf`, which allows for lots of configuration
 
 ### What it does not have
