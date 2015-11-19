@@ -1,0 +1,17 @@
+#!/bin/bash
+
+gpm_exists() {
+    prog_exists gpm
+}
+
+gpm_start() {
+    gpm ${GPM_ARGS} >/dev/null 2>&1 || return $?
+}
+
+gpm_stop() {
+    pidfilekill /run/gpm.pid
+}
+
+gpm_status() {
+    pidfileexists /run/gpm.pid
+}
