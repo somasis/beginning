@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# vixie-cron uses `cron`, cronie is `crond`, busybox uses links
+vixie-cron_exists() {
+    ! prog_exists crond && prog_exists cron && [[ "$(readlink -f $(type -fPp crontab))" != */busybox ]]
+}
+
+vixie-cron_provides() {
+    echo cron
+}
+
+vixie-cron_start() {
+    cron -n ${VIXIE_CRON_ARGS} &
+    echo $! > /run/vixie-cron.pid
+}
+
+vixie-cron_stop() {
+    pidfilekill /run/vixie-cron.pid
+}
+
+vixie-cron_status() {
+    pidfileexists /run/vixie-cron.pid
+}
+
