@@ -1,0 +1,14 @@
+# rc.conf(5) -- Main configuration file for Beginning
+=============================================
+
+## SYNOPSIS
+
+## DESCRIPTION
+
+## OPTIONS
+
+## EXAMPLES
+
+## SEE ALSO
+
+rc(8), rc.conf.d(5), rc.d(5)
