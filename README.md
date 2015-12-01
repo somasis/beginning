@@ -43,19 +43,30 @@ After installation, `/bin/begin` will need to be linked to `/bin/init`. Or,
 you can just add `init=/bin/begin` to the kernel command line if you wish.
 
 ## Rationale and Design
-Beginning is somewhat designed to be an anti-thesis of systems such as
-Upstart and systemd. In addition, the philosophy behind it is somewhat akin
-to how BSD-style inits work. Consider it an amalgamation of the very good
-parts of systemd, with the configurability and straightforwardness of
-BSD-style init.
-
 *Prior art: OpenBSD init, systemd, Arch Linux initscripts, sinit*
+
+Beginning is my response to systemd and friends. I've used systemd,
+Upstart, OpenRC, Arch Linux's initscripts, and basically all of them leave
+a bit to be desired, are annoying to use, feel inconsistent, or do too much.
+
+The philosophy behind it is very much akin to how BSD-style inits work.
+
+Configuration is intended to be flexible, but not overbearing; in addition,
+I want it to be as deterministic as it can. The program should not have any
+functionality which decides for the user; things like providers for virtuals,
+order to run daemons in, and so on, should all be determined and executed the
+same way each time. While this does mean it requires some initial set up
+before you can safely reboot with Beginning as your init, it means that you
+can expect it to always run the same way, regardless of what changes on your
+system. (aside from obvious things such as removing daemons and stuff)
 
 You could also consider this to be a demonstration of just how simple init
 systems really need to be; the most complex part of this is probably the
 daemon dependency resolution.
+
 The actual `init` program is just 34 SLOC, because all `init` has to do is
-`wait` forever, and handle shutdown and reboot signals. Nothing else.
+sleep forever, and handle shutdown and reboot signals. `bash` takes care of
+reparenting children processes for us.
 
 ### What it does have
 - `PID 1`
@@ -69,9 +80,6 @@ The actual `init` program is just 34 SLOC, because all `init` has to do is
 
 ### What it does not have
 - No runlevels (`telinit 1`, `systemctl start multi-user.target`, etc.)
-    - I feel as though runlevels are needless complication. You might manage to
-      convince me if you can provide a very common use-case that can't be
-      implemented with your own custom `rchooks`.
 - No network management (use a separate daemon for that)
 - No socket managing
     - Not enough possible benefits of using sockets for daemons. If you
@@ -79,6 +87,8 @@ The actual `init` program is just 34 SLOC, because all `init` has to do is
       and go to conserve resources, you might have bigger problems on your
       hands.
 - No enable/disable functionality in `rc`
-    - This will probably change once I work out a better way to handle it
+    - This will might change once I work out a better way to handle it
       while still keeping the `DAEMONS` variable in `/etc/rc.conf`.
+    - OpenBSD apparently switched to using key=value format for their `rc.conf`;
+      but we don't want to do that because having functions in rc.conf is nice.
 
