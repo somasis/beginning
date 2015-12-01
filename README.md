@@ -56,8 +56,6 @@ systems really need to be; the most complex part of this is probably the
 daemon dependency resolution.
 The actual `init` program is just 34 SLOC, because all `init` has to do is
 `wait` forever, and handle shutdown and reboot signals. Nothing else.
-Compare this to other init systems that install a fully-functional kitchen
-sink.
 
 ### What it does have
 - `PID 1`
