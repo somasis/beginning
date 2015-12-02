@@ -5,15 +5,15 @@ cupsd_exists() {
 }
 
 cupsd_start() {
-    cupsd -t -c ${CUPSD_CONFIG:-/etc/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 && \
-    cupsd -f -c ${CUPSD_CONFIG:-/etc/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/cupsd.pid
+    cupsd -t -c ${CUPSD_CONFIG:-"@@sysconfdir@@"/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 && \
+    cupsd -f -c ${CUPSD_CONFIG:-"@@sysconfdir@@"/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 &
+    echo $! > "@@runstatedir@@"/cupsd.pid
 }
 
 cupsd_stop() {
-    pidfilekill /run/cupsd.pid
+    pidfilekill "@@runstatedir@@"/cupsd.pid
 }
 
 cupsd_status() {
-    pidfileexists /run/cupsd.pid
+    pidfileexists "@@runstatedir@@"/cupsd.pid
 }

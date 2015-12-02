@@ -10,13 +10,13 @@ opensshd_start() {
 }
 
 opensshd_reload() {
-    pidfilekill -HUP /run/sshd.pid
+    pidfilekill -HUP "@@runstatedir@@"/sshd.pid
 }
 
 opensshd_stop() {
-    setsid -w kill $(</run/sshd.pid)
+    setsid -w kill $(<"@@runstatedir@@"/sshd.pid)
 }
 
 opensshd_status() {
-    pidfileexists /run/sshd.pid
+    pidfileexists "@@runstatedir@@"/sshd.pid
 }

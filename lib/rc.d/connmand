@@ -14,13 +14,13 @@ connmand_depends() {
 
 connmand_start() {
     connmand -n ${CONNMAN_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/connmand.pid
+    echo $! > "@@runstatedir@@"/connmand.pid
 }
 
 connmand_stop() {
-    pidfilekill /run/connmand.pid
+    pidfilekill "@@runstatedir@@"/connmand.pid
 }
 
 connmand_status() {
-    pidfileexists /run/connmand.pid
+    pidfileexists "@@runstatedir@@"/connmand.pid
 }

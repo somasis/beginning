@@ -9,9 +9,9 @@ skel_wants() {
 }
 
 skel_start() {
-    skel_status || rm -f /run/skel.pid
+    skel_status || rm -f "@@runstatedir@@"/skel.pid
     skel &
-    echo $! > /run/skel.pid
+    echo $! > "@@runstatedir@@"/skel.pid
 }
 
 skel_reload() {
@@ -19,10 +19,10 @@ skel_reload() {
 }
 
 skel_stop() {
-    pidfilekill /run/skel.pid
-    skel_status || rm -f /run/skel.pid
+    pidfilekill "@@runstatedir@@"/skel.pid
+    skel_status || rm -f "@@runstatedir@@"/skel.pid
 }
 
 skel_status() {
-    pidexists /run/skel.pid
+    pidexists "@@runstatedir@@"/skel.pid
 }

@@ -21,9 +21,9 @@ consolefont_start() {
             return $err
         fi
     done
-    echo "CONSOLEFONT_FONT=${CONSOLEFONT_FONT}"     > /run/beginning/consolefont
-    echo "CONSOLEFONT_MAP=${CONSOLEFONT_MAP}"       > /run/beginning/consolefont
-    echo "CONSOLEFONT_UNIMAP=${CONSOLEFONT_UNIMAP}" > /run/beginning/consolefont
+    echo "CONSOLEFONT_FONT=${CONSOLEFONT_FONT}"     > "@@runstatedir@@"/beginning/consolefont
+    echo "CONSOLEFONT_MAP=${CONSOLEFONT_MAP}"       > "@@runstatedir@@"/beginning/consolefont
+    echo "CONSOLEFONT_UNIMAP=${CONSOLEFONT_UNIMAP}" > "@@runstatedir@@"/beginning/consolefont
 }
 
 consolefont_stop() {
@@ -36,9 +36,9 @@ consolefont_stop() {
             return $err
         fi
     done
-    rm -f /run/beginning/consolefont
+    rm -f "@@runstatedir@@"/beginning/consolefont
 }
 
 consolefont_status() {
-    [[ -r /run/beginning/consolefont ]]
+    [[ -r "@@runstatedir@@"/beginning/consolefont ]]
 }

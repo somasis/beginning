@@ -6,18 +6,18 @@ znc_exists() {
 
 znc_start() {
     if [[ "${ZNC_USER}" ]];then
-        touch /run/znc.pid && chown "${ZNC_USER}" /run/znc.pid
+        touch "@@runstatedir@@"/znc.pid && chown "${ZNC_USER}" "@@runstatedir@@"/znc.pid
         su -s $(type -fPp sh) -c "znc -f ${ZNC_ARGS}" "${ZNC_USER}" >/dev/null 2>&1 &
     else
         znc -f ${ZNC_ARGS} >/dev/null 2>&1 &
     fi
-    echo $! > /run/znc.pid
+    echo $! > "@@runstatedir@@"/znc.pid
 }
 
 znc_stop() {
-    pidfilekill /run/znc.pid
+    pidfilekill "@@runstatedir@@"/znc.pid
 }
 
 znc_status() {
-    pidfileexists /run/znc.pid
+    pidfileexists "@@runstatedir@@"/znc.pid
 }

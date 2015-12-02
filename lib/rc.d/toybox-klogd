@@ -10,13 +10,13 @@ toybox-klogd_exists() {
 
 toybox-klogd_start() {
     toybox klogd -n ${TOYBOX_KLOGD_CONF:+-f ${TOYBOX_KLOGD_CONF}} ${TOYBOX_KLOGD_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/toybox-klogd.pid
+    echo $! > "@@runstatedir@@"/toybox-klogd.pid
 }
 
 toybox-klogd_stop() {
-    pidfilekill /run/toybox-klogd.pid
+    pidfilekill "@@runstatedir@@"/toybox-klogd.pid
 }
 
 toybox-klogd_status() {
-    pidfileexists /run/toybox-klogd.pid
+    pidfileexists "@@runstatedir@@"/toybox-klogd.pid
 }

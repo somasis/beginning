@@ -9,13 +9,13 @@ openntpd_depends() {
 }
 
 openntpd_start() {
-    openntpd -p /run/openntpd.pid ${OPENNTPD_ARGS} >/dev/null 2>&1
+    openntpd -p "@@runstatedir@@"/openntpd.pid ${OPENNTPD_ARGS} >/dev/null 2>&1
 }
 
 openntpd_stop() {
-    pidfilekill /run/openntpd.pid
+    pidfilekill "@@runstatedir@@"/openntpd.pid
 }
 
 openntpd_status() {
-    pidfileexists /run/openntpd.pid
+    pidfileexists "@@runstatedir@@"/openntpd.pid
 }

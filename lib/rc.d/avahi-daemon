@@ -17,7 +17,7 @@ avahi-daemon_reload() {
 }
 
 avahi-daemon_stop() {
-    pidfilekill /run/avahi-daemon/pid
+    pidfilekill "@@runstatedir@@"/avahi-daemon/pid
 }
 
 avahi-daemon_status() {

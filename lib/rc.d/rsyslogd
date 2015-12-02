@@ -9,13 +9,13 @@ rsyslogd_exists() {
 }
 
 rsyslogd_start() {
-    rsyslogd -n -i "/run/rsyslogd.pid" ${RSYSLOGD_ARGS} >/dev/null 2>&1 &
+    rsyslogd -n -i "@@runstatedir@@/rsyslogd.pid" ${RSYSLOGD_ARGS} >/dev/null 2>&1 &
 }
 
 rsyslogd_stop() {
-    pidfilekill /run/rsyslogd.pid
+    pidfilekill "@@runstatedir@@"/rsyslogd.pid
 }
 
 rsyslogd_status() {
-    pidfileexists /run/rsyslogd.pid
+    pidfileexists "@@runstatedir@@"/rsyslogd.pid
 }

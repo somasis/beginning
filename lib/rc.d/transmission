@@ -6,17 +6,17 @@ transmission_exists() {
 
 transmission_start() {
     if [[ "${TRANSMISSION_USER}" ]];then
-        touch /run/transmission.pid && chown "${TRANSMISSION_USER}" /run/transmission.pid
-        su -s $(type -fPp sh) -c "transmission-daemon -x /run/transmission.pid ${TRANSMISSION_ARGS}" "${TRANSMISSION_USER}" &
+        touch "@@runstatedir@@"/transmission.pid && chown "${TRANSMISSION_USER}" "@@runstatedir@@"/transmission.pid
+        su -s $(type -fPp sh) -c "transmission-daemon -x "@@runstatedir@@"/transmission.pid ${TRANSMISSION_ARGS}" "${TRANSMISSION_USER}" &
     else
-        transmission-daemon -x /run/transmission.pid ${TRANSMISSION_ARGS} &
+        transmission-daemon -x "@@runstatedir@@"/transmission.pid ${TRANSMISSION_ARGS} &
     fi
 }
 
 transmission_stop() {
-    pidfilekill /run/transmission.pid
+    pidfilekill "@@runstatedir@@"/transmission.pid
 }
 
 transmission_status() {
-    pidfileexists /run/transmission.pid
+    pidfileexists "@@runstatedir@@"/transmission.pid
 }

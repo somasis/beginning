@@ -5,16 +5,16 @@ lighttpd_exists() {
 }
 
 lighttpd_start() {
-    lighttpd -t -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 || return $?
-    lighttpd -D -f ${LIGHTTPD_CONFIG:-/etc/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/beginning/lighttpd.pid
-    pidfileexists /run/beginning/lighttpd.pid || return 1
+    lighttpd -t -f ${LIGHTTPD_CONFIG:-"@@sysconfdir@@"/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 || return $?
+    lighttpd -D -f ${LIGHTTPD_CONFIG:-"@@sysconfdir@@"/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
+    echo $! > "@@runstatedir@@"/beginning/lighttpd.pid
+    pidfileexists "@@runstatedir@@"/beginning/lighttpd.pid || return 1
 }
 
 lighttpd_stop() {
-    pidfilekill /run/beginning/lighttpd.pid
+    pidfilekill "@@runstatedir@@"/beginning/lighttpd.pid
 }
 
 lighttpd_status() {
-    pidfileexists /run/beginning/lighttpd.pid
+    pidfileexists "@@runstatedir@@"/beginning/lighttpd.pid
 }

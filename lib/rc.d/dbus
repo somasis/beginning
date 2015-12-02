@@ -5,21 +5,21 @@ dbus_exists() {
 }
 
 dbus_start() {
-    mkdir /run/dbus >/dev/null 2>&1
-    [[ -d "/run/dbus" ]] || return 1
+    mkdir "@@runstatedir@@"/dbus >/dev/null 2>&1
+    [[ -d "@@runstatedir@@"/dbus ]] || return 1
     dbus-uuidgen --ensure
-    dbus-daemon --system --fork --nopidfile --print-pid ${DBUS_ARGS} > /run/dbus.pid
+    dbus-daemon --system --fork --nopidfile --print-pid ${DBUS_ARGS} > "@@runstatedir@@"/dbus.pid
 }
 
 dbus_reload() {
     dbus_status || return 1
-    kill -1 $(</run/dbus.pid)
+    kill -1 $(<"@@runstatedir@@"/dbus.pid)
 }
 
 dbus_stop() {
-    pidfilekill /run/dbus.pid
+    pidfilekill "@@runstatedir@@"/dbus.pid
 }
 
 dbus_status() {
-    pidfileexists /run/dbus.pid
+    pidfileexists "@@runstatedir@@"/dbus.pid
 }

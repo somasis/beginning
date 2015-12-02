@@ -9,9 +9,9 @@ gpm_start() {
 }
 
 gpm_stop() {
-    pidfilekill /run/gpm.pid
+    pidfilekill "@@runstatedir@@"/gpm.pid
 }
 
 gpm_status() {
-    pidfileexists /run/gpm.pid
+    pidfileexists "@@runstatedir@@"/gpm.pid
 }

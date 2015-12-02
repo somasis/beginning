@@ -24,7 +24,7 @@ fi
 
 cd /
 
-BEGINNING_LIB="${LIBDIR:-/lib}"/beginning
+BEGINNING_LIB="@@libdir@@"/beginning
 
 if [[ -r "${BEGINNING_LIB}"/rc.functions ]];then
     . "${BEGINNING_LIB}"/rc.functions

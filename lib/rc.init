@@ -23,11 +23,11 @@ if [[ "$PPID" -ne 1 ]];then
     exit 1
 fi
 
-LIBDIR=${LIBDIR:-/lib}
-BEGINNING_DIR=${BEGINNING_DIR:-$LIBDIR/beginning}
+LIBDIR="@@libdir@@"
+BEGINNING_DIR="${LIBDIR}"/beginning
 
-if [[ -r ${BEGINNING_DIR}/rc.functions ]];then
-    . ${BEGINNING_DIR}/rc.functions
+if [[ -r "${BEGINNING_DIR}"/rc.functions ]];then
+    . "${BEGINNING_DIR}"/rc.functions
 else
     printf 'Could not find %s/rc.functions, going into emergency shell...\n' "${BEGINNING_DIR}"
     while true;do
@@ -45,12 +45,13 @@ dmesg -n 3
 [[ "${RC_CLEAR_BOOT}" == true ]] && clear
 
 printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
-printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}" "${BEGINNING_COPYRIGHT}" "Running $(uname -srvm)"
+[[ "${COPYRIGHT}" ]] && printf "\t%s\n" "${COPYRIGHT}${HOME_URL:+ - ${HOME_URL}}${SUPPORT_URL:+ - ${SUPPORT_URL}}"
+printf "\t%s\n" "${BEGINNING_COPYRIGHT}" "Running $(uname -srvm)"
 printf "\n"
 
 # Mount partitions required to do anything useful
 
-mkdir /dev /proc /tmp /run /sys >/dev/null 2>&1
+mkdir /dev /proc /tmp @@runstatedir@@ /sys >/dev/null 2>&1
 
 mount -n -t proc        -o nodev,noexec,nosuid      proc    /proc    >/dev/null 2>&1
 mount -n -t sysfs       -o nodev,noexec,nosuid      sys     /sys     >/dev/null 2>&1
@@ -60,7 +61,7 @@ mount -n -t devpts      -o gid=5,mode=0620          devpts  /dev/pts >/dev/null 
 mount -n -t tmpfs       -o nodev,nosuid,noexec      tmpfs   /tmp     >/dev/null 2>&1
 mkdir /dev/shm
 mount -n -t tmpfs       -o nodev,nosuid,noexec      shm     /dev/shm >/dev/null 2>&1
-mount -n -t tmpfs       -o rw,nosuid,nodev,mode=755 tmpfs   /run     >/dev/null 2>&1
+mount -n -t tmpfs       -o rw,nosuid,nodev,mode=755 tmpfs   @@runstatedir@@     >/dev/null 2>&1
 
 # Enable ctrl-alt-del rebooting
 { echo 0 > /proc/sys/kernel/ctrl-alt-del; } >/dev/null 2>&1 || ctrlaltdel soft >/dev/null 2>&1
@@ -95,25 +96,25 @@ rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
-rm -rf /tmp/* /run/beginning >/dev/null 2>&1
-mkdir -p /run/beginning
+rm -rf /tmp/* "@@runstatedir@@"/beginning >/dev/null 2>&1
+mkdir -p "@@runstatedir@@"/beginning
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
 mount  -av | egrep -v '(already|ignored)'
 swapon -av | egrep -v '(already|ignored)'
 
-printf "Storing dmesg output to /var/log/dmesg.log...\n"
-dmesg > /var/log/dmesg.log
+printf "Storing dmesg output to %s...\n" "@@localstatedir@@/log/dmesg.log"
+dmesg > "@@localstatedir@@"/log/dmesg.log
 
 # If the kernel wants us to restrict dmesg to just the root, do so with the log
 if [[ -r /proc/sys/kernel/dmesg_restrict && $(</proc/sys/kernel/dmesg_restrict) == "1" ]];then
-    chmod 0600 /var/log/dmesg.log
+    chmod 0600 "@@localstatedir@@"/log/dmesg.log
 else
-    chmod 0644 /var/log/dmesg.log
+    chmod 0644 "@@localstatedir@@"/log/dmesg.log
 fi
 
-[[ -w /var/run/utmp || ! -f /var/run/utmp ]] && : > /var/run/utmp
+[[ -w "@@runstatedir@@"/utmp || ! -f "@@runstatedir@@"/utmp ]] && : > "@@runstatedir@@"/utmp
 
 rchook post_boot
 

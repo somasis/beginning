@@ -26,8 +26,8 @@ fi
 # Since we check for the readability/existence of rc.functions in rc.init,
 # we don't really need to check again. If you remove it then uh...
 # don't do that, stupid
-LIBDIR=${LIBDIR:-/lib}
-. ${BEGINNING_LIB:-$LIBDIR/beginning}/rc.functions
+LIBDIR="@@libdir@@"
+. "${LIBDIR}"/beginning/rc.functions
 
 BEGINNING_RUNNER=rc.shutdown
 

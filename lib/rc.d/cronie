@@ -11,14 +11,14 @@ cronie_provides() {
 
 cronie_start() {
     crond -n ${CRONIE_ARGS} &
-    echo $! > /run/cronie.pid
+    echo $! > "@@runstatedir@@"/cronie.pid
 }
 
 cronie_stop() {
-    pidfilekill /run/cronie.pid
+    pidfilekill "@@runstatedir@@"/cronie.pid
 }
 
 cronie_status() {
-    pidfileexists /run/cronie.pid
+    pidfileexists "@@runstatedir@@"/cronie.pid
 }
 

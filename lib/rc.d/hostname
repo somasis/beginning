@@ -45,7 +45,7 @@ hostname_start() {
         echo "${HOSTNAME}" > /proc/sys/kernel/hostname || err=$?
     fi
     hostname_lo_up || err=$?
-    [[ $err -eq 0 ]] && echo "${HOSTNAME}" > /run/beginning/hostname
+    [[ $err -eq 0 ]] && echo "${HOSTNAME}" > "@@runstatedir@@"/beginning/hostname
     return $err
 }
 
@@ -55,5 +55,5 @@ hostname_stop() {
 }
 
 hostname_status() {
-    hostname_lo_status && [[ -r /run/beginning/hostname ]]
+    hostname_lo_status && [[ -r "@@runstatedir@@"/beginning/hostname ]]
 }

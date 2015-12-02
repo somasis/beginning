@@ -14,13 +14,13 @@ toybox-syslogd_exists() {
 
 toybox-syslogd_start() {
     toybox syslogd -n ${TOYBOX_SYSLOGD_CONF:+-f ${TOYBOX_SYSLOGD_CONF}} ${TOYBOX_SYSLOGD_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/toybox-syslogd.pid
+    echo $! > "@@runstatedir@@"/toybox-syslogd.pid
 }
 
 toybox-syslogd_stop() {
-    pidfilekill /run/toybox-syslogd.pid
+    pidfilekill "@@runstatedir@@"/toybox-syslogd.pid
 }
 
 toybox-syslogd_status() {
-    pidfileexists /run/toybox-syslogd.pid
+    pidfileexists "@@runstatedir@@"/toybox-syslogd.pid
 }

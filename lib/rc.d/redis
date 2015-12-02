@@ -1,9 +1,9 @@
 #!/bin/bash
 
 _redis_server() {
-    pushd /var/db/redis >/dev/null 2>&1 || return $?
+    pushd "@@localstatedir@@"/db/redis >/dev/null 2>&1 || return $?
     su -s $(type -fPp sh) -c "redis-server ${REDIS_ARGS} $*" ${REDIS_USER}; local err=$?
-    popd /var/db/redis >/dev/null 2>&1 || return $?
+    popd "@@localstatedir@@"/db/redis >/dev/null 2>&1 || return $?
     return $err
 }
 
@@ -12,16 +12,16 @@ redis_exists() {
 }
 
 redis_start() {
-    { cat "${REDIS_CONF}" && echo "daemonize yes" && echo "pidfile /run/redis.pid"; } \
+    { cat "${REDIS_CONF}" && echo "daemonize yes" && echo "pidfile "@@runstatedir@@"/redis.pid"; } \
         | redis-server - >/dev/null 2>&1
     return $?
 }
 
 redis_stop() {
-    pidfilekill /run/redis.pid
+    pidfilekill "@@runstatedir@@"/redis.pid
 }
 
 redis_status() {
-    pidfileexists /run/redis.pid
+    pidfileexists "@@runstatedir@@"/redis.pid
 }
 

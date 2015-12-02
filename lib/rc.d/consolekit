@@ -17,10 +17,10 @@ consolekit_start() {
 }
 
 consolekit_stop() {
-    pidfilekill /run/console-kit-daemon.pid
+    pidfilekill "@@runstatedir@@"/console-kit-daemon.pid
 }
 
 consolekit_status() {
-    pidfileexists /run/console-kit-daemon.pid
+    pidfileexists "@@runstatedir@@"/console-kit-daemon.pid
 }
 

@@ -5,13 +5,13 @@ dhcpd_exists() {
 }
 
 dhcpd_start() {
-    dhcpd -pf /run/dhcpd.pid -q ${DHCPD_CONF:+-cf ${DHCPD_CONF}} ${DHCPD_ARGS} ${DHCPD_IFACE} || return $?
+    dhcpd -pf "@@runstatedir@@"/dhcpd.pid -q ${DHCPD_CONF:+-cf ${DHCPD_CONF}} ${DHCPD_ARGS} ${DHCPD_IFACE} || return $?
 }
 
 dhcpd_stop() {
-    pidfilekill /run/dhcpd.pid
+    pidfilekill "@@runstatedir@@"/dhcpd.pid
 }
 
 dhcpd_status() {
-    pidfileexists /run/dhcpd.pid
+    pidfileexists "@@runstatedir@@"/dhcpd.pid
 }

@@ -14,8 +14,8 @@ randomseed_start() {
         cat "${RANDOMSEED_FILE}" > /dev/urandom || err=$?
         rm -f "${RANDOMSEED_FILE}"
     fi
-    echo "RANDOMSEED_FILE=${RANDOMSEED_FILE}" > /run/beginning/randomseed
-    echo "RANDOMSEED_POOLSIZE=${RANDOMSEED_POOLSIZE}" >> /run/beginning/randomseed
+    echo "RANDOMSEED_FILE=${RANDOMSEED_FILE}" > "@@runstatedir@@"/beginning/randomseed
+    echo "RANDOMSEED_POOLSIZE=${RANDOMSEED_POOLSIZE}" >> "@@runstatedir@@"/beginning/randomseed
     return $err
 }
 
@@ -24,10 +24,10 @@ randomseed_stop() {
     local err
     # save random state
     dd if=/dev/urandom of="${RANDOMSEED_FILE}" count=1 bs=${RANDOMSEED_POOLSIZE} >/dev/null 2>&1 || err=$?
-    [[ "$err" -eq 0 ]] && rm -f /run/beginning/randomseed
+    [[ "$err" -eq 0 ]] && rm -f "@@runstatedir@@"/beginning/randomseed
     return $err
 }
 
 randomseed_status() {
-    [[ -r /run/beginning/randomseed ]]
+    [[ -r "@@runstatedir@@"/beginning/randomseed ]]
 }

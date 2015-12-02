@@ -5,14 +5,14 @@ haveged_exists() {
 }
 
 haveged_start() {
-    haveged -p "/run/haveged.pid" ${HAVEGED_ARGS}
+    haveged -p "@@runstatedir@@/haveged.pid" ${HAVEGED_ARGS}
 }
 
 haveged_stop() {
-    pidfilekill /run/haveged.pid
+    pidfilekill "@@runstatedir@@"/haveged.pid
 }
 
 haveged_status() {
-    pidfileexists /run/haveged.pid
+    pidfileexists "@@runstatedir@@"/haveged.pid
 }
 

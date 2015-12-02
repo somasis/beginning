@@ -1,7 +1,7 @@
 #!/bin/bash
 
 bluez_exists() {
-    if prog_exists bluetoothd || PATH=/usr/libexec/bluetooth prog_exists bluetoothd;then
+    if prog_exists bluetoothd || PATH="@@libexecdir@@"/bluetooth:"@@bindir@@" prog_exists bluetoothd;then
         return 0
     else
         return 1
@@ -13,15 +13,15 @@ bluez_depends() {
 }
 
 bluez_start() {
-    PATH="/usr/libexec/bluetooth/:${PATH}"
+    PATH="@@libexecdir@@"/bluetooth:"@@bindir@@":"${PATH}"
     bluetoothd -n ${BLUEZ_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/bluetooth.pid
+    echo $! > "@@runstatedir@@"/bluetooth.pid
 }
 
 bluez_stop() {
-    pidfilekill /run/bluetooth.pid
+    pidfilekill "@@runstatedir@@"/bluetooth.pid
 }
 
 bluez_status() {
-    pidfileexists /run/bluetooth.pid
+    pidfileexists "@@runstatedir@@"/bluetooth.pid
 }

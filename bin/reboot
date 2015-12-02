@@ -22,13 +22,13 @@ if [[ "$UID" -ne 0 ]];then
     exit 1
 fi
 
-BEGINNING_LIBEXEC="${LIBEXECDIR:-/usr/libexec}"/beginning
-BEGINNING_LIB="${LIBDIR:-/lib}"/beginning
+BEGINNING_LIBEXEC="@@libexecdir@@"/beginning
+BEGINNING_LIB="@@libdir@@"/beginning
 
 if [[ -r "${BEGINNING_LIB}"/rc.functions ]];then
     . "${BEGINNING_LIB}"/rc.functions
 else
-    printf 'Could not find /lib/beginning/rc.functions, dying...\n'
+    printf 'Could not find %s/rc.functions, dying...\n' "${BEGINNING_LIB}"
     exit 2
 fi
 

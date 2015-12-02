@@ -17,7 +17,7 @@ eudev_start() {
     local pid=$!
     udevadm trigger --action=add --type=subsystems
     udevadm trigger --action=add --type=devices
-    echo $pid > /run/eudev.pid
+    echo $pid > "@@runstatedir@@"/eudev.pid
 }
 
 eudev_reload() {
@@ -30,5 +30,5 @@ eudev_stop() {
 }
 
 eudev_status() {
-    pidfileexists /run/eudev.pid
+    pidfileexists "@@runstatedir@@"/eudev.pid
 }

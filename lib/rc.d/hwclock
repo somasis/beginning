@@ -23,7 +23,7 @@ hwclock_start() {
         ;;
     esac
     unset TZ
-    echo "TZ=${HWCLOCK_TZ}" > /run/beginning/hwclock
+    echo "TZ=${HWCLOCK_TZ}" > "@@runstatedir@@"/beginning/hwclock
     return $err
 }
 
@@ -42,10 +42,10 @@ hwclock_stop() {
         ;;
     esac
     unset TZ
-    rm -f /run/beginning/hwclock
+    rm -f "@@runstatedir@@"/beginning/hwclock
     return $err
 }
 
 hwclock_status() {
-    [[ -r /run/beginning/hwclock ]]
+    [[ -r "@@runstatedir@@"/beginning/hwclock ]]
 }

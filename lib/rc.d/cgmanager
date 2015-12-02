@@ -6,14 +6,14 @@ cgmanager_exists() {
 
 cgmanager_start() {
     cgmanager ${CGMANAGER_ARGS} >/dev/null 2>&1 &
-    echo $! > /run/cgmanager.pid
+    echo $! > "@@runstatedir@@"/cgmanager.pid
 }
 
 cgmanager_stop() {
-    pidfilekill /run/cgmanager.pid
+    pidfilekill "@@runstatedir@@"/cgmanager.pid
 }
 
 cgmanager_status() {
-    pidfileexists /run/cgmanager.pid
+    pidfileexists "@@runstatedir@@"/cgmanager.pid
 }
 

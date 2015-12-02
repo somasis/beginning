@@ -19,13 +19,13 @@
 
 umask 022
 
-export PATH="/bin:/sbin"
+export PATH="@@bindir@@"
 
 BEGINNING_PLATFORM=$(uname -s)
 
-LIBEXECDIR="${LIBEXECDIR:-/usr/libexec}"
-LIBDIR="${LIBDIR:-/lib}"
-SYSCONFDIR="${SYSCONFDIR:-/etc}"
+LIBEXECDIR="@@libexecdir@@"
+LIBDIR="@@libdir@@"
+SYSCONFDIR="@@sysconfdir@@"
 
 BEGINNING_LIB="${LIBDIR}"/beginning
 BEGINNING_LIBEXEC="${LIBEXECDIR}"/beginning
