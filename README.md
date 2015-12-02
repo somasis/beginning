@@ -3,40 +3,40 @@
 "_Omnium rerum principia parva sunt._" --Marcus Tullius Cicero
 
 An [ISC-licensed](LICENSE) init system and service manager, designed to be
-deterministic and not do anything unexpected.
+deterministic and minimal, but not difficult to use.
 
-Beginning is still a work-in-progress. Design choices may still change, and
-configurations may need to be updated often. You should keep an eye on the
-commit log and actually read the changes if you plan on installing this,
+**Beginning is still a work-in-progress.** Design choices may still change,
+and configurations may need to be updated often. You should keep an eye on
+the commit log and actually read the changes if you plan on installing this,
 until it is stable.
 
 ## Requirements
 - bash
 - C compiler (for the executables in libexec/)
 - coreutils (busybox is more than enough)
-- syslogd
-- agetty, if you wish to log in from the console
 
 ## Installation
-1.  `git clone https://github.com/somasis/beginning`, or [download a release]
+1. `git clone https://github.com/somasis/beginning`, or [download a release]
 
-2.  `make`
+2. `make`
 
-3.  `make install`
+    The makefile follows GNU Makefile standards, and can be influenced by variables
+    such as `DESTDIR`, `bindir`, `libdir`, `libexecdir`,`docdir`, `sysconfdir`,
+    and `prefix`. Variables for directories are changed in the source files.
 
-    The makefile follows standard variables, and can be influenced by variables
-    such as `DESTDIR`, `BINDIR`, `LIBDIR`, `LIBEXECDIR`,`DOCDIR`, `SYSCONFDIR`,
-    and `PREFIX`.
+    The top of the Makefile contains a full list of variables.
+
+3. `make install`
 
 [download a release]: https://github.com/somasis/beginning/releases
 
 ### Defaults
--   The `PID 1` will be installed to `$(PREFIX)$(BINDIR)/begin`. To use it as
-    the default init system, either add `init=/bin/begin` to your kernel's boot
-    parameters, or make a symlink at `/bin/init` that points to `begin`.
--   A reboot/shutdown/poweroff/halt program is installed to
-    `$(PREFIX)$(BINDIR)/reboot`. Run it as root to reboot, make a symlink to it
-    named `poweroff`, `halt`, and `shutdown` in order to turn off the system.
+- The `PID 1` will be installed to `$(PREFIX)$(bindir)/begin`. To use it as
+  the default init system, either add `init=/bin/begin` to your kernel's boot
+  parameters, or make a symlink at `/bin/init` that points to `begin`.
+- A reboot/shutdown/poweroff/halt program is installed to
+  `$(PREFIX)$(bindir)/reboot`. Run it as root to reboot, make a symlink to it
+  named `poweroff`, `halt`, and `shutdown` in order to turn off the system.
 
 ## Usage
 After installation, `/bin/begin` will need to be linked to `/bin/init`. Or,
@@ -87,8 +87,9 @@ reparenting children processes for us.
       and go to conserve resources, you might have bigger problems on your
       hands.
 - No enable/disable functionality in `rc`
-    - This will might change once I work out a better way to handle it
-      while still keeping the `DAEMONS` variable in `/etc/rc.conf`.
+    - Keeping in line with having deterministic functionality, it seems to me that
+      having the boot sequence be affected by a command line program, rather than
+      explicit configuration editing would go against Beginning's philosophy.
     - OpenBSD apparently switched to using key=value format for their `rc.conf`;
       but we don't want to do that because having functions in rc.conf is nice.
 
