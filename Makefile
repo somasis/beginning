@@ -1,6 +1,7 @@
 VERSION=scm
 
 CC?=cc
+CFLAGS?=-O2 -g
 
 DESTDIR?=$(PWD)/image
 BUILD?=$(PWD)/build
