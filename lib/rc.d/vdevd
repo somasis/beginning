@@ -1,0 +1,25 @@
+#!/bin/bash
+
+VDEVD_ARGS=${VDEVD_ARGS:-}
+VDEVD_CONF=${VDEVD_CONF:-"@@sysconfdir@@"/vdev/devd.conf}
+VDEVD_MOUNTPOINT=${VDEVD_MOUNTPOINT:-"/dev"}
+
+vdevd_provides() {
+    echo dev
+}
+
+vdevd_exists() {
+    prog_exists vdevd
+}
+
+vdevd_start() {
+    vdevd -c "${VDEVD_CONF}" -p "@@runstatedir@@"/vdevd.pid ${VDEVD_ARGS} ${VDEVD_MOUNTPOINT} >/dev/null 2>&1 & disown
+}
+
+vdevd_stop() {
+    pidfilekill "@@runstatedir@@"/vdevd.pid
+}
+
+vdevd_status() {
+    pidfileexists "@@runstatedir@@"/vdevd.pid
+}
