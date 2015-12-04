@@ -1,5 +1,7 @@
 #!/bin/bash
 
+WICD_ARGS=${WICD_ARGS:-}
+
 wicd_exists() {
     prog_exists wicd
 }

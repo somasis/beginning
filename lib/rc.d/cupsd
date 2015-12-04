@@ -1,12 +1,15 @@
 #!/bin/bash
 
+CUPSD_ARGS=${CUPSD_ARGS:-}
+CUPSD_CONF=${CUPSD_CONF:-"@@sysconfdir@@"/cups/cupsd.conf}
+
 cupsd_exists() {
     prog_exists cupsd
 }
 
 cupsd_start() {
-    cupsd -t -c ${CUPSD_CONFIG:-"@@sysconfdir@@"/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 && \
-    cupsd -f -c ${CUPSD_CONFIG:-"@@sysconfdir@@"/cups/cupsd.conf} ${CUPSD_ARGS} >/dev/null 2>&1 &
+    cupsd -t -c ${CUPSD_CONF} ${CUPSD_ARGS} >/dev/null 2>&1 && \
+    cupsd -f -c ${CUPSD_CONF} ${CUPSD_ARGS} >/dev/null 2>&1 &
     echo $! > "@@runstatedir@@"/cupsd.pid
 }
 

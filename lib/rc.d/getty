@@ -1,5 +1,8 @@
 #!/bin/bash
 
+GETTY_ARGS=${GETTY_ARGS:-"--noclear"}
+GETTY_VTERMS=${GETTY_VTERMS:-7}
+
 getty_exists() {
     prog_exists agetty
 }

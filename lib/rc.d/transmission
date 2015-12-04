@@ -1,5 +1,8 @@
 #!/bin/bash
 
+TRANSMISSION_ARGS=${TRANMISSION_ARGS:-}
+TRANSMISSION_USER=${TRANSMISSION_USER:-"transmission"}
+
 transmission_exists() {
     prog_exists transmission-daemon
 }

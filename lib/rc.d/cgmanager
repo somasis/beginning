@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CGMANAGER_ARGS=${CGMANAGER_ARGS:-}
+
 cgmanager_exists() {
     prog_exists cgmanager
 }

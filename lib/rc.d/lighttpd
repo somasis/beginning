@@ -1,12 +1,15 @@
 #!/bin/bash
 
+LIGHTTPD_ARGS=${LIGHTTPD_ARGS:-}
+LIGHTTPD_CONF=${LIGHTTPD_CONF:-"@@sysconfdir@@"/lighttpd/lighttpd.conf}
+
 lighttpd_exists() {
     prog_exists lighttpd
 }
 
 lighttpd_start() {
-    lighttpd -t -f ${LIGHTTPD_CONFIG:-"@@sysconfdir@@"/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 || return $?
-    lighttpd -D -f ${LIGHTTPD_CONFIG:-"@@sysconfdir@@"/lighttpd/lighttpd.conf} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
+    lighttpd -t -f ${LIGHTTPD_CONF} ${LIGHTTPD_ARGS} >/dev/null 2>&1 || return $?
+    lighttpd -D -f ${LIGHTTPD_CONF} ${LIGHTTPD_ARGS} >/dev/null 2>&1 &
     echo $! > "@@runstatedir@@"/beginning/lighttpd.pid
     pidfileexists "@@runstatedir@@"/beginning/lighttpd.pid || return 1
 }

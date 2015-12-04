@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OPENSSHD_ARGS=${OPENSSHD_ARGS:-}
+
 opensshd_exists() {
     prog_exists sshd
 }

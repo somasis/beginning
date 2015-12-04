@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BUSYBOX_KLOGD_ARGS=${BUSYBOX_KLOGD_ARGS:-}
+BUSYBOX_KLOGD_CONF=${BUSYBOX_KLOGD_CONF:-}
+
 busybox-klogd_exists() {
     prog_exists busybox && busybox | grep -q klogd
 }

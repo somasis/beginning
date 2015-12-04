@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CONNMAND_ARGS=${CONNMAND_ARGS:-}
+
 connmand_exists() {
     prog_exists connmand
 }
@@ -13,7 +15,7 @@ connmand_depends() {
 }
 
 connmand_start() {
-    connmand -n ${CONNMAN_ARGS} >/dev/null 2>&1 &
+    connmand -n ${CONNMAND_ARGS} >/dev/null 2>&1 &
     echo $! > "@@runstatedir@@"/connmand.pid
 }
 

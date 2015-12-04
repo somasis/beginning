@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OPENNTPD_ARGS=${OPENNTPD_ARGS:-}
+
 openntpd_exists() {
     prog_exists openntpd
 }

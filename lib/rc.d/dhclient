@@ -1,5 +1,9 @@
 #!/bin/bash
 
+DHCLIENT_ARGS=${DHCLIENT_ARGS:-}
+DHCLIENT_CONF=${DHCLIENT_CONF:-}
+DHCLIENT_IFACE=${DHCLIENT_IFACE:-}
+
 dhclient_exists() {
     prog_exists dhclient
 }

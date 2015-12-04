@@ -1,5 +1,6 @@
 #!/bin/bash
 
+RANDOMSEED_FILE=${RANDOMSEED_FILE:-"@@localstatedir@@"/tmp/random-seed}
 RANDOMSEED_POOLSIZE=$(echo $(</proc/sys/kernel/random/poolsize) || echo 512)
 
 randomseed_exists() {

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+ZNC_ARGS=${ZNC_ARGS:-}
+ZNC_USER=${ZNC_USER:-"znc"}
+
 znc_exists() {
     prog_exists znc
 }

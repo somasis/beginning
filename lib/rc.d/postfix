@@ -1,5 +1,7 @@
 #!/bin/bash
 
+POSTFIX_ARGS=${POSTFIX_ARGS:-}
+POSTFIX_CONF=${POSTFIX_CONF:-}
 MAIL_CONFIG=${POSTFIX_CONF}
 
 postfix() {

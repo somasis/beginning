@@ -1,5 +1,7 @@
 #!/bin/bash
 
+AVAHI_DAEMON_ARGS=${AVAHI_DAEMON_ARGS:-}
+
 avahi-daemon_exists() {
     prog_exists avahi-daemon
 }

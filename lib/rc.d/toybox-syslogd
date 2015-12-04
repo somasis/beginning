@@ -1,5 +1,8 @@
 #!/bin/bash
 
+TOYBOX_SYSLOGD_ARGS=${TOYBOX_SYSLOGD_CONF:-}
+TOYBOX_SYSLOGD_CONF=${TOYBOX_SYSLOGD_CONF:-}
+
 toybox-syslogd_provides() {
     echo syslog
 }

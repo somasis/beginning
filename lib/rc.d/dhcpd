@@ -1,5 +1,9 @@
 #!/bin/bash
 
+DHCPD_ARGS=${DHCPD_ARGS:-}
+DHCPD_CONF=${DHCPD_CONF:-}
+DHCPD_IFACE=${DHCPD_IFACE:-}
+
 dhcpd_exists() {
     prog_exists dhcpd
 }

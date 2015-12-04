@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CONSOLEKIT_ARGS=${CONSOLEKIT_ARGS:-}
+
 consolekit_exists() {
     prog_exists console-kit-daemon
 }

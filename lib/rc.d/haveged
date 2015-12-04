@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HAVEGED_ARGS=${HAVEGED_ARGS:-}
+
 haveged_exists() {
     prog_exists haveged
 }

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BITLBEE_ARGS=${BITLBEE_ARGS:-}
+BITLBEE_USER=${BITLBEE_USER:-}
+
 bitlbee_exists() {
     prog_exists bitlbee
 }

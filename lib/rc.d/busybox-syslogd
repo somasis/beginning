@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BUSYBOX_SYSLOGD_ARGS=${BUSYBOX_SYSLOGD_ARGS:-}
+BUSYBOX_SYSLOGD_CONF=${BUSYBOX_SYSLOGD_CONF:-}
+
 busybox-syslogd_provides() {
     echo syslog
 }

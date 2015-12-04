@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CUPS_BROWSED_ARGS=${CUPS_BROWSED_ARGS:-}
+
 cups-browsed_exists() {
     prog_exists cups-browsed
 }

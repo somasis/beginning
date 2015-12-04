@@ -1,5 +1,10 @@
 #!/bin/bash
 
+REDIS_ARGS=${REDIS_ARGS:-}
+REDIS_CONF=${REDIS_CONF:-"@@sysconfdir@@"/redis.conf}
+REDIS_DATA_DIR=${REDIS_DATA_DIR:-"@@localstatedir@@"/db/redis}
+REDIS_USER=${REDIS_USER:-"redis"}
+
 _redis_server() {
     pushd "@@localstatedir@@"/db/redis >/dev/null 2>&1 || return $?
     su -s $(type -fPp sh) -c "redis-server ${REDIS_ARGS} $*" ${REDIS_USER}; local err=$?

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+HOSTNAME=${HOSTNAME:-"localhost"}
+[[ -s "@@sysconfdir@@"/hostname ]] && HOSTNAME=$(<"@@sysconfdir@@"/hostname)
+
 hostname_exists() {
     prog_exists hostname || [[ -r "/proc/sys/kernel/hostname" ]]
 }

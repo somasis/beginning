@@ -1,5 +1,7 @@
 #!/bin/bash
 
+RSYSLOGD_ARGS=${RSYSLOGD_ARGS:-}
+
 rsyslogd_provides() {
     echo syslog
 }

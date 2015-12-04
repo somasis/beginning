@@ -1,5 +1,7 @@
 #!/bin/bash
 
+GPM_ARGS=${GPM_ARGS:-"-m /dev/input/mice -t ps2"}
+
 gpm_exists() {
     prog_exists gpm
 }

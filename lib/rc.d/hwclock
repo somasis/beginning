@@ -1,5 +1,11 @@
 #!/bin/bash
 
+HWCLOCK_ARGS=${HWCLOCK_ARGS:-}
+HWCLOCK_TYPE=${HWCLOCK_TYPE:-UTC}
+[[ -L "@@sysconfdir@@"/localtime && -r "@@sysconfdir@@"/localtime ]] && \
+    HWCLOCK_TZ=$(realpath "@@sysconfdir@@"/localtime | cut -d'/' -f5-)
+HWCLOCK_TZ=${HWCLOCK_TZ:-UTC}
+
 hwclock_exists() {
     if prog_exists hwclock && [[ -e /dev/rtc0 ]];then
         return 0
