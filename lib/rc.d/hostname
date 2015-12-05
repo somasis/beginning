@@ -12,6 +12,8 @@ hostname_lo_up() {
         ip link set dev lo up
     elif prog_exists ifconfig;then
         ifconfig lo up
+    elif prog_exists busybox && busybox --list | grep -q ifconfig;then
+        busybox ifconfig lo up
     else
         return 1
     fi
@@ -23,6 +25,8 @@ hostname_lo_down() {
         ip link set dev lo down
     elif prog_exists ifconfig;then
         ifconfig lo down
+    elif prog_exists busybox && busybox --list | grep -q ifconfig;then
+        busybox ifconfig lo down
     else
         return 1
     fi
@@ -34,6 +38,8 @@ hostname_lo_status() {
         ip link show lo | head -1 | grep -q 'UP'
     elif prog_exists ifconfig;then
         ifconfig lo | head -1 | grep -q 'UP'
+    elif prog_exists busybox && busybox --list | grep -q ifconfig;then
+        busybox ifconfig lo | head -1 | grep -q 'UP'
     else
         return 1
     fi
