@@ -19,7 +19,25 @@ mandir?=$(datarootdir)/man
 localstatedir?=$(prefix)/var
 runstatedir?=$(localstatedir)/run
 
-all:	build
+all:
+	@printf "Beginning, an init system that isn't smarter than you\n\n"
+	@printf "%-20s%-20s\n"	\
+		"DESTDIR"		"$(DESTDIR)"		\
+		"BUILD"			"$(BUILD)"			\
+		"prefix"		"$(prefix)"			\
+		"exec_prefix"	"$(exec_prefix)"	\
+		"bindir"		"$(bindir)"			\
+		"libdir"		"$(libdir)"			\
+		"libexecdir"	"$(libexecdir)"		\
+		"datarootdir"	"$(datarootdir)"	\
+		"datadir"		"$(datadir)"		\
+		"sysconfdir"	"$(sysconfdir)"		\
+		"docdir"		"$(docdir)"			\
+		"mandir"		"$(mandir)"			\
+		"localstatedir"	"$(localstatedir)"	\
+		"runstatedir"	"$(runstatedir)"	\
+		""
+	@$(MAKE) --no-print-directory build
 
 $(BUILD)/%: libexec/%.c
 	@[[ -d "$(BUILD)" ]] || mkdir -p $(BUILD)
