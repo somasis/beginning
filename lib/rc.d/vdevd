@@ -13,7 +13,12 @@ vdevd_exists() {
 }
 
 vdevd_start() {
-    vdevd -c "${VDEVD_CONF}" -p "@@runstatedir@@"/vdevd.pid ${VDEVD_ARGS} ${VDEVD_MOUNTPOINT} >/dev/null 2>&1 & disown
+    # suppress "Segmentation Fault" message from bash
+    exec 2>/dev/null
+    # vdevd is known to segfault even if the daemon starts and forks
+    # successfully, so we run _status if $? ne 0 to make sure
+    vdevd -c "${VDEVD_CONF}" -p "@@runstatedir@@"/vdevd.pid ${VDEVD_ARGS} ${VDEVD_MOUNTPOINT}
+    vdevd_status; return $?
 }
 
 vdevd_stop() {
