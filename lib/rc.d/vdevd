@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VDEVD_ARGS=${VDEVD_ARGS:-}
-VDEVD_CONF=${VDEVD_CONF:-"@@sysconfdir@@"/vdev/devd.conf}
+VDEVD_CONF=${VDEVD_CONF:-"@@sysconfdir@@"/vdev/vdevd.conf}
 VDEVD_MOUNTPOINT=${VDEVD_MOUNTPOINT:-"/dev"}
 
 vdevd_provides() {
