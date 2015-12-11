@@ -36,6 +36,99 @@ help() {
     echo "usage: ${0##*/} <start|stop|restart|reload|list|status|providers> [daemon ...]"
 }
 
+rc_list() {
+    [[ -n "$2" ]] || shift
+    case "$2" in
+        '')
+            for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
+                status STARTED "${dae}"
+            done
+            for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
+                status STOPPED "${dae}"
+            done
+        ;;
+        virtuals|all|started|stopped|existent|nonexistent|daemons)
+            beginning_daemon_list "${2}" 2>/dev/null
+        ;;
+        *)
+            help
+        ;;
+    esac
+}
+
+rc_status() {
+    [[ $# -lt 2 ]] && help && return 3
+    shift
+    beginning_daemon_list all 2>/dev/null | for dae in "${@}";do
+        grep -q "^${dae}$" || { help; return 5; }
+    done
+
+    for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
+        status STARTED "${dae}"
+    done
+    for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
+        status STOPPED "${dae}"
+    done
+}
+
+rc_providers() {
+    [[ $# -ne 2 ]] && help && return 2
+    shift
+    BEGINNING_PROVIDER_LIST_ONLY=true
+    beginning_daemon_load "${1}" >/dev/null 2>&1
+    providers=$(beginning_daemon_provider "" "$1" "installed")
+    possible=$(beginning_daemon_provider "" "$1" "all")
+    if [[ "${providers}" ]];then
+        for p in ${providers};do
+            echo "$p"
+        done
+    elif ! "${1}"_virtual >/dev/null 2>&1;then
+        printf '%s: %s is not a virtual and therefore has no providers.\n' "${0##*/}" "$1" >&2
+        return 20
+    elif [[ -z "${possible}" ]];then
+        printf '%s: %s does not have any providers, installed or nonexisttent.\n' "${0##*/}" "$1" >&2
+    elif [[ -z "${providers}" ]];then
+        printf '%s: %s does not have any providers installed. Possible providers: %s\n' "${0##*/}" "$1" "${possible}" >&2
+        return 30
+    fi
+}
+
+rc_action() {
+    [[ "$#" -lt 2 ]] && return 1
+    act="$1"
+    shift
+    for dae in ${@};do
+        err=
+        beginning_daemon_load "${dae}" >/dev/null 2>&1
+        if func_exists ${dae}_exists && ! ${dae}_exists >/dev/null 2>&1;then
+            err=5
+        elif func_exists beginning_daemon_${act};then
+            beginning_daemon_${act} "${dae}"
+        elif func_exists ${dae}_${act};then
+            beginning_daemon_do ${dae} ${act}
+        else
+            err=1
+        fi
+        err=${err:-$?}
+    done
+    if [[ "$err" -eq 5 ]];then
+        printf "%s: %s isn't installed.\n" "${0##*/}" "${dae}" >&2
+    elif [[ "$err" -eq 4 ]];then
+        printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
+    elif [[ "$err" -eq 3 ]];then
+        printf "%s: %s: script not found.\n" "${0##*/}" "${dae}" >&2
+    fi
+    return $err
+}
+
+rc_restart() {
+    local d
+    for d in $@;do
+        beginning_daemon_status started "${d}" && rc_action stop "${d}"
+        rc_action start "${d}"
+    done
+}
+
 case "$1" in
     # non-daemon actions
     help)
@@ -55,89 +148,25 @@ case "$1" in
 
     # informative
     list|ls|'')
-        [[ -n "$2" ]] || shift
-        case "$2" in
-            '')
-                for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
-                    status STARTED "${dae}"
-                done
-                for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
-                    status STOPPED "${dae}"
-                done
-            ;;
-            virtuals|all|started|stopped|existent|nonexistent|daemons)
-                beginning_daemon_list "${2}" 2>/dev/null
-            ;;
-            *)
-                help
-            ;;
-        esac
+        rc_list "$@"
     ;;
     status)
-        #[[ $# -lt 2 ]] && help && exit 3
-        shift
-        beginning_daemon_list all 2>/dev/null | for dae in "${@}";do
-            grep -q "^${dae}$" || { help; exit 5; }
-        done
-
-        for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
-            status STARTED "${dae}"
-        done
-        for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
-            status STOPPED "${dae}"
-        done
+        rc_status "$@"
     ;;
 
     providers)
-        [[ $# -ne 2 ]] && help && exit 2
-        shift
-        BEGINNING_PROVIDER_LIST_ONLY=true
-        beginning_daemon_load "${1}" >/dev/null 2>&1
-        providers=$(beginning_daemon_provider "" "$1" "installed")
-        possible=$(beginning_daemon_provider "" "$1" "all")
-        if [[ "${providers}" ]];then
-            for p in ${providers};do
-                echo "$p"
-            done
-        elif ! "${1}"_virtual >/dev/null 2>&1;then
-            printf '%s: %s is not a virtual and therefore has no providers.\n' "${0##*/}" "$1" >&2
-            exit 20
-        elif [[ -z "${possible}" ]];then
-            printf '%s: %s does not have any providers, installed or nonexisttent.\n' "${0##*/}" "$1" >&2
-        elif [[ -z "${providers}" ]];then
-            printf '%s: %s does not have any providers installed. Possible providers: %s\n' "${0##*/}" "$1" "${possible}" >&2
-            exit 30
-        fi
+        rc_providers "$@"
     ;;
 
     # acting on daemons
     restart)
         shift
-        "$0" stop "$@"
-        "$0" start "$@"
+        rc_restart "$@"
     ;;
     *)
-        [[ $# -le 1 ]] && help && exit 2
-        act="$1"
-        shift
-        for dae in ${@};do
-            err=
-            beginning_daemon_load "${dae}"
-            if func_exists ${dae}_exists && ! ${dae}_exists;then
-                err=5
-            elif func_exists beginning_daemon_${act};then
-                beginning_daemon_${act} "${dae}"
-            elif func_exists ${dae}_${act};then
-                beginning_daemon_do ${dae} ${act}
-            else
-                err=1
-            fi
-            err=${err:-$?}
-        done
-        [[ "$err" -eq 5 ]] && printf "%s: %s isn't installed.\n" "${0##*/}" "${dae}" >&2
-        [[ "$err" -eq 4 ]] && printf "%s: %s does not have a %s action.\n" "${0##*/}" "${dae}" "${act}" >&2
-        [[ "$err" -eq 3 ]] && printf "%s: %s: script not found.\n" "${0##*/}" "${dae}" >&2
-        exit $err
+        rc_action "$@"
     ;;
 esac
+
+exit $?
 
