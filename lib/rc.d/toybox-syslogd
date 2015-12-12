@@ -7,7 +7,7 @@ toybox-syslogd_provides() {
     echo syslog
 }
 
-toybox-syslogd_exists() {
+toybox-syslogd_depends() {
     [[ "${BEGINNING_PLATFORM}" == "Linux" ]] && echo toybox-klogd
 }
 
