@@ -14,6 +14,7 @@ until it is stable.
 - bash
 - C compiler (for the executables in libexec/)
 - coreutils (busybox is more than enough)
+- (optional but highly recommended) [beginning-scripts]
 
 ## Installation
 1. `git clone https://github.com/somasis/beginning`, or [download a release]
@@ -28,7 +29,15 @@ until it is stable.
 
 3. `make install`
 
+Beginning only comes with two core daemons, `hostname` and `randomseed` which are
+considered to be important enough to be part of the default installation.
+All other daemon scripts written so far are located in [beginning-scripts] and
+are almost certainly needed if you wish to have a nice default system.
+
+See [beginning-scripts]'s README for usage.
+
 [download a release]: https://github.com/somasis/beginning/releases
+[beginning-scripts]:  https://github.com/somasis/beginning-scripts
 
 ### Defaults
 - The `PID 1` will be installed to `$(PREFIX)$(bindir)/begin`. To use it as
