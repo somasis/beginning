@@ -92,7 +92,7 @@ rchook pre_fsck
 
 printf "Checking filesystems...\n"
 trap 'killall fsck' INT
-fsck -ATy
+fsck -A -T -a -t
 
 trap - INT
 
