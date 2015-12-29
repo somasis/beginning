@@ -51,6 +51,8 @@ printf "\e[0m%s ${ANSI_COLOR}%s\e[0m...\n\n" "${word}" "${PRETTY_NAME}"
 # Allow for ctrl-alt-del hard reboots, for if this script breaks
 { echo 1 > /proc/sys/kernel/ctrl-alt-del; } >/dev/null 2>&1 || ctrlaltdel hard >/dev/null 2>&1
 
+stty -F /dev/tty0 -echo
+
 beginning_daemon_stop $(echo ${CORE_DAEMONS_BEFORE[@]} $(beginning_daemon_list) ${DAEMONS[@]} ${CORE_DAEMONS_AFTER[@]} | tr ' ' '\n' | tac)
 
 printf 'Sending TERM to all processes...\n'

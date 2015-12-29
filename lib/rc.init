@@ -51,7 +51,8 @@ printf "Beginning ${ANSI_COLOR}%s\e[0m...\n" "${PRETTY_NAME}"
 printf "\t%s\n" "${BEGINNING_COPYRIGHT}" "Running $(uname -srvm)"
 printf "\n"
 
-# Mount partitions required to do anything useful
+# Disable echoing of keyboard input so everything looks pretty even if you're messing with keys
+stty -F /dev/tty0 -echo
 
 # Mount partitions required to do anything useful
 
@@ -137,5 +138,8 @@ else
     beginning_daemon_start ${DAEMONS[@]}
     beginning_daemon_start ${CORE_DAEMONS_AFTER[@]}
 fi
+
+# Restore keyboard input echoing
+stty -F /dev/tty0 echo
 
 wait
