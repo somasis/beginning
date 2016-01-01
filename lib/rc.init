@@ -26,8 +26,8 @@ fi
 LIBDIR="@@libdir@@"
 BEGINNING_DIR="${LIBDIR}"/beginning
 
-BEGINNING_EXPECTED_DIRECTORIES=( /dev{,/pts,/shm} /proc /tmp "@@runstatedir@@"{,/beginning} /sys )
 BEGINNING_CLEAN_DIRECTORIES=( /tmp /run )
+BEGINNING_EXPECTED_DIRECTORIES=( /dev{,/pts,/shm} /proc /tmp "@@runstatedir@@"{,/beginning,/user,/lock} /sys )
 if [[ -r "${BEGINNING_DIR}"/rc.functions ]];then
     . "${BEGINNING_DIR}"/rc.functions
 else
@@ -101,13 +101,33 @@ rchook pre_root_rw
 
 printf "Remounting root as read-write...\n"
 mount -o remount,rw /
+
+printf "Creating runtime directories...\n"
 for d in ${BEGINNING_CLEAN_DIRECTORIES[@]};do
     rm -rf "${d}"/* >/dev/null 2>&1
 done
 for d in ${BEGINNING_EXPECTED_DIRECTORIES[@]};do
     [[ -d "${d}" ]] || mkdir -p "${d}"
 done
+
+# Create a /run/user/$user directory for each user to prevent security issues
+for u in $(cut -f1,3-4 -d ':' "@@sysconfdir@@"/passwd);do
+    user=${u%%:*}
+    gid=${u##*:}
+    uid=${u%:*}; uid=${uid##*:}
+    [[ -d "@@runstatedir@@"/user/"${uid}" ]] || mkdir "@@runstatedir@@"/user/"${uid}" >/dev/null
+    # make sure directory is owned by user's primary group
+    chown "${uid}:${gid}" "@@runstatedir@@"/user/"${uid}" >/dev/null
+
+    # programs seem to default to /run/user/${USER} if XDG_RUNTIME_DIR unset
+    ln -sf "@@runstatedir@@"/user/"${uid}" "@@runstatedir@@"/user/"${user}"
+done
+
 d=
+u=
+user=
+gid=
+uid=
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
