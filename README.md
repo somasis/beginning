@@ -51,7 +51,7 @@ See [beginning-scripts]'s README for usage.
 After installation, `/bin/begin` will need to be linked to `/bin/init`. Or,
 you can just add `init=/bin/begin` to the kernel command line if you wish.
 
-## Rationale and Design
+## Rationale and Design choices
 *Prior art: OpenBSD init, systemd, Arch Linux initscripts, sinit*
 
 Beginning is my response to systemd and friends. I've used systemd,
@@ -76,6 +76,14 @@ daemon dependency resolution.
 The actual `init` program is just 34 SLOC, because all `init` has to do is
 sleep forever, and handle shutdown and reboot signals. `bash` takes care of
 reparenting children processes for us.
+
+Beginning can be ran with theoretically any sensible filesystem layout, but for
+intents of compatibility and forward-looking practices, it expects the
+filesystem to loosely adhere to systemd's own `file-hierarchy(7)` guidelines.
+
+`file-hierarchy(7)` is used because it provides some compatibility with
+programs that expect the layout, distributions which have adopted it, as well as
+the author liking it.
 
 ### What it does have
 - `PID 1`
