@@ -253,7 +253,18 @@ beginning_daemon_start() {
     for daemon in ${@};do
         beginning_daemon_load "${daemon}"
         if func_exists ${daemon}_virtual && ${daemon}_virtual;then
-            beginning_daemon_provider start "${daemon}"; continue
+            if [[ -z "$BEGINNING_NO_RESOLVE_DEPENDS" ]];then
+                BEGINNING_RESOLVING_DEPS=true
+                func_exists ${daemon}_depends && beginning_daemon_start $(${daemon}_depends)
+                BEGINNING_RESOLVING_DEPS=
+            fi
+            if func_exists ${daemon}_wants;then
+                BEGINNING_RESOLVING_DEPS=true
+                beginning_daemon_start $(${daemon}_wants) || true
+                BEGINNING_RESOLVING_DEPS=
+            fi
+            beginning_daemon_provider start "${daemon}"
+            continue
         fi
         if func_exists ${daemon}_exists && ${daemon}_exists;then
             true
