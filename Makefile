@@ -71,6 +71,15 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 		-e "s|@@runstatedir@@|$(runstatedir)|g"		\
 		-e "s|@@COPYRIGHT@@|$(copyright)|g"			\
 		-i {} \;
+	@echo
+	@for file in $$(grep -lr '^\#!/bin/bash' $(BUILD));do \
+		bash -n "$$file"; \
+		if [[ $$? -eq 0 ]];then \
+			echo "SYNTAX PASS: $$file"; \
+		else \
+			echo "SYNTAX FAIL: $$file" || exit 1; \
+		fi; \
+	done
 
 install: $(BUILD)
 	mkdir -p $(DESTDIR)
