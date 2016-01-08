@@ -1,0 +1,37 @@
+#!/bin/bash
+
+sysctl_exists() {
+    [[ "${BEGINNING_PLATFORM}" == Linux ]] && prog_exists sysctl
+}
+
+sysctl_start() {
+    # this matches the list of sysctl configuration files in sysctl's manpage
+    local file err files
+    files=(
+        "@@runstatedir@@"/sysctl.d/*.conf
+        "@@sysconfdir@@"/sysctl.d/*.conf
+        "@@libdir@@"/sysctl.d/*.conf
+        "@@sysconfdir@@"/sysctl.conf
+    )
+    for file in ${files[@]};do
+        if [[ -r "${file}" ]];then
+            status CUSTOM "sysctl: applying settings from \"${file}\""
+            sysctl -p "${file}" >/dev/null 2>&1 || err=$?
+            if [[ "${err}" -ne 0 ]];then
+                BEGINNING_FAILURE="failed to apply \"${file}\""
+                return 1
+            else
+                printf '%s\n' "${file}" >> "@@runstatedir@@"/beginning/sysctl
+            fi
+        fi
+    done
+}
+
+sysctl_stop() {
+    [[ "${BEGINNING_RUNNER}" == rc.shutdown ]] || return 1
+    return 0
+}
+
+sysctl_status() {
+    [[ -r "@@runstatedir@@"/beginning/sysctl ]]
+}
