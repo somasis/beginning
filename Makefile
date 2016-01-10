@@ -77,7 +77,8 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 		if [[ $$? -eq 0 ]];then \
 			echo "SYNTAX PASS: $$file"; \
 		else \
-			echo "SYNTAX FAIL: $$file" || exit 1; \
+			echo "SYNTAX FAIL: $$file";	\
+			exit 2; \
 		fi; \
 	done
 
