@@ -43,7 +43,7 @@ all:
 	@$(MAKE) --no-print-directory build
 
 $(BUILD)/%: libexec/%.c
-	@[[ -d "$(BUILD)" ]] || mkdir -p $(BUILD)
+	-mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) $< -o $@
 
 build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
