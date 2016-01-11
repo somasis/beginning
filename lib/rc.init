@@ -52,7 +52,7 @@ printf "\t%s\n" "${BEGINNING_COPYRIGHT}" "Running $(uname -srvm)"
 printf "\n"
 
 # Disable echoing of keyboard input so everything looks pretty even if you're messing with keys
-stty -F /dev/tty0 -echo
+stty -F /dev/tty0 -echo 2>/dev/null
 
 # Mount partitions required to do anything useful
 
@@ -160,6 +160,6 @@ else
 fi
 
 # Restore keyboard input echoing
-stty -F /dev/tty0 echo
+stty -F /dev/tty0 echo 2>/dev/null
 
 wait
