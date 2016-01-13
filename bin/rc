@@ -41,6 +41,7 @@ commands=(
     start
     status
     stop
+    version
     $(declare -F | sed 's/.*declare -f //' | grep -- '^beginning_daemon_.*')
 )
 
@@ -49,6 +50,10 @@ help() {
     echo
     echo "commands:"
     printf '    %s\n' ${commands[@]} | cut -d'|' -f2-
+}
+
+version() {
+    echo "rc ${VERSION}"
 }
 
 rc_list() {

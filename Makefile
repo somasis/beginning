@@ -1,5 +1,6 @@
 bash_completion	?=true
 
+COPYRIGHT		?=
 VERSION			=scm
 
 CC				?=cc
@@ -22,7 +23,7 @@ localstatedir	?=$(prefix)/var
 runstatedir		?=$(localstatedir)/run
 
 all:
-	@printf "Beginning, an init system that isn't smarter than you\n\n"
+	@printf "Beginning $(VERSION), an init system that isn't smarter than you\n\n"
 	@printf "%-20s%-20s\n"	\
 		"DESTDIR"		"$(DESTDIR)"		\
 		"BUILD"			"$(BUILD)"			\
@@ -73,7 +74,8 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 		-e "s|@@mandir@@|$(mandir)|g"				\
 		-e "s|@@localstatedir@@|$(localstatedir)|g"	\
 		-e "s|@@runstatedir@@|$(runstatedir)|g"		\
-		-e "s|@@COPYRIGHT@@|$(copyright)|g"			\
+		-e "s|@@COPYRIGHT@@|$(COPYRIGHT)|g"			\
+		-e "s|@@VERSION@@|$(VERSION)|g"				\
 		-i {} \;
 	@echo
 	@for file in $$(grep -lr '^\#!/bin/bash' $(BUILD));do \

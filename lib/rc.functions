@@ -23,6 +23,8 @@ export PATH="@@sbindir@@:@@bindir@@"
 
 BEGINNING_PLATFORM=$(uname -s)
 
+VERSION="@@VERSION@@"
+
 LIBEXECDIR="@@libexecdir@@"
 LIBDIR="@@libdir@@"
 SYSCONFDIR="@@sysconfdir@@"
