@@ -14,6 +14,7 @@ until it is stable.
 - bash
 - C compiler (for the executables in libexec/)
 - coreutils (busybox is more than enough)
+- bash-completion (if usage of `rc`'s completion script is desired)
 - (optional but highly recommended) [beginning-scripts]
 
 ## Installation
@@ -26,6 +27,9 @@ until it is stable.
     and `prefix`. Variables for directories are changed in the source files.
 
     The top of the Makefile contains a full list of variables.
+
+    If bash_completion should not be installed, set bash_completion to
+    anything but 'true'.
 
 3. `make install`
 

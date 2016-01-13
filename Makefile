@@ -1,23 +1,25 @@
-VERSION=scm
+bash_completion	?=true
 
-CC?=cc
-CFLAGS?=-O2 -g
+VERSION			=scm
 
-DESTDIR?=$(PWD)/image
-BUILD?=$(PWD)/build
+CC				?=cc
+CFLAGS			?=-O2 -g
 
-prefix?=/usr/local
-exec_prefix?=$(prefix)
-bindir?=$(exec_prefix)/bin
-libdir?=$(exec_prefix)/lib
-libexecdir?=$(exec_prefix)/libexec
-datarootdir?=$(prefix)/share
-datadir?=$(datarootdir)
-sysconfdir?=$(prefix)/etc
-docdir?=$(datarootdir)/doc/beginning-$(VERSION)
-mandir?=$(datarootdir)/man
-localstatedir?=$(prefix)/var
-runstatedir?=$(localstatedir)/run
+DESTDIR			?=$(PWD)/image
+BUILD			?=$(PWD)/build
+
+prefix			?=/usr/local
+exec_prefix		?=$(prefix)
+bindir			?=$(exec_prefix)/bin
+libdir			?=$(exec_prefix)/lib
+libexecdir		?=$(exec_prefix)/libexec
+datarootdir		?=$(prefix)/share
+datadir			?=$(datarootdir)
+sysconfdir		?=$(prefix)/etc
+docdir			?=$(datarootdir)/doc/beginning-$(VERSION)
+mandir			?=$(datarootdir)/man
+localstatedir	?=$(prefix)/var
+runstatedir		?=$(localstatedir)/run
 
 all:
 	@printf "Beginning, an init system that isn't smarter than you\n\n"
@@ -56,6 +58,8 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	mv $(BUILD)/reboot $(BUILD)/halt $(BUILD)/poweroff $(BUILD)$(libexecdir)/beginning
 	cp -r etc/* $(BUILD)$(sysconfdir)
 	cp -r doc/* $(BUILD)$(docdir)
+	cp -r share/* $(BUILD)$(datadir)
+	-[[ "$(bash_completion)" == 'true' ]] || rm -rf $(BUILD)$(datadir)/bash-completion
 	find $(BUILD) -type f -exec sed \
 		-e "s|@@prefix@@|$(prefix)|g"				\
 		-e "s|@@exec_prefix@@|$(exec_prefix)|g"		\

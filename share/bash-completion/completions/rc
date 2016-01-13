@@ -1,0 +1,24 @@
+#!/bin/bash
+
+_rc() {
+    local cur prev words cword
+    _init_completion || return
+
+    case "${prev}" in
+        beginning_daemon_list|list|ls)
+            COMPREPLY=( $(compgen -W "started stopped nonexistent existent daemons virtuals all" -- "${cur}") )
+        ;;
+        providers)
+            COMPREPLY=( $(compgen -W "$(rc beginning_daemon_list virtuals)" -- "${cur}") )
+        ;;
+        *)
+            if [[ "${cword:-0}" -ge 2 ]];then
+                COMPREPLY=( $(compgen -W "$(rc beginning_daemon_list existent)" -- "${cur}") )
+            else
+                COMPREPLY=( $(compgen -W "$(rc print-commands)" -- "${cur}") )
+            fi
+        ;;
+    esac
+}
+
+complete -F _rc rc
