@@ -33,7 +33,8 @@ if [[ "${UID}" -ne 0 ]];then
 fi
 
 commands=(
-    help
+    --help
+    --version
     list
     ls
     print-commands
@@ -42,7 +43,6 @@ commands=(
     start
     status
     stop
-    version
     $(declare -F | sed 's/.*declare -f //' | grep -- '^beginning_daemon_.*')
 )
 
@@ -54,7 +54,7 @@ help() {
 }
 
 version() {
-    echo "rc ${VERSION}"
+    echo "Beginning ${VERSION}"
 }
 
 rc_list() {
@@ -152,10 +152,10 @@ rc_restart() {
 
 case "$1" in
     # non-daemon actions
-    help)
+    --help)
         help
     ;;
-    version)
+    --version)
         version
     ;;
     print-commands)
