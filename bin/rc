@@ -71,9 +71,6 @@ rc_list() {
         virtuals|all|started|stopped|existent|nonexistent|daemons)
             beginning_daemon_list "${2}" 2>/dev/null
         ;;
-        *)
-            help
-        ;;
     esac
 }
 
@@ -81,7 +78,7 @@ rc_status() {
     [[ $# -lt 2 ]] && help && return 3
     shift
     beginning_daemon_list all 2>/dev/null | for dae in "${@}";do
-        grep -q "^${dae}$" || { help; return 5; }
+        grep -q "^${dae}$"
     done
 
     for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
