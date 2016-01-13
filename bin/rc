@@ -33,6 +33,7 @@ if [[ "${UID}" -ne 0 ]];then
 fi
 
 commands=(
+    help
     list
     ls
     print-commands
