@@ -32,8 +32,23 @@ if [[ "${UID}" -ne 0 ]];then
     exit 4
 fi
 
+commands=(
+    list
+    ls
+    print-commands
+    providers
+    restart
+    start
+    status
+    stop
+    $(declare -F | sed 's/.*declare -f //' | grep -- '^beginning_daemon_.*')
+)
+
 help() {
-    echo "usage: ${0##*/} <start|stop|restart|reload|list|status|providers> [daemon ...]"
+    echo "usage: ${0##*/} <command> [daemon]"
+    echo
+    echo "commands:"
+    printf '    %s\n' ${commands[@]} | cut -d'|' -f2-
 }
 
 rc_list() {
@@ -136,6 +151,9 @@ case "$1" in
     ;;
     version)
         version
+    ;;
+    print-commands)
+        printf '%s\n' ${commands[@]}
     ;;
 
     # internal functions
