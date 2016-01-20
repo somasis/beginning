@@ -1,8 +1,3 @@
-bash_completion	?=true
-
-COPYRIGHT		?=
-VERSION			=scm
-
 CC				?=cc
 CFLAGS			?=-O2 -g
 
@@ -22,6 +17,18 @@ mandir			?=$(datarootdir)/man
 localstatedir	?=$(prefix)/var
 runstatedir		?=$(localstatedir)/run
 
+bash_completion	?=true
+COPYRIGHT		?=
+VERSION			=scm
+
+ifeq ($(bash_completion), true)
+    bash_completion	=true
+else ifeq ($(bash_completion), false)
+    bash_completion	=false
+else
+    $(error bash_completion can only be true or false)
+endif
+
 all:
 	@printf "Beginning $(VERSION), an init system that isn't smarter than you\n\n"
 	@printf "%-20s%-20s\n"	\
@@ -39,6 +46,10 @@ all:
 		"mandir"		"$(mandir)"			\
 		"localstatedir"	"$(localstatedir)"	\
 		"runstatedir"	"$(runstatedir)"	\
+		""				""					\
+		"Options:"		""					\
+		"COPYRIGHT"			"$(COPYRIGHT)"			\
+		"bash_completion"	"$(bash_completion)"	\
 		""
 	@$(MAKE) --no-print-directory build
 
