@@ -62,10 +62,14 @@ rc_list() {
     case "$2" in
         '')
             for dae in $(beginning_daemon_list started "${@}" 2>/dev/null);do
-                status STARTED "${dae}"
+                beginning_daemon_load "${dae}" >/dev/null 2>&1
+                provides=$(${dae}_provides 2>/dev/null)
+                status STARTED "${dae}${provides:+ ($provides)}"
             done
             for dae in $(beginning_daemon_list stopped "${@}" 2>/dev/null);do
-                status STOPPED "${dae}"
+                beginning_daemon_load "${dae}" >/dev/null 2>&1
+                provides=$(${dae}_provides 2>/dev/null)
+                status STOPPED "${dae}${provides:+ ($provides)}"
             done
         ;;
         virtuals|all|started|stopped|existent|nonexistent|daemons)
