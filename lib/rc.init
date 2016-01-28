@@ -131,8 +131,9 @@ uid=
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
-mount  -av | egrep -v '(already|ignored)'
-swapon -av | egrep -v '(already|ignored)'
+mount -a
+printf "Activating swap devices...\n"
+swapon -a
 
 printf "Storing dmesg output to %s...\n" "@@localstatedir@@/log/dmesg.log"
 dmesg > "@@localstatedir@@"/log/dmesg.log
