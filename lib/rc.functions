@@ -387,10 +387,14 @@ beginning_daemon_status() {
 pidfileexists() {
     if [[ -r "${1}" ]];then
         local pid=$(<"${1}")
+    elif [[ -r "@@runstatedir@@"/beginning/"${1}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
+    elif [[ -r "@@runstatedir@@"/"${1}" ]];then
+        local pid=$(<"@@runstatedir@@"/"${1}")
     else
         return 1
     fi
-    pidexists "$1"
+    pidexists "$pid"
 }
 
 # if we are root, we use the bash builtin kill, and if not we use ps
@@ -424,6 +428,10 @@ pidfilekill() {
     [[ $# -gt 1 ]] && local sig="${1}" && shift
     if [[ -r "${@}" ]];then
         local pid=$(<"${1}")
+    elif [[ -r "@@runstatedir@@"/beginning/"${1}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
+    elif [[ -r "@@runstatedir@@"/"${1}" ]];then
+        local pid=$(<"@@runstatedir@@"/"${1}")
     else
         return 1
     fi
