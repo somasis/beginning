@@ -405,6 +405,21 @@ pidexists() {
     fi
 }
 
+pidfilewrite() {
+    local pid="$1" file="$2"
+    echo "$pid" > "@@runstatedir@@"/beginning/"${file}".pid
+}
+
+pidfile() {
+    local pid="$1" file="$2"
+    pidfilewrite "${pid}" "${file}"
+    if pidexists "$pid";then
+        return 0
+    else
+        return 1
+    fi
+}
+
 pidfilekill() {
     [[ $# -gt 1 ]] && local sig="${1}" && shift
     if [[ -r "${@}" ]];then
