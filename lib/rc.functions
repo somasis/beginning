@@ -391,6 +391,8 @@ pidfileexists() {
         local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
     elif [[ -r "@@runstatedir@@"/"${1}" ]];then
         local pid=$(<"@@runstatedir@@"/"${1}")
+    elif [[ -r "@@runstatedir@@"/"${1}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/"${1}".pid)
     else
         return 1
     fi
@@ -426,12 +428,14 @@ pidfile() {
 
 pidfilekill() {
     [[ $# -gt 1 ]] && local sig="${1}" && shift
-    if [[ -r "${@}" ]];then
+    if [[ -r "${1}" ]];then
         local pid=$(<"${1}")
     elif [[ -r "@@runstatedir@@"/beginning/"${1}".pid ]];then
         local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
     elif [[ -r "@@runstatedir@@"/"${1}" ]];then
         local pid=$(<"@@runstatedir@@"/"${1}")
+    elif [[ -r "@@runstatedir@@"/"${1}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/"${1}".pid)
     else
         return 1
     fi
