@@ -7,6 +7,7 @@ BUILD			?=$(PWD)/build
 prefix			?=/usr/local
 exec_prefix		?=$(prefix)
 bindir			?=$(exec_prefix)/bin
+sbindir			?=$(exec_prefix)/sbin
 libdir			?=$(exec_prefix)/lib
 libexecdir		?=$(exec_prefix)/libexec
 datarootdir		?=$(prefix)/share
@@ -37,6 +38,7 @@ all:
 		"prefix"		"$(prefix)"			\
 		"exec_prefix"	"$(exec_prefix)"	\
 		"bindir"		"$(bindir)"			\
+		"sbindir"		"$(sbindir)"			\
 		"libdir"		"$(libdir)"			\
 		"libexecdir"	"$(libexecdir)"		\
 		"datarootdir"	"$(datarootdir)"	\
@@ -75,8 +77,9 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	find $(BUILD) -type f -exec sed \
 		-e "s|@@prefix@@|$(prefix)|g"				\
 		-e "s|@@exec_prefix@@|$(exec_prefix)|g"		\
-		-e "s|@@libdir@@|$(libdir)|g"				\
 		-e "s|@@bindir@@|$(bindir)|g"				\
+		-e "s|@@sbindir@@|$(sbindir)|g"				\
+		-e "s|@@libdir@@|$(libdir)|g"				\
 		-e "s|@@libexecdir@@|$(libexecdir)|g"		\
 		-e "s|@@datarootdir@@|$(datarootdir)|g"		\
 		-e "s|@@datadir@@|$(datadir)|g"				\
