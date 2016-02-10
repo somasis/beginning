@@ -27,7 +27,7 @@ LIBDIR="@@libdir@@"
 BEGINNING_DIR="${LIBDIR}"/beginning
 
 BEGINNING_CLEAN_DIRECTORIES=( /tmp /run )
-BEGINNING_EXPECTED_DIRECTORIES=( /dev{,/pts,/shm} /proc /tmp "@@runstatedir@@"{,/beginning,/user,/lock} /sys )
+BEGINNING_EXPECTED_DIRECTORIES=( /dev /proc /tmp "@@runstatedir@@"{,/beginning,/user,/lock} /sys )
 if [[ -r "${BEGINNING_DIR}"/rc.functions ]];then
     . "${BEGINNING_DIR}"/rc.functions
 else
@@ -60,17 +60,19 @@ for d in ${BEGINNING_EXPECTED_DIRECTORIES[@]};do
     mkdir -p "${d}" >/dev/null 2>&1
 done
 d=
-mount -n -t proc        -o nodev,noexec,nosuid      proc    /proc    >/dev/null 2>&1
-mount -n -t sysfs       -o nodev,noexec,nosuid      sys     /sys     >/dev/null 2>&1
-mount -n -t devtmpfs    -o nosuid,mode=0755         dev     /dev     >/dev/null 2>&1
-mount -n -t devpts      -o gid=5,mode=0620          devpts  /dev/pts >/dev/null 2>&1
-mount -n -t tmpfs       -o nodev,nosuid,noexec      tmpfs   /tmp     >/dev/null 2>&1
-mount -n -t tmpfs       -o nodev,nosuid,noexec      shm     /dev/shm >/dev/null 2>&1
-mount -n -t tmpfs       -o rw,nosuid,nodev,mode=755 tmpfs   @@runstatedir@@     >/dev/null 2>&1
+
+printf "Mounting system partitions...\n"
+mountpoint -q /proc             || mount -n -t proc -o nodev,noexec,nosuid proc /proc
+mountpoint -q /sys              || mount -n -t sysfs -o nodev,noexec,nosuid sys /sys
+mountpoint -q /dev              || mount -n -t devtmpfs -o nosuid,mode=0755 dev /dev
+mkdir -p /dev/{pts,shm} >/dev/null 2>&1
+mountpoint -q /dev/pts          || mount -n -t devpts -o mode=0620 devpts /dev/pts
+mountpoint -q /dev/shm          || mount -n -t tmpfs -o nodev,nosuid,noexec shm /dev/shm
+mountpoint -q /tmp              || mount -n -t tmpfs -o nodev,nosuid,noexec tmpfs /tmp
+mountpoint -q "@@runstatedir@@" || mount -n -t tmpfs -o rw,nosuid,nodev,mode=755 tmpfs "@@runstatedir@@"
 
 # Enable ctrl-alt-del rebooting
 { echo 0 > /proc/sys/kernel/ctrl-alt-del; } >/dev/null 2>&1 || ctrlaltdel soft >/dev/null 2>&1
-
 
 # If we specify that the kernel should be verbose, we should tell dmesg
 if [[ " $(</proc/cmdline) " == *" verbose "* ]];then
