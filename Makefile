@@ -73,7 +73,7 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	cp -r etc/* $(BUILD)$(sysconfdir)
 	cp -r doc/* $(BUILD)$(docdir)
 	cp -r share/* $(BUILD)$(datadir)
-	-[[ "$(bash_completion)" == 'true' ]] || rm -rf $(BUILD)$(datadir)/bash-completion
+	-[ "$(bash_completion)" = 'true' ] || rm -rf $(BUILD)$(datadir)/bash-completion
 	find $(BUILD) -type f -exec sed \
 		-e "s|@@prefix@@|$(prefix)|g"				\
 		-e "s|@@exec_prefix@@|$(exec_prefix)|g"		\
@@ -94,7 +94,7 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	@echo
 	@for file in $$(grep -lr '^\#!/bin/bash' $(BUILD));do \
 		bash -n "$$file"; \
-		if [[ $$? -eq 0 ]];then \
+		if [ $$? -eq 0 ];then \
 			echo "SYNTAX PASS: $$file"; \
 		else \
 			echo "SYNTAX FAIL: $$file";	\
