@@ -19,7 +19,7 @@
 
 umask 022
 
-export PATH="@@sbindir@@:@@bindir@@"
+export PATH="@@sbindir@@:@@bindir@@:/bin:/sbin"
 
 BEGINNING_PLATFORM=$(uname -s)
 
