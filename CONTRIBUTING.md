@@ -11,9 +11,9 @@ up into multiple commits, so that they can be reviewed seperately.
 
 Scripts for controlling daemons (which are located in lib/rc.d) should be sent to
 [beginning-scripts], unless they concern the scripts already located in the lib/rc.d
-directory in this repository. However, for scripts that may be deemed important enough
-for systems of any type (embedded, servers, desktops, low-resource), scripts can be
-submitted and we can decide then.
+directory in this repository. However, for scripts that may be deemed important
+enough for systems of any type (embedded, servers, desktops, low-resource), scripts
+can be submitted and we can decide then.
 
 But for the most part they should go in [beginning-scripts].
 
