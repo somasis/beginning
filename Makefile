@@ -1,4 +1,4 @@
-CC				?=cc
+CC			?=cc
 CFLAGS			?=-O2 -g
 
 DESTDIR			?=$(PWD)/image
@@ -15,10 +15,10 @@ datadir			?=$(datarootdir)
 sysconfdir		?=$(prefix)/etc
 docdir			?=$(datarootdir)/doc/beginning-$(VERSION)
 mandir			?=$(datarootdir)/man
-localstatedir	?=$(prefix)/var
+localstatedir		?=$(prefix)/var
 runstatedir		?=$(localstatedir)/run
 
-bash_completion	?=true
+bash_completion		?=true
 COPYRIGHT		?=
 VERSION			=scm
 
@@ -32,26 +32,26 @@ endif
 
 all:
 	@printf "Beginning $(VERSION), an init system that isn't smarter than you\n\n"
-	@printf "%-20s%-20s\n"	\
-		"DESTDIR"		"$(DESTDIR)"		\
-		"BUILD"			"$(BUILD)"			\
-		"prefix"		"$(prefix)"			\
-		"exec_prefix"	"$(exec_prefix)"	\
-		"bindir"		"$(bindir)"			\
-		"sbindir"		"$(sbindir)"			\
-		"libdir"		"$(libdir)"			\
-		"libexecdir"	"$(libexecdir)"		\
-		"datarootdir"	"$(datarootdir)"	\
-		"datadir"		"$(datadir)"		\
-		"sysconfdir"	"$(sysconfdir)"		\
-		"docdir"		"$(docdir)"			\
-		"mandir"		"$(mandir)"			\
-		"localstatedir"	"$(localstatedir)"	\
-		"runstatedir"	"$(runstatedir)"	\
-		""				""					\
-		"Options:"		""					\
-		"COPYRIGHT"			"$(COPYRIGHT)"			\
-		"bash_completion"	"$(bash_completion)"	\
+	@printf "%-20s%-20s\n" \
+		"DESTDIR"     "$(DESTDIR)" \
+		"BUILD"       "$(BUILD)" \
+		"prefix"      "$(prefix)" \
+		"exec_prefix" "$(exec_prefix)" \
+		"bindir"      "$(bindir)" \
+		"sbindir"     "$(sbindir)" \
+		"libdir"      "$(libdir)" \
+		"libexecdir"  "$(libexecdir)" \
+		"datarootdir" "$(datarootdir)" \
+		"datadir"     "$(datadir)" \
+		"sysconfdir"  "$(sysconfdir)" \
+		"docdir"      "$(docdir)" \
+		"mandir"      "$(mandir)" \
+		"localstatedir" "$(localstatedir)" \
+		"runstatedir"   "$(runstatedir)" \
+		"" "" \
+		"Options:" "" \
+		"COPYRIGHT" "$(COPYRIGHT)" \
+		"bash_completion" "$(bash_completion)" \
 		""
 	@$(MAKE) --no-print-directory build
 
@@ -75,21 +75,21 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	cp -r share/* $(BUILD)$(datadir)
 	-[ "$(bash_completion)" = 'true' ] || rm -rf $(BUILD)$(datadir)/bash-completion
 	find $(BUILD) -type f -exec sed \
-		-e "s|@@prefix@@|$(prefix)|g"				\
-		-e "s|@@exec_prefix@@|$(exec_prefix)|g"		\
-		-e "s|@@bindir@@|$(bindir)|g"				\
-		-e "s|@@sbindir@@|$(sbindir)|g"				\
-		-e "s|@@libdir@@|$(libdir)|g"				\
-		-e "s|@@libexecdir@@|$(libexecdir)|g"		\
-		-e "s|@@datarootdir@@|$(datarootdir)|g"		\
-		-e "s|@@datadir@@|$(datadir)|g"				\
-		-e "s|@@sysconfdir@@|$(sysconfdir)|g"		\
-		-e "s|@@docdir@@|$(docdir)|g"				\
-		-e "s|@@mandir@@|$(mandir)|g"				\
-		-e "s|@@localstatedir@@|$(localstatedir)|g"	\
-		-e "s|@@runstatedir@@|$(runstatedir)|g"		\
-		-e "s|@@COPYRIGHT@@|$(COPYRIGHT)|g"			\
-		-e "s|@@VERSION@@|$(VERSION)|g"				\
+		-e "s|@@prefix@@|$(prefix)|g" \
+		-e "s|@@exec_prefix@@|$(exec_prefix)|g" \
+		-e "s|@@bindir@@|$(bindir)|g" \
+		-e "s|@@sbindir@@|$(sbindir)|g" \
+		-e "s|@@libdir@@|$(libdir)|g" \
+		-e "s|@@libexecdir@@|$(libexecdir)|g" \
+		-e "s|@@datarootdir@@|$(datarootdir)|g" \
+		-e "s|@@datadir@@|$(datadir)|g" \
+		-e "s|@@sysconfdir@@|$(sysconfdir)|g" \
+		-e "s|@@docdir@@|$(docdir)|g" \
+		-e "s|@@mandir@@|$(mandir)|g" \
+		-e "s|@@localstatedir@@|$(localstatedir)|g" \
+		-e "s|@@runstatedir@@|$(runstatedir)|g" \
+		-e "s|@@COPYRIGHT@@|$(COPYRIGHT)|g" \
+		-e "s|@@VERSION@@|$(VERSION)|g" \
 		-i {} \;
 	@echo
 	@for file in $$(grep -lr '^\#!/bin/bash' $(BUILD));do \
@@ -97,7 +97,7 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 		if [ $$? -eq 0 ];then \
 			echo "SYNTAX PASS: $$file"; \
 		else \
-			echo "SYNTAX FAIL: $$file";	\
+			echo "SYNTAX FAIL: $$file"; \
 			exit 2; \
 		fi; \
 	done
