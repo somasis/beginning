@@ -1,5 +1,6 @@
 CC			?=cc
 CFLAGS			?=-O2 -g
+PKG_CONFIG		?=pkg-config
 
 DESTDIR			?=$(PWD)/image
 BUILD			?=$(PWD)/build
@@ -24,6 +25,7 @@ VERSION			=scm
 
 ifeq ($(bash_completion), true)
     bash_completion	=true
+    bashcompletiondir	?=$(shell $(PKG_CONFIG) --variable=completionsdir bash-completion)
 else ifeq ($(bash_completion), false)
     bash_completion	=false
 else
@@ -48,6 +50,7 @@ all:
 		"mandir"      "$(mandir)" \
 		"localstatedir" "$(localstatedir)" \
 		"runstatedir"   "$(runstatedir)" \
+		"bashcompletiondir" "$(bashcompletiondir)" \
 		"" "" \
 		"Options:" "" \
 		"COPYRIGHT" "$(COPYRIGHT)" \
@@ -72,8 +75,10 @@ build:	$(BUILD)/halt $(BUILD)/poweroff $(BUILD)/reboot
 	mv $(BUILD)/reboot $(BUILD)/halt $(BUILD)/poweroff $(BUILD)$(libexecdir)/beginning
 	cp -r etc/* $(BUILD)$(sysconfdir)
 	cp -r doc/* $(BUILD)$(docdir)
-	cp -r share/* $(BUILD)$(datadir)
-	-[ "$(bash_completion)" = 'true' ] || rm -rf $(BUILD)$(datadir)/bash-completion
+	-if [ "$(bash_completion)" = 'true' ];then \
+		mkdir -p $(BUILD)$(bashcompletiondir) && \
+		cp -r share/bash-completion/* $(BUILD)$(bashcompletiondir); \
+	fi
 	find $(BUILD) -type f -exec sed \
 		-e "s|@@prefix@@|$(prefix)|g" \
 		-e "s|@@exec_prefix@@|$(exec_prefix)|g" \
