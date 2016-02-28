@@ -54,13 +54,12 @@ printf "\n"
 # Disable echoing of keyboard input so everything looks pretty even if you're messing with keys
 stty -F /dev/tty0 -echo 2>/dev/null
 
-# Mount partitions required to do anything useful
-
 for d in ${BEGINNING_EXPECTED_DIRECTORIES[@]};do
     mkdir -p "${d}" >/dev/null 2>&1
+    d=
 done
-d=
 
+# Mount partitions required to do anything useful
 printf "Mounting system partitions...\n"
 mountpoint -q /proc             || mount -n -t proc -o nodev,noexec,nosuid proc /proc
 mountpoint -q /sys              || mount -n -t sysfs -o nodev,noexec,nosuid sys /sys
@@ -107,29 +106,12 @@ mount -o remount,rw /
 printf "Creating runtime directories...\n"
 for d in ${BEGINNING_CLEAN_DIRECTORIES[@]};do
     rm -rf "${d}"/* >/dev/null 2>&1
+    d=
 done
 for d in ${BEGINNING_EXPECTED_DIRECTORIES[@]};do
     [[ -d "${d}" ]] || mkdir -p "${d}"
+    d=
 done
-
-# Create a /run/user/$user directory for each user to prevent security issues
-for u in $(cut -f1,3-4 -d ':' "@@sysconfdir@@"/passwd);do
-    user=${u%%:*}
-    gid=${u##*:}
-    uid=${u%:*}; uid=${uid##*:}
-    [[ -d "@@runstatedir@@"/user/"${uid}" ]] || mkdir "@@runstatedir@@"/user/"${uid}" >/dev/null
-    # make sure directory is owned by user's primary group
-    chown "${uid}:${gid}" "@@runstatedir@@"/user/"${uid}" >/dev/null
-
-    # programs seem to default to /run/user/${USER} if XDG_RUNTIME_DIR unset
-    ln -sf "@@runstatedir@@"/user/"${uid}" "@@runstatedir@@"/user/"${user}"
-done
-
-d=
-u=
-user=
-gid=
-uid=
 
 rchook pre_fstab_mount
 printf "Mounting filesystems in fstab...\n"
