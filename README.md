@@ -13,7 +13,7 @@ until it is stable.
 ## Requirements
 - bash
 - C compiler (for the executables in libexec/)
-- coreutils (busybox is more than enough)
+- coreutils (busybox is known to be enough)
 - bash-completion (if usage of `rc`'s completion script is desired)
     - pkg-config is needed to detect directory to install completion files to
 - (optional but highly recommended) [beginning-scripts]
