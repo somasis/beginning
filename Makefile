@@ -1,27 +1,27 @@
-CC			?=cc
-CFLAGS			?=-O2 -g
-PKG_CONFIG		?=pkg-config
+CC              ?=cc
+CFLAGS          ?=-O2 -g
+PKG_CONFIG      ?=pkg-config
 
-DESTDIR			?=$(PWD)/image
-BUILD			?=$(PWD)/build
+DESTDIR         ?=$(PWD)/image
+BUILD           ?=$(PWD)/build
 
-prefix			?=/usr/local
-exec_prefix		?=$(prefix)
-bindir			?=$(exec_prefix)/bin
-sbindir			?=$(exec_prefix)/sbin
-libdir			?=$(exec_prefix)/lib
-libexecdir		?=$(exec_prefix)/libexec
-datarootdir		?=$(prefix)/share
-datadir			?=$(datarootdir)
-sysconfdir		?=$(prefix)/etc
-docdir			?=$(datarootdir)/doc/beginning-$(VERSION)
-mandir			?=$(datarootdir)/man
-localstatedir		?=$(prefix)/var
-runstatedir		?=$(localstatedir)/run
+prefix          ?=/usr/local
+exec_prefix     ?=$(prefix)
+bindir          ?=$(exec_prefix)/bin
+sbindir         ?=$(exec_prefix)/sbin
+libdir          ?=$(exec_prefix)/lib
+libexecdir      ?=$(exec_prefix)/libexec
+datarootdir     ?=$(prefix)/share
+datadir         ?=$(datarootdir)
+sysconfdir      ?=$(prefix)/etc
+docdir          ?=$(datarootdir)/doc/beginning-$(VERSION)
+mandir          ?=$(datarootdir)/man
+localstatedir   ?=$(prefix)/var
+runstatedir     ?=$(localstatedir)/run
 
-bash_completion		?=true
-COPYRIGHT		?=
-VERSION			=scm
+bash_completion ?=true
+COPYRIGHT       ?=
+VERSION         =scm
 
 ifeq ($(bash_completion), true)
     bash_completion	=true

@@ -27,15 +27,9 @@ LIBDIR="@@libdir@@"
 BEGINNING_DIR="${LIBDIR}"/beginning
 
 BEGINNING_CLEAN_DIRECTORIES=( /tmp /run )
-BEGINNING_EXPECTED_DIRECTORIES=( /dev /proc /tmp "@@runstatedir@@"{,/beginning,/user,/lock} /sys )
-if [[ -r "${BEGINNING_DIR}"/rc.functions ]];then
-    . "${BEGINNING_DIR}"/rc.functions
-else
-    printf 'Could not find %s/rc.functions, going into emergency shell...\n' "${BEGINNING_DIR}"
-    while true;do
-        sulogin && exec "$0"
-    done
-fi
+BEGINNING_EXPECTED_DIRECTORIES=( /dev /proc /tmp "@@runstatedir@@"{,/beginning,/beginning/state,/user,/lock} /sys )
+
+. "@@libdir@@"/beginning/rc.functions
 
 BEGINNING_RUNNER=rc.init
 

@@ -17,101 +17,46 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-umask 022
-
+# Set up environment, make sure it's not liable to change based on parent
+umask 0022
 export PATH="@@sbindir@@:@@bindir@@:/bin:/sbin"
 
+# Variables which should always be set
+BEGINNING_VERSION="@@VERSION@@"
 BEGINNING_PLATFORM=$(uname -s)
 
-VERSION="@@VERSION@@"
+BEGINNING_RUNDIR="@@runstatedir@@"/beginning
+BEGINNING_STATEDIR="${BEGINNING_RUNDIR}"/state
 
-LIBEXECDIR="@@libexecdir@@"
-LIBDIR="@@libdir@@"
-SYSCONFDIR="@@sysconfdir@@"
+# Read /lib/beginning/rc.conf, /etc/rc.conf, /lib/os-release, /etc/os-release
+for file in {"@@libdir@@"/beginning,"@@sysconfdir@@"}/beginning.conf {"@@libdir@@","@@sysconfdir@@"}/os-release;do
+    [[ -r "${file}" ]] && . "${file}"
+done
 
-BEGINNING_LIB="${LIBDIR}"/beginning
-BEGINNING_LIBEXEC="${LIBEXECDIR}"/beginning
-BEGINNING_RC="${BEGINNING_LIB}"/rc.d
-USER_RC="${SYSCONFDIR}"/rc.d
-
-[[ -r "${BEGINNING_LIB}"/rc.conf ]] && . "${BEGINNING_LIB}"/rc.conf
-[[ -r "${SYSCONFDIR}"/rc.conf ]]    && . "${SYSCONFDIR}"/rc.conf
-# os-release contains things such as distro name, distro's 'color'...
-[[ -r "${LIBDIR}"/os-release ]]     && . "${LIBDIR}"/os-release
-[[ -r "${SYSCONFDIR}"/os-release ]] && . "${SYSCONFDIR}"/os-release
-
-if [[ -d "${BEGINNING_LIB}"/rc.conf.d ]];then
-    for file in "${BEGINNING_LIB}"/rc.conf.d/*;do
-        . "${file}"
-    done
-    file=
-fi
-if [[ -d "${SYSCONFDIR}"/rc.conf.d ]];then
-    for file in "${SYSCONFDIR}"/rc.conf.d/*;do
-        . "${file}"
-    done
-    file=
-fi
-
-if [[ ! -r "${BEGINNING_LIB}"/rc.conf && ! -f "${SYSCONFDIR}"/rc.conf ]];then
-    printf 'Could not read/find %s/rc.conf or %s/rc.conf, going into emergency shell...\n' "${BEGINNING_LIB}" "${SYSCONFDIR}"
-    emergency_shell
-fi
-
-# If os-release gives us a color, use it; if not, use the reset color code
-ANSI_COLOR="\e[${ANSI_COLOR:-0}m"
-[[ -z "$PRETTY_NAME" ]] && PRETTY_NAME="${NAME:-$BEGINNING_PLATFORM}"
-
-status() {
-    local bold='\e[1m'
-    local fg_black='\e[30m'
-    local fg_red='\e[31m'
-    local fg_green='\e[32m'
-    local fg_white='\e[37m'
-    local bg_black='\e[40m'
-    local bg_red='\e[41m'
-    local bg_green='\e[42m'
-    local bg_white='\e[47m'
-    local reset='\e[0m'
-    local stat="${1^^}"
-    STATUS_SUCCESS="${bold}${fg_white}${bg_green}"
-    STATUS_STARTED=${STATUS_SUCCESS}
-    STATUS_FAILURE="${bold}${fg_white}${bg_red}"
-    STATUS_STOPPED=${STATUS_FAILURE}
-    STATUS_UNKNOWN="${bold}${fg_white}${bg_black}"
-    STATUS_NOTHING=${STATUS_UNKNOWN}
-    STATUS_CUSTOM=${STATUS_UNKNOWN}
-    shift
-
-    case "${stat}" in
-        STARTED)    printf "\e[2K\r${STATUS_STARTED}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_STARTED:+: ${BEGINNING_STARTED}}"   ;; # green bg   [white]
-        SUCCESS)    printf "\e[2K\r${STATUS_SUCCESS}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_SUCCESS:+: ${BEGINNING_SUCCESS}}"   ;; # green bg   [white]
-        FAILURE)    printf "\e[2K\r${STATUS_FAILURE}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_FAILURE:+: ${BEGINNING_FAILURE}}"   ;; # red bg     [white]
-        STOPPED)    printf "\e[2K\r${STATUS_STOPPED}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_STOPPED:+: ${BEGINNING_STOPPED}}"   ;; # red bg     [white]
-        UNKNOWN)    printf "\e[2K\r${STATUS_UNKNOWN}[ ${stat} ]${reset} %s\n" "$@${BEGINNING_UNKNOWN:+: ${BEGINNING_UNKNOWN}}"   ;; # black bg   [white]
-        NOTHING)    printf "\e[2K\r${STATUS_NOTHING}[         ]${reset} %s"   "$@${BEGINNING_NOTHING:+: ${BEGINNING_NOTHING}}"   ;; # black bg   [white]
-        CUSTOM)     printf  "\e[2K\r${STATUS_CUSTOM}[         ]${reset} %s"   "$@${BEGINNING_CUSTOM:+: ${BEGINNING_CUSTOM}}"     ;; # black bg   [white]
-    esac
-}
-
-emergency_shell() {
-    while true;do
-        setsid sulogin && exec "$@"
-    done
-}
-
-reverse() {
-    if [[ $# -ne 0 ]];then
-        local rev="$1"
-        shift
-        reverse "$@"
-        printf '%s\n' "$rev"
+# Read all executable files within /lib/beginning/rc.conf.d and /etc/rc.conf.d
+for dir in {"@@libdir@@"/beginning,"@@sysconfdir@@"}/rc.conf.d;do
+    if [[ -d "${dir}" ]];then
+        for file in "${dir}"/*;do
+            [[ -x "${file}" ]] && . "${file}"
+        done
     fi
+done
+
+unset file dir
+
+# reverse <words>
+reverse() {
+    local words word
+    words=( "${@}" )
+    # I loathe this style
+    for (( word = ${#words[@]} - 1; word >= 0; word-- ));do
+        echo "${words[${word}]}"
+    done
 }
 
 func_exists() {
     local func err
-    for func in $@;do
+    for func in ${@};do
         type -t "${func}" >/dev/null 2>&1
         err=$?
         [[ "${err}" -eq 0 ]] || break
@@ -383,94 +328,96 @@ beginning_daemon_status() {
     done
 }
 
-# check if $1's contents is a pid which is exists
-pidfileexists() {
-    if [[ -f "${1}" ]];then
-        local pid=$(<"${1}")
-    elif [[ -f "@@runstatedir@@"/beginning/"${1}".pid ]];then
-        local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
-    elif [[ -f "@@runstatedir@@"/"${1}" ]];then
-        local pid=$(<"@@runstatedir@@"/"${1}")
-    elif [[ -f "@@runstatedir@@"/"${1}".pid ]];then
-        local pid=$(<"@@runstatedir@@"/"${1}".pid)
-    else
-        return 1
-    fi
-    pidexists "$pid"
-}
-
-# if we are root, we use the bash builtin kill, and if not we use ps
-# since kill will return 'operation not permitted' with a 1 errcode, which
-# would be interpreted as the pid not existing
-pidexists() {
+beginning_pid_exists() {
     local pid="$1"
-    if [[ "$UID" -eq 0 ]];then
-        kill -0 "$pid" >/dev/null 2>&1; return $?
-    else
-        ps "$pid" >/dev/null 2>&1; return $?
-    fi
+
+    case "${BEGINNING_PLATFORM}" in
+        Linux)
+            [[ -e /proc/${pid} ]]; return $?
+        ;;
+    esac
+
+    # if we are root, we use the bash builtin kill, and if not we use ps
+    # since kill will return 'operation not permitted' with a 1 errcode, which
+    # would be interpreted as the pid not existing
+    #if [[ "$UID" -eq 0 ]];then
+    #    kill -0 "$pid" >/dev/null 2>&1; return $?
+    #else
+    #    ps "$pid" >/dev/null 2>&1; return $?
+    #fi
 }
 
-pidfilewrite() {
-    local pid="$1" file="$2"
-    echo "$pid" > "@@runstatedir@@"/beginning/"${file}".pid
-}
+# beginning_pidfile <daemon>
+#   print the pid of a daemon
+beginning_pidfile() {
+    local daemon="${1}"
 
-pidfile() {
-    local pid="$1" file="$2"
-    pidfilewrite "${pid}" "${file}"
-    if pidexists "$pid";then
-        return 0
-    else
-        return 1
-    fi
-}
-
-pidfilekill() {
-    [[ $# -gt 1 ]] && local sig="${1}" && shift
-    if [[ -f "${1}" ]];then
-        local pid=$(<"${1}")
-    elif [[ -f "@@runstatedir@@"/beginning/"${1}".pid ]];then
-        local pid=$(<"@@runstatedir@@"/beginning/"${1}".pid)
-    elif [[ -f "@@runstatedir@@"/"${1}" ]];then
-        local pid=$(<"@@runstatedir@@"/"${1}")
-    elif [[ -f "@@runstatedir@@"/"${1}".pid ]];then
-        local pid=$(<"@@runstatedir@@"/"${1}".pid)
+    if [[ -f "${pid}" ]];then
+        local pid=$(<"${pid}")
+    elif [[ -f "${BEGINNING_PIDDIR}"/"${pid}" ]];then
+        local pid=$(<"${BEGINNING_PIDDIR}"/"${pid}")
+    elif [[ -f "@@runstatedir@@"/"${pid}" ]];then
+        local pid=$(<"@@runstatedir@@"/"${pid}")
+    elif [[ -f "@@runstatedir@@"/"${pid}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/"${pid}".pid)
     else
         return 1
     fi
-    kill ${sig} "$pid" >/dev/null 2>&1
+}
+
+# beginning_pidfile_write <pid> <daemon>
+#   write a pid to ${BEGINNING_PIDDIR}/${daemon}
+beginning_pidfile_write() {
+    local pid="${1}"
+    local daemon="${2}"
+
+    printf '%s' "${pid}" > "${BEGINNING_PIDDIR}"/"${daemon}"
+}
+
+# beginning_pidfile_signal <pid file> [signal]
+#   without [signal], send TERM
+beginning_pidfile_signal() {
+    local pid="${1}"
+    local signal="${2:-SIGTERM}"
+
+    if [[ -f "${pid}" ]];then
+        local pid=$(<"${pid}")
+    elif [[ -f "${BEGINNING_PIDDIR}"/"${pid}" ]];then
+        local pid=$(<"${BEGINNING_PIDDIR}"/"${pid}")
+    elif [[ -f "@@runstatedir@@"/"${pid}" ]];then
+        local pid=$(<"@@runstatedir@@"/"${pid}")
+    elif [[ -f "@@runstatedir@@"/"${pid}".pid ]];then
+        local pid=$(<"@@runstatedir@@"/"${pid}".pid)
+    else
+        return 1
+    fi
+    kill -"${signal}" "${pid}" >/dev/null 2>&1
     return $?
 }
 
-killall5() {
-    for pid in $(pgrep . | egrep -v "^(1|$$|$PPID)$");do
-        disown "$pid" >/dev/null 2>&1 # hide Killed message from bash
-        kill "${1:--15}" "$pid" >/dev/null 2>&1
+# beginning_signal_all [signal]
+# without [signal], send TERM
+beginning_signal_all() {
+    local signal="${1:-SIGTERM}"
+
+    local pid
+    for pid in $(pgrep . | egrep -v "^(1|$$|${PPID})$");do
+        disown "${pid}" >/dev/null 2>&1 # hide Killed message from bash
+        kill -"${signal}" "${pid}" >/dev/null 2>&1
     done
 }
 
-keeprunning() {
-    local err
-    local daemon="$1"
-    shift
-    while [[ "${err:-1}" -ne 0 ]];do
-        local i=$(( ${i:-1} + 1 ))
-        "$@"; local err=$?
-        sleep 1
-        if [[ "$i" -eq 10 ]];then
-            break
-        fi
-    done
-}
+# beginning_set_status <daemon> <status> [custom status message]
+beginning_set_status() {
+    local daemon="${1}"
+    local status="${2,,}"
+    local custom="${3:-}"
 
-rchook() {
-    if func_exists "$@";then
-        status NOTHING "rchook: ${@}"
-        if "$@";then
-            status STARTED "rchook: ${@}"
-        else
-            status FAILURE "rchook: ${@}"
-        fi
+    local daemon_file="${BEGINNING_STATEDIR}"/"${daemon}"
+    if [[ -n "${custom}" ]];then
+        status="${status}:${custom}"
     fi
+
+    printf '%s' "${status}" > "${daemon_file}"
 }
+
