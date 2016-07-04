@@ -1,3 +1,9 @@
+**This project is abandoned.** I've been thoroughly convinced that this is
+a problem being solved well by existing systems, notably the `s6` process
+supervision suite of programs.
+
+This repository will continue to stay up for archival purposes.
+
 # Beginning, an init system that isn't smarter than you
 
 "_Omnium rerum principia parva sunt._" --Marcus Tullius Cicero
